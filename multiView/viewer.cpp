@@ -106,6 +106,7 @@ void Viewer::openOFF(QString filename) {
     double radius;
     MeshTools::computeAveragePosAndRadius(vertices, center, radius);
     updateCamera(center, static_cast<float>(radius));
+
     update();
 }
 
@@ -121,12 +122,12 @@ void Viewer::initCurve(){
     const long nbCP = 4;
     Point control[nbCP];
 
-    startPoint = Point(-10, -10, 0);
-    endPoint = Point(80, -10, 0);
+    startPoint = Point(-50, -30, -30);
+    endPoint = Point(50, -30, -30);
 
     control[0] = startPoint;
-    control[1] = Point(20, 20, 0);
-    control[2] = Point(50, 20, 0);
+    control[1] = Point(-30, -120, -100);
+    control[2] = Point(20, -120, -100);
     control[3] = endPoint;
 
     curve = new Curve(nbCP, control);
@@ -138,10 +139,10 @@ void Viewer::initCurve(){
 }
 
 void Viewer::initPlanes(){
-    leftPlane = new Plane();
-    rightPlane = new Plane();
-    leftPlane->setSize(10.0);
-    rightPlane->setSize(10.0);
+    Axis a = mesh.computeAxis();
+
+    leftPlane = new Plane(10.0, a);
+    rightPlane = new Plane(10.0, a);
 
     leftPlane->setPosition(startPoint.toVec());
     rightPlane->setPosition(endPoint.toVec());

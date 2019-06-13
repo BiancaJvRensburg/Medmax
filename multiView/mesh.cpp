@@ -18,15 +18,9 @@ void Mesh::computeBB(){
     radius = (BBMax - BBMin).norm();
 
     BBCentre = (BBMax + BBMin)/2.0f;
+
+    isInit = true;
 }
-
-/*void Mesh::Zero(){
-    computeBB();
-
-    for(int i=0; i<vertices.size(); i++){
-        vertices[i] -= BBCentre;
-    }
-} */
 
 void Mesh::update(){
     computeBB();
@@ -102,12 +96,15 @@ void Mesh::glTriangle(unsigned int i){
 }
 
 Axis Mesh::computeAxis(){
-    float x = abs(BBMax[0] - BBMin[0]);
-    float y = abs(BBMax[1] - BBMin[1]);
-    float z = abs(BBMax[2] - BBMin[2]);
+    if(isInit){
+        float x = abs(BBMax[0] - BBMin[0]);
+        float y = abs(BBMax[1] - BBMin[1]);
+        float z = abs(BBMax[2] - BBMin[2]);
 
-    if(x>y && x>z) return Axis::X;
-    else if(y>z) return Axis::Y;
+        if(x>y && x>z) return Axis::X;
+        else if(y>z) return Axis::Y;
+        else return Axis::Z;
+    }
     else return Axis::Z;
 }
 

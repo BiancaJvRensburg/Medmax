@@ -62,6 +62,8 @@ protected:
     Vec3Df BBCentre;
     float radius;
 
+    boolean isInit = false;
+
     int normalDirection;
 };
 

@@ -4,12 +4,14 @@
 #include <QGLViewer/qglviewer.h>
 #include <QGLViewer/manipulatedFrame.h>
 
+#include "mesh.h"
+
 using namespace qglviewer;
 
 class Plane
 {
 public:
-    Plane();
+    Plane(double s, Axis a);
     void setSize(double s){ size = s; }
 
     void movePlane(Vec pos);
@@ -22,7 +24,7 @@ private:
     double size;
     ManipulatedFrame normalFrame;
 
-    void initBasePlane();
+    void initBasePlane(Axis a);
 };
 
 #endif // PLANE_H

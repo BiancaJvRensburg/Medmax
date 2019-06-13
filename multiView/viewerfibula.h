@@ -15,6 +15,8 @@ public Q_SLOTS:
     void moveLeftPlane(double);
     void moveRightPlane(double);
 
+    void initCurve();
+
 private:
     int indexOffset;
     int maxOffset;

@@ -37,7 +37,7 @@ protected:
     void updateCamera(const Vec3Df & center, float radius);
 
     virtual void initCurve();
-    virtual void initPlanes();
+    void initPlanes();
 
     Plane *leftPlane;
     Plane *rightPlane;

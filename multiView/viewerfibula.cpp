@@ -44,3 +44,22 @@ void ViewerFibula::moveRightPlane(double percentage){
 
     update();
 }
+
+void ViewerFibula::initCurve(){
+    const long nbCP = 3;
+    Point control[nbCP];
+
+    startPoint = Point(70, 70, -800);
+    endPoint = Point(80, 90, -1200);
+
+    control[0] = startPoint;
+    control[1] = Point(80, 100, -1000);
+    control[2] = endPoint;
+
+    curve = new Curve(nbCP, control);
+
+    nbU = 500;
+    curve->generateBezierCasteljau(nbU);
+
+    initPlanes();
+}
