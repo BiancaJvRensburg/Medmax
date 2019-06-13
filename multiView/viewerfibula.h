@@ -8,20 +8,16 @@ class ViewerFibula : public Viewer
     Q_OBJECT
 
 public:
-    ViewerFibula(QWidget *parent, StandardCamera *camera);
+    ViewerFibula(QWidget *parent, StandardCamera *camera, int sliderMax, int fibulaOffsetMax);
 
 public Q_SLOTS:
     void movePlanes(int);
     void moveLeftPlane(double);
     void moveRightPlane(double);
 
-protected:
-    Vec* initPosition(int side);
-    void createPlane(Vec side);
-    void setMaxDistance(double maxDistance);
-
 private:
-    int lastPos = 0;
+    int indexOffset;
+    int maxOffset;
 };
 
 #endif // VIEWERFIBULA_H

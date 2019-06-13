@@ -28,6 +28,10 @@ private:
 private Q_SLOTS:
     void openSkullMesh();
     void openFibulaMesh();
+
+private:
+    int sliderMax;
+    int fibulaOffsetMax;
 };
 
 #endif // MAINWINDOW_H

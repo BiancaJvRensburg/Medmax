@@ -3,11 +3,13 @@
 #include "Vec3D.h"
 #include <QGLViewer/manipulatedFrame.h>
 
-Viewer::Viewer(QWidget *parent, StandardCamera *cam) : QGLViewer(parent) {
+Viewer::Viewer(QWidget *parent, StandardCamera *cam, int sliderMax) : QGLViewer(parent) {
     // Change the camera.
     Camera *c = camera();
     setCamera(cam);
     delete c;
+
+    this->sliderMax = sliderMax;
 }
 
 void Viewer::draw() {
@@ -39,42 +41,7 @@ void Viewer::init() {
 
   setAxisIsDrawn();
 
-  zIncL = 0;
-  setMaxDistance(50.0);
-
-  mainAxis = Axis::X; // default
-
-  // Set up the planes
-  leftPlane = new Plane();
-  rightPlane = new Plane();
-  leftPlane->setSize(30.0);
-  rightPlane->setSize(30.0);
-
-  lastPosL = 0;
-  lastPosR = 0;
-
-  // The curve
-  const long nbCP = 4;
-  Point control[nbCP];
-
-  startPoint = Point(-10, -10, 0);
-  endPoint = Point(80, -10, 0);
-
-  control[0] = startPoint;
-  control[1] = Point(20, 20, 0);
-  control[2] = Point(50, 20, 0);
-  control[3] = endPoint;
-
-  curve = new Curve(nbCP, control);
-
-  nbU = 100;
-  curve->generateBezierCasteljau(nbU);
-
-  leftPlane->setPosition(startPoint.toVec());
-  rightPlane->setPosition(endPoint.toVec());
-
-  curveIndexR = nbU - 1;
-  curveIndexL = 0;
+  initCurve();
 
   // Set up gl settings
   glEnable(GL_LIGHTING);
@@ -92,43 +59,39 @@ QString Viewer::helpString() const {
   return text;
 }
 
-// TODO : block the slider
-
 void Viewer::moveLeftPlane(int position){
 
-    int change = position - lastPosL;
+    double percentage = static_cast<double>(position) / static_cast<double>(sliderMax);
+    int index = static_cast<int>(percentage * static_cast<double>(nbU) );
 
-    if(change < 0 || curveIndexR > curveIndexL + change){   // Only move if we're going backwards or we haven't met the other plane
-        curveIndexL += change;
+    if(curveIndexR > index){   // Only move if we're going backwards or we haven't met the other plane
+        curveIndexL = index;
 
         if(curveIndexL >= nbU) curveIndexL = nbU-1;
         else if(curveIndexL < 0) curveIndexL = 0;   // shouldn't ever happen
 
         leftPlane->setPosition(curve->getCurve()[curveIndexL].toVec());
 
-        lastPosL = position;
         update();
-        double percentage = position / (2.0 * maxDistance);
         Q_EMIT leftPosChanged(percentage);
     }
 }
 
 void Viewer::moveRightPlane(int position){
 
-    int change = position - lastPosR;
+    double percentage = static_cast<double>(position) / static_cast<double>(sliderMax);
+    int index = nbU - 1 - static_cast<int>(percentage * static_cast<double>(nbU) );
 
-    if(change < 0 || curveIndexR - change > curveIndexL){
-        curveIndexR -= change;  // opposite to L because we start from the end
+    if(index > curveIndexL){
+        curveIndexR = index;
 
         if(curveIndexR >= nbU) curveIndexR = nbU-1;
         else if(curveIndexR < 0) curveIndexR = 0;   // shouldn't ever happen
 
         rightPlane->setPosition(curve->getCurve()[curveIndexR].toVec());
 
-        lastPosR = position;
         update();
-        double percentage = position / (2.0 * maxDistance);
-        Q_EMIT leftPosChanged(percentage);
+        Q_EMIT rightPosChanged(percentage);
     }
 }
 
@@ -137,8 +100,6 @@ void Viewer::openOFF(QString filename) {
     std::vector<Triangle> &triangles = mesh.getTriangles();
 
     FileIO::openOFF(filename.toStdString(), vertices, triangles);
-
-    mainAxis = mesh.computeAxis();
 
     // Set the camera
     Vec3Df center;
@@ -156,14 +117,37 @@ void Viewer::wheelEvent(QWheelEvent *e) {
     QGLViewer::wheelEvent(e);
 }
 
-Vec* Viewer::initPosition(int side){
-    // TODO : change
-    if(side==0) return new Vec(-maxDistance,0,-40);
-    else return new Vec(maxDistance,0,-40);
+void Viewer::initCurve(){
+    const long nbCP = 4;
+    Point control[nbCP];
+
+    startPoint = Point(-10, -10, 0);
+    endPoint = Point(80, -10, 0);
+
+    control[0] = startPoint;
+    control[1] = Point(20, 20, 0);
+    control[2] = Point(50, 20, 0);
+    control[3] = endPoint;
+
+    curve = new Curve(nbCP, control);
+
+    nbU = 1000;
+    curve->generateBezierCasteljau(nbU);
+
+    initPlanes();
 }
 
-double Viewer::getMaxDistance(){ return maxDistance; }
-void Viewer::setMaxDistance(double mD){ maxDistance = mD; }
+void Viewer::initPlanes(){
+    leftPlane = new Plane();
+    rightPlane = new Plane();
+    leftPlane->setSize(10.0);
+    rightPlane->setSize(10.0);
+
+    leftPlane->setPosition(startPoint.toVec());
+    rightPlane->setPosition(endPoint.toVec());
+    curveIndexR = nbU - 1;
+    curveIndexL = 0;
+}
 
 void Viewer::updateCamera(const Vec3Df & center, float radius){
     camera()->setSceneCenter(Vec(static_cast<double>(center[0]), static_cast<double>(center[1]), static_cast<double>(center[2])));

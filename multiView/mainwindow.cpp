@@ -13,15 +13,18 @@ MainWindow::MainWindow(QWidget *parent)
         this->setObjectName("window");
     this->resize(929, 891);
 
+    sliderMax = 100;
+    fibulaOffsetMax = 100;
+
     // The qglviewer
     //QString skullFilename = "C:\\Users\\Medmax\\Documents\\Project\\Mand_B.off";
     StandardCamera *sc = new StandardCamera();
-    skullViewer = new Viewer(this, sc);
+    skullViewer = new Viewer(this, sc, sliderMax);
 
     // The fibula viewer
     //QString fibulaFilename = "C:\\Users\\Medmax\\Documents\\Project\\Fibula_G.off";
     StandardCamera *scFibula = new StandardCamera();
-    fibulaViewer = new ViewerFibula(this, scFibula);
+    fibulaViewer = new ViewerFibula(this, scFibula, sliderMax, fibulaOffsetMax);
 
     // Main widget
     QWidget *mainWidget = new QWidget(this);
@@ -70,9 +73,11 @@ void MainWindow::initDisplayDockWidgets(){
 
     // Add the sliders (skull)
     QSlider *leftPlaneSilder = new QSlider(Qt::Horizontal);
+    leftPlaneSilder->setMaximum(sliderMax);
     contentLayout->addRow("Left slider", leftPlaneSilder);
 
     QSlider *rightPlaneSilder = new QSlider(Qt::Horizontal);
+    rightPlaneSilder->setMaximum(sliderMax);
     contentLayout->addRow("Right slider", rightPlaneSilder);
 
     // Connect the skull sliders
@@ -82,6 +87,8 @@ void MainWindow::initDisplayDockWidgets(){
     // Add the slider (fibula)
     QSlider *fibulaSlider = new QSlider(Qt::Horizontal);
     contentLayout->addRow("Fibula position slider", fibulaSlider);
+    fibulaSlider->setMinimum(-fibulaOffsetMax);
+    fibulaSlider->setMaximum(fibulaOffsetMax);
 
     // Connect the fibula slider
     connect(fibulaSlider, static_cast<void (QSlider::*)(int)>(&QSlider::sliderMoved), fibulaViewer, &ViewerFibula::movePlanes);

@@ -16,7 +16,7 @@ class Viewer : public QGLViewer
     Q_OBJECT
 
 public :
-    Viewer(QWidget *parent, StandardCamera *camera);
+    Viewer(QWidget *parent, StandardCamera *camera, int sliderMax);
    // ~Viewer();
     void openOFF(QString f);
     Mesh mesh;
@@ -34,31 +34,22 @@ protected:
     void init();
     QString helpString() const;
     void wheelEvent(QWheelEvent *e);
-    //virtual void createPlane(Vec side);
-    virtual Vec *initPosition(int side);
-    virtual void setMaxDistance(double maxDistance);
-    double getMaxDistance();
-    /*Vec *rightPos;
-    Vec *leftPos;*/
-    Axis mainAxis;
     void updateCamera(const Vec3Df & center, float radius);
-    //QString filename;
+
+    virtual void initCurve();
+    virtual void initPlanes();
+
     Plane *leftPlane;
     Plane *rightPlane;
     Curve *curve;
-
-private:
-    int zIncL;
-    int zIncR;
-    int lastPosL;
-    int lastPosR;
-    double maxDistance;
 
     Point startPoint;
     Point endPoint;
     int curveIndexL;
     int curveIndexR;
     int nbU;
+    int sliderMax;
+
 };
 
 #endif // VIEWER_H
