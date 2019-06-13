@@ -13,24 +13,19 @@ Viewer::Viewer(QWidget *parent, StandardCamera *cam) : QGLViewer(parent) {
 void Viewer::draw() {
     glPushMatrix();   // Push the current modelView
     glMultMatrixd(manipulatedFrame()->matrix());  // Multiply the modelView by a manipulated frame
-    //drawAxis();
-
-    //glPolygonOffset (-1.0, 1.0);
+    drawAxis();
 
     glColor3f(1.,1.,1.);
     mesh.draw();
 
-    /*glColor3f(1.0, 0, 0);
-    createPlane(*leftPos);
+    glColor3f(1.0, 0, 0);
+    leftPlane->draw();
 
     glColor3f(0, 1.0, 0);
-    createPlane(*rightPos);*/
+    rightPlane->draw();
 
-    glColor3f(1.0, 0, 0);
-    leftPlane->movePlane(new Vec(0,0,0), new Vec(1,1,1));
-
-    /*glColor3f(0, 1.0, 0);
-    rightPlane->movePlane(new Vec(0,0,0), new Vec(1,1,1));*/
+    curve->draw();
+    curve->drawControl();
 
     glPopMatrix();    // Bring back the modelView
 }
@@ -42,26 +37,44 @@ void Viewer::init() {
   // Create the manipulated frame which will allow us to rotate the view
   setManipulatedFrame(new ManipulatedFrame());
 
-  //setAxisIsDrawn();
+  setAxisIsDrawn();
 
   zIncL = 0;
   setMaxDistance(50.0);
 
-  //camera()->fitSphere(Vec(0,0,0), 100);
-
   mainAxis = Axis::X; // default
-
-  // Open and read the mesh file
-  //openOFF();
-
-  /*leftPos = initPosition(0);
-  rightPos = initPosition(1);*/
 
   // Set up the planes
   leftPlane = new Plane();
   rightPlane = new Plane();
   leftPlane->setSize(30.0);
   rightPlane->setSize(30.0);
+
+  lastPosL = 0;
+  lastPosR = 0;
+
+  // The curve
+  const long nbCP = 4;
+  Point control[nbCP];
+
+  startPoint = Point(-10, -10, 0);
+  endPoint = Point(80, -10, 0);
+
+  control[0] = startPoint;
+  control[1] = Point(20, 20, 0);
+  control[2] = Point(50, 20, 0);
+  control[3] = endPoint;
+
+  curve = new Curve(nbCP, control);
+
+  nbU = 100;
+  curve->generateBezierCasteljau(nbU);
+
+  leftPlane->setPosition(startPoint.toVec());
+  rightPlane->setPosition(endPoint.toVec());
+
+  curveIndexR = nbU - 1;
+  curveIndexL = 0;
 
   // Set up gl settings
   glEnable(GL_LIGHTING);
@@ -79,99 +92,59 @@ QString Viewer::helpString() const {
   return text;
 }
 
-/*void Viewer::createPlane(Vec side){
-    float size = 20.0f;
-
-    float x = static_cast<float>(side.x);
-    float y = static_cast<float>(side.y);
-    float z = static_cast<float>(side.z);
-
-    switch (mainAxis) {
-      case Axis::X:
-        glBegin(GL_QUADS);
-            glVertex3f(x, y - size, z - size);
-            glVertex3f(x, y + size, z - size);
-            glVertex3f(x, y + size, z + size);
-            glVertex3f(x, y - size, z + size);
-        glEnd();
-        break;
-
-      case Axis::Y:
-        glBegin(GL_QUADS);
-            glVertex3f(x - size, y, z - size);
-            glVertex3f(x + size, y, z - size);
-            glVertex3f(x + size, y, z + size);
-            glVertex3f(x - size, y, z + size);
-        glEnd();
-        break;
-
-      case Axis::Z:
-        glBegin(GL_QUADS);
-            glVertex3f(x - size, y - size, z);
-            glVertex3f(x - size, y + size, z);
-            glVertex3f(x + size, y + size, z);
-            glVertex3f(x + size, y - size, z);
-        glEnd();
-        break;
-    }
-}*/
-
 // TODO : block the slider
 
 void Viewer::moveLeftPlane(int position){
-    /*if(position <= 2*maxDistance - zIncR){
-        zIncL = position;
 
-        switch (mainAxis) {
-          case Axis::X:
-            leftPos->x = - maxDistance + zIncL;
-            break;
+    int change = position - lastPosL;
 
-          case Axis::Y:
-            leftPos->y = - maxDistance + zIncL;
-            break;
+    if(change < 0 || curveIndexR > curveIndexL + change){   // Only move if we're going backwards or we haven't met the other plane
+        curveIndexL += change;
 
-          case Axis::Z:
-              leftPos->z = - maxDistance + zIncL;
-              break;
+        if(curveIndexL >= nbU) curveIndexL = nbU-1;
+        else if(curveIndexL < 0) curveIndexL = 0;   // shouldn't ever happen
 
-        }
+        leftPlane->setPosition(curve->getCurve()[curveIndexL].toVec());
+
+        lastPosL = position;
         update();
         double percentage = position / (2.0 * maxDistance);
         Q_EMIT leftPosChanged(percentage);
-    }*/
+    }
 }
 
 void Viewer::moveRightPlane(int position){
-    /*if(position <= 2*maxDistance - zIncL){
-        zIncR = position;
-        rightPos->x = maxDistance - zIncR;
-        update();
 
+    int change = position - lastPosR;
+
+    if(change < 0 || curveIndexR - change > curveIndexL){
+        curveIndexR -= change;  // opposite to L because we start from the end
+
+        if(curveIndexR >= nbU) curveIndexR = nbU-1;
+        else if(curveIndexR < 0) curveIndexR = 0;   // shouldn't ever happen
+
+        rightPlane->setPosition(curve->getCurve()[curveIndexR].toVec());
+
+        lastPosR = position;
+        update();
         double percentage = position / (2.0 * maxDistance);
-        Q_EMIT rightPosChanged(percentage);
-    }*/
+        Q_EMIT leftPosChanged(percentage);
+    }
 }
 
 void Viewer::openOFF(QString filename) {
-
-    //clear();
-
     std::vector<Vec3Df> &vertices = mesh.getVertices();
     std::vector<Triangle> &triangles = mesh.getTriangles();
 
     FileIO::openOFF(filename.toStdString(), vertices, triangles);
 
-    // mesh.Zero();
     mainAxis = mesh.computeAxis();
 
     // Set the camera
-    //std::vector<Vec3Df> &vertices = mesh.getVertices();
     Vec3Df center;
     double radius;
     MeshTools::computeAveragePosAndRadius(vertices, center, radius);
-    updateCamera(center, radius);
-
+    updateCamera(center, static_cast<float>(radius));
     update();
 }
 
@@ -184,14 +157,9 @@ void Viewer::wheelEvent(QWheelEvent *e) {
 }
 
 Vec* Viewer::initPosition(int side){
-    if(side==0){
-
-        return new Vec(-maxDistance,0,-40);
-    }
-    else{
-
-        return new Vec(maxDistance,0,-40);
-    }
+    // TODO : change
+    if(side==0) return new Vec(-maxDistance,0,-40);
+    else return new Vec(maxDistance,0,-40);
 }
 
 double Viewer::getMaxDistance(){ return maxDistance; }

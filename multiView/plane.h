@@ -2,6 +2,7 @@
 #define PLANE_H
 
 #include <QGLViewer/qglviewer.h>
+#include <QGLViewer/manipulatedFrame.h>
 
 using namespace qglviewer;
 
@@ -9,31 +10,19 @@ class Plane
 {
 public:
     Plane();
-    Plane(Vec* position, Vec* normal);
-
-    Vec* getPosition(){ return position; }
-    Vec* getNormal(){ return normal; }
-    void setPosition(Vec* pos){ position = pos; }
-    void setNormal(Vec* norm){ normal = norm; }
     void setSize(double s){ size = s; }
 
-    void movePlane(Vec* pos, Vec* norm);
+    void movePlane(Vec pos);
+    void setPosition(const qglviewer::Vec &pos) { normalFrame.setPosition(pos); }
+    void draw();
 
 private:
-    Vec *position;
-    Vec *normal;
-    Vec *normalRotation;
-    Vec *positionTranslation;
+    Vec *position;  // In relation to the normal, this is what will be adjusted with the manipulators
     Vec* points[4];
     double size;
+    ManipulatedFrame normalFrame;
 
     void initBasePlane();
-    void adjustPointsNormal();
-    void adjustPointsPosition();
-    void movePosition(double x, double y, double z);
-    void adjustNormal(double x, double y, double z);
-
-    void draw();
 };
 
 #endif // PLANE_H

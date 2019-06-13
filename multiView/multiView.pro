@@ -10,19 +10,23 @@ TEMPLATE = app
 TARGET   = multiView
 
 HEADERS  = \
+    curve.h \
     mainwindow.h \
     mesh.h \
     meshreader.h \
     plane.h \
+    point.h \
     standardcamera.h \
     viewer.h \
     Triangle.h \
     Vec3D.h \
     viewerfibula.h
 SOURCES  = main.cpp \
+    curve.cpp \
     mainwindow.cpp \
     mesh.cpp \
     plane.cpp \
+    point.cpp \
     standardcamera.cpp \
     viewer.cpp \
     viewerfibula.cpp

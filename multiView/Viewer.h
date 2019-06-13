@@ -6,6 +6,8 @@
 #include "mesh.h"
 #include "standardcamera.h"
 #include "plane.h"
+#include "curve.h"
+#include "point.h"
 
 using namespace qglviewer;
 
@@ -43,11 +45,20 @@ protected:
     //QString filename;
     Plane *leftPlane;
     Plane *rightPlane;
+    Curve *curve;
 
 private:
     int zIncL;
     int zIncR;
+    int lastPosL;
+    int lastPosR;
     double maxDistance;
+
+    Point startPoint;
+    Point endPoint;
+    int curveIndexL;
+    int curveIndexR;
+    int nbU;
 };
 
 #endif // VIEWER_H
