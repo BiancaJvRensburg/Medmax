@@ -9,6 +9,22 @@ public:
     Point();
     Point(double x, double y, double z);
 
+    Point operator-(const Point& p){
+        Point r;
+        r.setX(this->x - p.x);
+        r.setY(this->y - p.y);
+        r.setZ(this->z - p.z);
+        return r;
+    }
+
+    Point operator*(const long& n){
+        Point r;
+        r.setX(this->x * n);
+        r.setY(this->y * n);
+        r.setZ(this->z * n);
+        return r;
+    }
+
     double getX(){ return x;}
     double getY(){ return y;}
     double getZ(){ return z;}

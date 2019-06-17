@@ -38,6 +38,8 @@ protected:
 
     virtual void initCurve();
     void initPlanes();
+    Quaternion getNewOrientationL();
+    Quaternion getNewOrientationR();
 
     Plane *leftPlane;
     Plane *rightPlane;
@@ -49,6 +51,8 @@ protected:
     int curveIndexR;
     int nbU;
     int sliderMax;
+    Vec previousOrientationL;
+    Vec previousOrientationR;
 
 };
 

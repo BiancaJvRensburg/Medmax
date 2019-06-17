@@ -11,7 +11,6 @@ Curve::Curve(long nbCP)
 Curve::Curve(long nbCP, Point cntrlPoints[]){
     TabControlPoint = new Point[nbCP];
     nbControlPoint = nbCP;
-    nbCntrl = nbCP - 1;
 
         // TODO : add size protection
 
@@ -20,54 +19,29 @@ Curve::Curve(long nbCP, Point cntrlPoints[]){
     }
 }
 
-void Curve::generateBezierBernstein(long n)
-{
-    nbU = n;
-    curve = new Point[nbU];
-
-    Point sum;
-
-  for(int j=0; j<nbU; j++){
-    double u = 1 / double(nbU) * j;
-    double sumx = 0.0;
-    double sumy = 0.0;
-    double sumz = 0.0;
-   for(int i=0; i<=nbCntrl; i++){
-      double coef = newton(double(i), double(nbCntrl)) * pow(u, i) * pow(1.0 - u, nbCntrl - i);
-      sumx += coef * TabControlPoint[i].getX();
-      sumy += coef * TabControlPoint[i].getY();
-      sumz += coef * TabControlPoint[i].getZ();
-    }
-    curve[j] = Point(sumx, sumy, sumz);
-  }
-}
-
-double Curve::newton(double i, double n)
-{
-  return factorial(n) / (factorial(i) * factorial(n-i));
-}
-
-double Curve::factorial(double n){
-  if(n==0.0) return 1;
-  else return n * factorial(n-1);
-}
-
 void Curve::generateBezierCasteljau(long n)
 {
-    nbU = n;
-    curve = new Point[nbU];
+    curve = casteljau(TabControlPoint, nbControlPoint, n);
+    dt = derivative();
+}
 
-  double x, y, z;
-  for(int i=0; i<nbU; i++){
-    double u = 1 / double(nbU-1) * i;
-    //double coef = pow(1.0 - u, nbControlPoint);
-    double coef = 1.0;
-    Point * p = finalPoint(TabControlPoint, nbControlPoint, u);
-    x = p->getX() * coef;
-    y = p->getY() * coef;
-    z = p->getZ() * coef;
-    curve[i] = Point(x,y,z);
-  }
+Point* Curve::casteljau(Point TabControlPoint[], long nbControlPoint, long n){
+    nbU = n;
+    Point* c = new Point[nbU];
+
+    double x, y, z;
+    for(int i=0; i<nbU; i++){
+        double u = 1 / double(nbU-1) * i;
+        //double coef = pow(1.0 - u, nbControlPoint);
+        double coef = 1.0;
+        Point * p = finalPoint(TabControlPoint, nbControlPoint, u);
+        x = p->getX() * coef;
+        y = p->getY() * coef;
+        z = p->getZ() * coef;
+        c[i] = Point(x,y,z);
+    }
+
+    return c;
 }
 
 Point* Curve::finalPoint(Point TabControlPoint[], long nbControlPoint, double u){
@@ -109,3 +83,78 @@ void Curve::drawControl(){
 
       glEnd();
 }
+
+void Curve::drawDerative(){
+    Point * der = derivative();
+
+    glBegin(GL_LINE_STRIP);
+    glColor3f(0.0, 1.0, 1.0);
+
+    for(int i=0; i<nbU; i++){
+      Point p = der[i];
+      glVertex3f(p.getX(), p.getY(), p.getZ());
+    }
+
+    glEnd();
+}
+
+// Frenet frame
+Point* Curve::derivative(){
+    const long nbCP = nbControlPoint -1;
+
+    if(nbCP<1) return NULL;
+
+    Point control[nbCP];
+
+    for(int i=0; i<nbCP; i++){
+        control[i] = Point( (TabControlPoint[i+1].getX() - TabControlPoint[i].getX()) * nbCP,
+                (TabControlPoint[i+1].getY() - TabControlPoint[i].getY()) * nbCP,
+                (TabControlPoint[i+1].getZ() - TabControlPoint[i].getZ()) * nbCP);
+    }
+
+    return casteljau(control, nbCP, nbU);
+}
+
+Vec Curve::tangent(int index){
+    Vec t = Vec(dt[index].getX(), dt[index].getY(), dt[index].getZ());
+    t.normalize();
+
+    return t;
+}
+
+void Curve::drawTangent(int index){
+    Vec t = tangent(index);
+
+    glBegin(GL_LINES);
+    glColor3f(0.0, 1.0, 1.0);
+      glVertex3f(curve[index].getX(), curve[index].getY(), curve[index].getZ());
+      glVertex3f(curve[index].getX() + t.x*10, curve[index].getY() + t.y*10, curve[index].getZ() + t.z*10);
+    glEnd();
+}
+
+/*Curve* Curve::derivative(){
+    const long nbCP = nbControlPoint -1;
+
+    std::cout << "deriving" << std::endl;
+
+    if(nbCP<1) return NULL;
+
+    Point control[nbCP];
+
+    for(int i=0; i<nbCP; i++){
+        control[i] = Point( (TabControlPoint[i+1].getX() - TabControlPoint[i].getX()) * nbControlPoint,
+                (TabControlPoint[i+1].getY() - TabControlPoint[i].getY()) * nbControlPoint,
+                (TabControlPoint[i+1].getZ() - TabControlPoint[i].getZ()) * nbControlPoint);
+    }
+
+    for(int i=0; i<nbCP; i++){
+        std::cout << control[i].getX() << " " << control->getY() << " " << control->getZ() << std::endl;
+    }
+
+    Curve* c = new Curve(nbCP, control);
+    c->generateBezierCasteljau(nbU);
+
+    std::cout << "generated" << std::endl;
+
+    return new Curve();
+}*/

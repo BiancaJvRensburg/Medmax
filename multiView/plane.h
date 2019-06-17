@@ -16,6 +16,8 @@ public:
 
     void movePlane(Vec pos);
     void setPosition(const qglviewer::Vec &pos) { normalFrame.setPosition(pos); }
+    void setOrientation(Quaternion q){ normalFrame.setOrientation(q); }
+    Quaternion getOrientation();
     void draw();
 
 private:
