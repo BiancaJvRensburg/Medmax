@@ -16,6 +16,8 @@ public:
     void generateBezierCasteljau(long nbU);
     Point* getCurve(){ return curve; }
 
+    Vec tangent(int index);
+
     void draw();
     void drawControl();
     void drawDerative();
@@ -33,7 +35,13 @@ private:
     // Frenet frame
     Point* derivative();
     Point* dt;
-    Vec tangent(int index);
+    Point* dtControl;
+
+    Point* secondDerivative();
+    Vec normal(int index);
+    Point* norm;
+
+    Vec binormal(Vec tangent, Vec norm);
 
 };
 

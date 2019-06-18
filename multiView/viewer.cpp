@@ -21,16 +21,15 @@ void Viewer::draw() {
     mesh.draw();
 
     glColor3f(1.0, 0, 0);
-    leftPlane->draw();
+    //leftPlane->draw();
 
     glColor3f(0, 1.0, 0);
-    rightPlane->draw();
+   // rightPlane->draw();
 
     curve->draw();
     curve->drawControl();
     //curve->drawDerative();
-
-    curve->drawTangent(50);
+    curve->drawTangent(curveIndexL);
 
     glPopMatrix();    // Bring back the modelView
 }
@@ -158,7 +157,7 @@ void Viewer::initPlanes(){
     leftPlane->setOrientation(Quaternion(0,0,1,0));
     rightPlane->setOrientation(Quaternion(0,0,1,0));
 
-    previousOrientationL = Vec(0,-1,0);
+    previousOrientationL = curve->tangent(0);
     previousOrientationR = Vec(0,-1,0);
 }
 
@@ -176,7 +175,7 @@ Quaternion Viewer::getNewOrientationL(){
     if(curveIndexL < nbU-1) next = Vec(curve->getCurve()[curveIndexL+1].toVec());
     else next = current;
 
-    Vec newOrientation = Vec(next.x - current.x, next.y - current.y, next.z - current.z);
+    Vec newOrientation = curve->tangent(curveIndexL);
 
    /* std::cout << "Current : " << current.x << " " << current.y << " " << current.z;
     std::cout << " Next : " << next.x << " " << next.y << " " << next.z << std::endl;*/

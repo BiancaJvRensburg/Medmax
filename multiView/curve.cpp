@@ -23,6 +23,7 @@ void Curve::generateBezierCasteljau(long n)
 {
     curve = casteljau(TabControlPoint, nbControlPoint, n);
     dt = derivative();
+    norm = secondDerivative();
 }
 
 Point* Curve::casteljau(Point TabControlPoint[], long nbControlPoint, long n){
@@ -100,7 +101,7 @@ void Curve::drawDerative(){
 
 // Frenet frame
 Point* Curve::derivative(){
-    const long nbCP = nbControlPoint -1;
+    const long nbCP = nbControlPoint - 1;
 
     if(nbCP<1) return NULL;
 
@@ -110,6 +111,24 @@ Point* Curve::derivative(){
         control[i] = Point( (TabControlPoint[i+1].getX() - TabControlPoint[i].getX()) * nbCP,
                 (TabControlPoint[i+1].getY() - TabControlPoint[i].getY()) * nbCP,
                 (TabControlPoint[i+1].getZ() - TabControlPoint[i].getZ()) * nbCP);
+    }
+
+    dtControl = control;
+
+    return casteljau(control, nbCP, nbU);
+}
+
+Point* Curve::secondDerivative(){
+    const long nbCP = nbControlPoint - 2;
+
+    if(nbCP<1) return NULL;
+
+    Point control[nbCP];
+
+    for(int i=0; i<nbCP; i++){
+        control[i] = Point( (dtControl[i+1].getX() - dtControl[i].getX()) * nbCP,
+                (dtControl[i+1].getY() - dtControl[i].getY()) * nbCP,
+                (dtControl[i+1].getZ() - dtControl[i].getZ()) * nbCP);
     }
 
     return casteljau(control, nbCP, nbU);
@@ -122,39 +141,41 @@ Vec Curve::tangent(int index){
     return t;
 }
 
+Vec Curve::normal(int index){
+    Vec n = Vec(norm[index].getX(), norm[index].getY(), norm[index].getZ());
+    n.normalize();
+
+    return n;
+}
+
+Vec Curve::binormal(Vec tangent, Vec normal){
+    return cross(tangent, normal);
+}
+
 void Curve::drawTangent(int index){
     Vec t = tangent(index);
+    Vec n = normal(index);
+    Vec b = binormal(t, n);
+
+    glColor3f(0.0, 1.0, 1.0);
+    glLineWidth(3);
 
     glBegin(GL_LINES);
-    glColor3f(0.0, 1.0, 1.0);
       glVertex3f(curve[index].getX(), curve[index].getY(), curve[index].getZ());
       glVertex3f(curve[index].getX() + t.x*10, curve[index].getY() + t.y*10, curve[index].getZ() + t.z*10);
     glEnd();
+
+    glColor3f(1.0, 0.0, 1.0);
+    glBegin(GL_LINES);
+      glVertex3f(curve[index].getX(), curve[index].getY(), curve[index].getZ());
+      glVertex3f(curve[index].getX() + n.x*10, curve[index].getY() + n.y*10, curve[index].getZ() + n.z*10);
+    glEnd();
+
+    glColor3f(1.0, 1.0, 0.0);
+    glBegin(GL_LINES);
+      glVertex3f(curve[index].getX(), curve[index].getY(), curve[index].getZ());
+      glVertex3f(curve[index].getX() + b.x*10, curve[index].getY() + b.y*10, curve[index].getZ() + b.z*10);
+    glEnd();
+
+    glLineWidth(1);
 }
-
-/*Curve* Curve::derivative(){
-    const long nbCP = nbControlPoint -1;
-
-    std::cout << "deriving" << std::endl;
-
-    if(nbCP<1) return NULL;
-
-    Point control[nbCP];
-
-    for(int i=0; i<nbCP; i++){
-        control[i] = Point( (TabControlPoint[i+1].getX() - TabControlPoint[i].getX()) * nbControlPoint,
-                (TabControlPoint[i+1].getY() - TabControlPoint[i].getY()) * nbControlPoint,
-                (TabControlPoint[i+1].getZ() - TabControlPoint[i].getZ()) * nbControlPoint);
-    }
-
-    for(int i=0; i<nbCP; i++){
-        std::cout << control[i].getX() << " " << control->getY() << " " << control->getZ() << std::endl;
-    }
-
-    Curve* c = new Curve(nbCP, control);
-    c->generateBezierCasteljau(nbU);
-
-    std::cout << "generated" << std::endl;
-
-    return new Curve();
-}*/
