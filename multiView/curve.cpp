@@ -23,7 +23,7 @@ void Curve::generateBezierCasteljau(long n)
 {
     curve = casteljau(TabControlPoint, nbControlPoint, n);
     dt = derivative();
-    norm = secondDerivative();
+    d2t = secondDerivative();
 }
 
 Point* Curve::casteljau(Point TabControlPoint[], long nbControlPoint, long n){
@@ -85,20 +85,6 @@ void Curve::drawControl(){
       glEnd();
 }
 
-void Curve::drawDerative(){
-    Point * der = derivative();
-
-    glBegin(GL_LINE_STRIP);
-    glColor3f(0.0, 1.0, 1.0);
-
-    for(int i=0; i<nbU; i++){
-      Point p = der[i];
-      glVertex3f(p.getX(), p.getY(), p.getZ());
-    }
-
-    glEnd();
-}
-
 // Frenet frame
 Point* Curve::derivative(){
     const long nbCP = nbControlPoint - 1;
@@ -142,20 +128,30 @@ Vec Curve::tangent(int index){
 }
 
 Vec Curve::normal(int index){
-    Vec n = Vec(norm[index].getX(), norm[index].getY(), norm[index].getZ());
-    n.normalize();
-
-    return n;
+    return cross(binormal(index), tangent(index));
 }
 
-Vec Curve::binormal(Vec tangent, Vec normal){
-    return cross(tangent, normal);
+Vec Curve::binormal(int index){
+    Vec b = cross(Vec(dt[index].getX(), dt[index].getY(), dt[index].getZ()), Vec(d2t[index].getX(), d2t[index].getY(), d2t[index].getZ()));
+    b.normalize();
+
+    return b;
+}
+
+Vec Curve::orientation(int index){
+    Vec t = tangent(index);
+    Vec n = normal(index);
+    Vec b = binormal(index);
+
+    Vec newOrientation = n + t + b;
+
+    return newOrientation;
 }
 
 void Curve::drawTangent(int index){
     Vec t = tangent(index);
     Vec n = normal(index);
-    Vec b = binormal(t, n);
+    Vec b = binormal(index);
 
     glColor3f(0.0, 1.0, 1.0);
     glLineWidth(3);
@@ -175,6 +171,16 @@ void Curve::drawTangent(int index){
     glBegin(GL_LINES);
       glVertex3f(curve[index].getX(), curve[index].getY(), curve[index].getZ());
       glVertex3f(curve[index].getX() + b.x*10, curve[index].getY() + b.y*10, curve[index].getZ() + b.z*10);
+    glEnd();
+
+    Vec newOrientation = orientation(index);
+    //std::cout << "index " << index << std::endl;
+    //std::cout << " Real orientation " << newOrientation.x << " " << newOrientation.y << " " << newOrientation.z << std::endl;
+
+    glColor3f(1.0, 0.0, 0.0);
+    glBegin(GL_LINES);
+      glVertex3f(curve[index].getX(), curve[index].getY(), curve[index].getZ());
+      glVertex3f(curve[index].getX() + newOrientation.x*10, curve[index].getY() + newOrientation.y*10, curve[index].getZ() + newOrientation.z*10);
     glEnd();
 
     glLineWidth(1);

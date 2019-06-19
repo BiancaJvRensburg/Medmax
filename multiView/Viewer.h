@@ -51,8 +51,6 @@ protected:
     int curveIndexR;
     int nbU;
     int sliderMax;
-    Vec previousOrientationL;
-    Vec previousOrientationR;
 
 };
 

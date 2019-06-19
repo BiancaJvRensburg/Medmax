@@ -21,14 +21,13 @@ void Viewer::draw() {
     mesh.draw();
 
     glColor3f(1.0, 0, 0);
-    //leftPlane->draw();
+    leftPlane->draw();
 
     glColor3f(0, 1.0, 0);
-   // rightPlane->draw();
+    rightPlane->draw();
 
     curve->draw();
     curve->drawControl();
-    //curve->drawDerative();
     curve->drawTangent(curveIndexL);
 
     glPopMatrix();    // Bring back the modelView
@@ -143,22 +142,18 @@ void Viewer::initCurve(){
 }
 
 void Viewer::initPlanes(){
-    Axis a = mesh.computeAxis();
-    a = Axis::Y;
 
-    leftPlane = new Plane(10.0, a);
-    rightPlane = new Plane(10.0, a);
+    leftPlane = new Plane(10.0);
+    rightPlane = new Plane(10.0);
 
     leftPlane->setPosition(startPoint.toVec());
     rightPlane->setPosition(endPoint.toVec());
     curveIndexR = nbU - 1;
     curveIndexL = 0;
 
-    leftPlane->setOrientation(Quaternion(0,0,1,0));
-    rightPlane->setOrientation(Quaternion(0,0,1,0));
+    leftPlane->setOrientation(getNewOrientationL());
+    rightPlane->setOrientation(getNewOrientationR());
 
-    previousOrientationL = curve->tangent(0);
-    previousOrientationR = Vec(0,-1,0);
 }
 
 void Viewer::updateCamera(const Vec3Df & center, float radius){
@@ -168,50 +163,34 @@ void Viewer::updateCamera(const Vec3Df & center, float radius){
 }
 
 Quaternion Viewer::getNewOrientationL(){
-    Quaternion q;
-    Vec rot, current, next;
+    Quaternion s;
+    Vec current, next;
 
     current = Vec(curve->getCurve()[curveIndexL].toVec());
     if(curveIndexL < nbU-1) next = Vec(curve->getCurve()[curveIndexL+1].toVec());
     else next = current;
 
-    Vec newOrientation = curve->tangent(curveIndexL);
+    Vec binorm = curve->binormal(curveIndexL);
+    //Vec norm = curve->normal(curveIndexL);
 
-   /* std::cout << "Current : " << current.x << " " << current.y << " " << current.z;
-    std::cout << " Next : " << next.x << " " << next.y << " " << next.z << std::endl;*/
-
-    rot = Vec(1,0,0);
-    //rot = cross(newOrientation, previousOrientationL);
-    double angle = sqrt( previousOrientationL*previousOrientationL * newOrientation*newOrientation) + previousOrientationL*newOrientation;
-
-    //previousOrientationL = Vec(newOrientation.x, newOrientation.y, newOrientation.z);
-
-    std::cout << angle << std::endl;
-
-    q = Quaternion(angle, rot.x, rot.y, rot.z);
-
-    return q.normalized();
+    s = Quaternion(Vec(0,0,1), binorm);
+    return s.normalized();
 }
 
 Quaternion Viewer::getNewOrientationR(){
-    Quaternion q;
+    Quaternion q,s;
     Vec rot, current, next;
 
     current = Vec(curve->getCurve()[curveIndexR].toVec());
     if(curveIndexR > 0) next = Vec(curve->getCurve()[curveIndexR-1].toVec());
     else next = current;
 
-    Vec newOrientation = Vec(next.x - current.x, next.y - current.y, next.z - current.z);
+    Vec binorm = curve->binormal(curveIndexR);
 
-    rot = Vec(1,0,0);
-    //rot = cross(previousOrientationR, newOrientation);
-    double angle = sqrt( (previousOrientationR*previousOrientationR) * (newOrientation*newOrientation)) + previousOrientationR*newOrientation;
+    s = Quaternion(Vec(0,0,1), binorm);
+    return s.normalized();
 
-    //previousOrientationR = newOrientation;
-
-    q = Quaternion(angle, rot.x, rot.y, rot.z);
-
-    return q.normalized();
 }
+
 
 

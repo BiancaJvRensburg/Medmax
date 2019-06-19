@@ -17,15 +17,18 @@ public:
     Point* getCurve(){ return curve; }
 
     Vec tangent(int index);
+    Vec binormal(int index);
+    Vec normal(int index);
+
+    Vec orientation(int index);
 
     void draw();
     void drawControl();
-    void drawDerative();
     void drawTangent(int index);
 
 private:
     Point* TabControlPoint;
-    long nbControlPoint;    // the actual size of the control table
+    long nbControlPoint;
     Point* curve;
     long nbU;
 
@@ -38,10 +41,7 @@ private:
     Point* dtControl;
 
     Point* secondDerivative();
-    Vec normal(int index);
-    Point* norm;
-
-    Vec binormal(Vec tangent, Vec norm);
+    Point* d2t;
 
 };
 

@@ -11,13 +11,13 @@ using namespace qglviewer;
 class Plane
 {
 public:
-    Plane(double s, Axis a);
+    Plane(double s);
     void setSize(double s){ size = s; }
 
     void movePlane(Vec pos);
     void setPosition(const qglviewer::Vec &pos) { normalFrame.setPosition(pos); }
     void setOrientation(Quaternion q){ normalFrame.setOrientation(q); }
-    Quaternion getOrientation();
+    void rotate(Quaternion q) { normalFrame.rotate(q); }
     void draw();
 
 private:
@@ -26,7 +26,7 @@ private:
     double size;
     ManipulatedFrame normalFrame;
 
-    void initBasePlane(Axis a);
+    void initBasePlane();
 };
 
 #endif // PLANE_H
