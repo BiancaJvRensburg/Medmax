@@ -12,8 +12,6 @@ Curve::Curve(long nbCP, Point cntrlPoints[]){
     TabControlPoint = new Point[nbCP];
     nbControlPoint = nbCP;
 
-        // TODO : add size protection
-
     for(int i=0; i<nbCP; i++){
         TabControlPoint[i] = cntrlPoints[i];
     }
@@ -171,11 +169,8 @@ void Curve::drawTangent(int index){
       glVertex3f(curve[index].getX() + b.x*10, curve[index].getY() + b.y*10, curve[index].getZ() + b.z*10);
     glEnd();
 
-    Vec newOrientation = orientation(index);
-    //std::cout << "index " << index << std::endl;
-    //std::cout << " Real orientation " << newOrientation.x << " " << newOrientation.y << " " << newOrientation.z << std::endl;
-
    /* glColor3f(1.0, 0.0, 0.0);
+    Vec newOrientation = orientation(index);
     glBegin(GL_LINES);
       glVertex3f(curve[index].getX(), curve[index].getY(), curve[index].getZ());
       glVertex3f(curve[index].getX() + newOrientation.x*10, curve[index].getY() + newOrientation.y*10, curve[index].getZ() + newOrientation.z*10);

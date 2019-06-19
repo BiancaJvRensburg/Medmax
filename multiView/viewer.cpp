@@ -79,6 +79,14 @@ void Viewer::moveLeftPlane(int position){
     }
 }
 
+void Viewer::rotateLeftPlane(int position){
+    double percentage = static_cast<double>(position) / static_cast<double>(sliderMax);
+
+    double theta = (M_PI/2.0)*percentage + M_PI;
+    leftPlane->rotate(Quaternion(0,0,cos(theta/2.0), sin(theta/2.0)));
+    update();
+}
+
 void Viewer::moveRightPlane(int position){
 
     double percentage = static_cast<double>(position) / static_cast<double>(sliderMax);
@@ -163,7 +171,7 @@ void Viewer::updateCamera(const Vec3Df & center, float radius){
 }
 
 Quaternion Viewer::getNewOrientationL(){
-    Quaternion s;
+    Quaternion s,q,r;
     Vec current, next;
 
     current = Vec(curve->getCurve()[curveIndexL].toVec());
@@ -172,7 +180,8 @@ Quaternion Viewer::getNewOrientationL(){
 
     Vec norm = curve->normal(curveIndexL);
 
-    s = Quaternion(Vec(0,0,1), norm);
+    // s = Quaternion(Vec(1.0/0.3,1.0/0.3,1.0/0.3), curve->orientation(curveIndexL));
+    s = Quaternion(Vec(0,0,1.0), norm);
     return s.normalized();
 }
 
@@ -189,6 +198,15 @@ Quaternion Viewer::getNewOrientationR(){
     s = Quaternion(Vec(0,0,1), norm);
     return s.normalized();
 
+}
+
+double Viewer::angle(Vec a, Vec b){
+    Vec ab = cross(a,b);
+    double na = a.normalize();
+    double nb = b.normalize();
+    double nab = ab.normalize();
+
+    return acos(nab / (na*nb));
 }
 
 

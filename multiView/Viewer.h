@@ -24,6 +24,7 @@ public :
 public Q_SLOTS:
     virtual void moveLeftPlane(int);
     virtual void moveRightPlane(int);
+    virtual void rotateLeftPlane(int);
 
 Q_SIGNALS:
     void leftPosChanged(double);
@@ -51,6 +52,8 @@ protected:
     int curveIndexR;
     int nbU;
     int sliderMax;
+
+    double angle(Vec a, Vec b);
 
 };
 

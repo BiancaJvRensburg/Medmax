@@ -18,6 +18,10 @@ public:
     void setPosition(const qglviewer::Vec &pos) { normalFrame.setPosition(pos); }
     void setOrientation(Quaternion q){ normalFrame.setOrientation(q); }
     void rotate(Quaternion q) { normalFrame.rotate(q); }
+    //void setRotation(Vec to, Vec from){ normalFrame.setRotation(Quaternion(to, from));}
+    void setRotation(Quaternion q){ normalFrame.setRotation(q);}
+    Vec coordinatesInRef(Vec v){ return normalFrame.coordinatesOfIn(v, normalFrame.referenceFrame()); }
+    Vec refCoordinatesInFrame(Vec v){ return normalFrame.coordinatesOfFrom(v, normalFrame.referenceFrame()); }
     void draw();
 
 private:

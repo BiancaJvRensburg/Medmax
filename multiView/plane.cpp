@@ -19,12 +19,12 @@ void Plane::draw(){
     glPushMatrix();
     glMultMatrixd(normalFrame.matrix());
 
-   /* glBegin(GL_QUADS);
+    glBegin(GL_QUADS);
         glVertex3f(points[0]->x, points[0]->y, points[0]->z);
         glVertex3f(points[1]->x, points[1]->y, points[1]->z);
         glVertex3f(points[2]->x, points[2]->y, points[2]->z);
         glVertex3f(points[3]->x, points[3]->y, points[3]->z);
-    glEnd();*/
+    glEnd();
 
     glColor3f(1,1,1);
     QGLViewer::drawAxis(15.0);
