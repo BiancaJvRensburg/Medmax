@@ -99,8 +99,6 @@ Point* Curve::derivative(){
                 (TabControlPoint[i+1].getZ() - TabControlPoint[i].getZ()) * nbCP);
     }
 
-    dtControl = control;
-
     return casteljau(control, nbCP, nbU);
 }
 
@@ -112,9 +110,9 @@ Point* Curve::secondDerivative(){
     Point control[nbCP];
 
     for(int i=0; i<nbCP; i++){
-        control[i] = Point( (dtControl[i+1].getX() - dtControl[i].getX()) * nbCP,
-                (dtControl[i+1].getY() - dtControl[i].getY()) * nbCP,
-                (dtControl[i+1].getZ() - dtControl[i].getZ()) * nbCP);
+        control[i] = Point( (TabControlPoint[i+2].getX() - 2.0 * TabControlPoint[i+1].getX() + TabControlPoint[i].getX()) * static_cast<double>(nbCP),
+                (TabControlPoint[i+2].getY() - 2.0 * TabControlPoint[i+1].getY() + TabControlPoint[i].getY()) * static_cast<double>(nbCP),
+                (TabControlPoint[i+2].getZ() - 2.0 * TabControlPoint[i+1].getZ() + TabControlPoint[i].getZ()) * static_cast<double>(nbCP));
     }
 
     return casteljau(control, nbCP, nbU);
@@ -177,11 +175,11 @@ void Curve::drawTangent(int index){
     //std::cout << "index " << index << std::endl;
     //std::cout << " Real orientation " << newOrientation.x << " " << newOrientation.y << " " << newOrientation.z << std::endl;
 
-    glColor3f(1.0, 0.0, 0.0);
+   /* glColor3f(1.0, 0.0, 0.0);
     glBegin(GL_LINES);
       glVertex3f(curve[index].getX(), curve[index].getY(), curve[index].getZ());
       glVertex3f(curve[index].getX() + newOrientation.x*10, curve[index].getY() + newOrientation.y*10, curve[index].getZ() + newOrientation.z*10);
-    glEnd();
+    glEnd();*/
 
     glLineWidth(1);
 }

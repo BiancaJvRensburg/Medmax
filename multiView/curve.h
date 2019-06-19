@@ -38,7 +38,6 @@ private:
     // Frenet frame
     Point* derivative();
     Point* dt;
-    Point* dtControl;
 
     Point* secondDerivative();
     Point* d2t;

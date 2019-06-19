@@ -170,10 +170,9 @@ Quaternion Viewer::getNewOrientationL(){
     if(curveIndexL < nbU-1) next = Vec(curve->getCurve()[curveIndexL+1].toVec());
     else next = current;
 
-    Vec binorm = curve->binormal(curveIndexL);
-    //Vec norm = curve->normal(curveIndexL);
+    Vec norm = curve->normal(curveIndexL);
 
-    s = Quaternion(Vec(0,0,1), binorm);
+    s = Quaternion(Vec(0,0,1), norm);
     return s.normalized();
 }
 
@@ -185,9 +184,9 @@ Quaternion Viewer::getNewOrientationR(){
     if(curveIndexR > 0) next = Vec(curve->getCurve()[curveIndexR-1].toVec());
     else next = current;
 
-    Vec binorm = curve->binormal(curveIndexR);
+    Vec norm = curve->normal(curveIndexR);
 
-    s = Quaternion(Vec(0,0,1), binorm);
+    s = Quaternion(Vec(0,0,1), norm);
     return s.normalized();
 
 }
