@@ -1,6 +1,7 @@
 #include "viewer.h"
 #include "Triangle.h"
 #include "Vec3D.h"
+#include "controlpoint.h"
 #include <QGLViewer/manipulatedFrame.h>
 
 Viewer::Viewer(QWidget *parent, StandardCamera *cam, int sliderMax) : QGLViewer(parent) {
@@ -28,7 +29,7 @@ void Viewer::draw() {
 
     curve->draw();
     curve->drawControl();
-    curve->drawTangent(curveIndexL);
+    //curve->drawTangent(curveIndexL);
 
     glPopMatrix();    // Bring back the modelView
 }

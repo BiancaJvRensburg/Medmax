@@ -3,6 +3,7 @@
 
 #include "point.h"
 #include <QGLViewer/qglviewer.h>
+#include "controlpoint.h"
 
 using namespace qglviewer;
 
@@ -27,13 +28,13 @@ public:
     void drawTangent(int index);
 
 private:
-    Point* TabControlPoint;
+    ControlPoint* TabControlPoint;
     long nbControlPoint;
     Point* curve;
     long nbU;
 
-    Point* casteljau(Point TabControlPoint[], long nbControlPoint, long n);
-    Point* finalPoint(Point TabControlPoint[], long nbControlPoint, double u);
+    Point* casteljau(ControlPoint TabControlPoint[], long nbControlPoint, long n);
+    Point* finalPoint(ControlPoint TabControlPoint[], long nbControlPoint, double u);
 
     // Frenet frame
     Point* derivative();
