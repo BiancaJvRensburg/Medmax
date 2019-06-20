@@ -25,6 +25,7 @@ public Q_SLOTS:
     virtual void moveLeftPlane(int);
     virtual void moveRightPlane(int);
     virtual void rotateLeftPlane(int);
+    virtual void rotateRightPlane(int);
 
 Q_SIGNALS:
     void leftPosChanged(double);

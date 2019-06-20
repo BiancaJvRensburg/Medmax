@@ -85,10 +85,15 @@ void MainWindow::initDisplayDockWidgets(){
     leftPlaneRotationSlider->setMaximum(sliderMax);
     contentLayout->addRow("Left rotation", leftPlaneRotationSlider);
 
+    QSlider *rightPlaneRotationSlider = new QSlider(Qt::Horizontal);
+    rightPlaneRotationSlider->setMaximum(sliderMax);
+    contentLayout->addRow("Right rotation", rightPlaneRotationSlider);
+
     // Connect the skull sliders
     connect(leftPlaneSilder, static_cast<void (QSlider::*)(int)>(&QSlider::sliderMoved), skullViewer, &Viewer::moveLeftPlane);
     connect(rightPlaneSilder, static_cast<void (QSlider::*)(int)>(&QSlider::sliderMoved), skullViewer, &Viewer::moveRightPlane);
     connect(leftPlaneRotationSlider, static_cast<void (QSlider::*)(int)>(&QSlider::sliderMoved), skullViewer, &Viewer::rotateLeftPlane);
+    connect(rightPlaneRotationSlider, static_cast<void (QSlider::*)(int)>(&QSlider::sliderMoved), skullViewer, &Viewer::rotateRightPlane);
 
     // Add the slider (fibula)
     QSlider *fibulaSlider = new QSlider(Qt::Horizontal);

@@ -82,8 +82,14 @@ void Viewer::moveLeftPlane(int position){
 void Viewer::rotateLeftPlane(int position){
     double percentage = static_cast<double>(position) / static_cast<double>(sliderMax);
 
-    double theta = (M_PI/2.0)*percentage + M_PI;
-    leftPlane->rotate(Quaternion(0,0,cos(theta/2.0), sin(theta/2.0)));
+    leftPlane->rotatePlaneZ(percentage);
+    update();
+}
+
+void Viewer::rotateRightPlane(int position){
+    double percentage = static_cast<double>(position) / static_cast<double>(sliderMax);
+
+    rightPlane->rotatePlaneZ(percentage);
     update();
 }
 

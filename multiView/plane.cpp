@@ -4,6 +4,7 @@ Plane::Plane(double s)
 {
     position = new Vec(0, 0, 0);
     size = s;
+    rotationPercentage = 0;
 
     initBasePlane();
 }
@@ -30,6 +31,14 @@ void Plane::draw(){
     QGLViewer::drawAxis(15.0);
 
     glPopMatrix();
+}
+
+void Plane::rotatePlaneZ(double percentage){
+    double r = (percentage - rotationPercentage);
+        rotationPercentage = percentage;
+
+        double theta = (M_PI*2.0)*r + M_PI;
+        rotate(Quaternion(0,0,cos(theta/2.0), sin(theta/2.0)));
 }
 
 void Plane::movePlane(Vec pos){
