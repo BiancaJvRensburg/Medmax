@@ -26,6 +26,7 @@ public:
     Vec refCoordinatesInFrame(Vec v){ return normalFrame.coordinatesOfFrom(v, normalFrame.referenceFrame()); }
 
     void rotatePlaneZ(double percentage);   // rotate around the z axis
+    void rotatePlane(Vec axis, double angle);
 
     void draw();
 

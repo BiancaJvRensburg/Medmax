@@ -168,6 +168,13 @@ void Viewer::initPlanes(){
     leftPlane->setOrientation(getNewOrientationL());
     rightPlane->setOrientation(getNewOrientationR());
 
+    /*Vec yAxis = Vec(0,1,0);
+    Vec t = curve->tangent(curveIndexL);
+
+    double theta = angle(t, yAxis);
+
+    leftPlane->rotatePlane(Vec(0,0,1), theta);*/
+
 }
 
 void Viewer::updateCamera(const Vec3Df & center, float radius){
@@ -207,7 +214,7 @@ Quaternion Viewer::getNewOrientationR(){
 }
 
 double Viewer::angle(Vec a, Vec b){
-    Vec ab = cross(a,b);
+    Vec ab = Vec(a.x*b.x, a.y*b.y, a.z*b.z);
     double na = a.normalize();
     double nb = b.normalize();
     double nab = ab.normalize();

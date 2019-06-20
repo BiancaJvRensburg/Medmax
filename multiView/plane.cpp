@@ -33,12 +33,18 @@ void Plane::draw(){
     glPopMatrix();
 }
 
+void Plane::rotatePlane(Vec axis, double theta){
+    rotate(Quaternion(cos(theta/2.0)*axis.x, cos(theta/2.0)*axis.y, cos(theta/2.0)*axis.z, sin(theta/2.0)));
+}
+
 void Plane::rotatePlaneZ(double percentage){
     double r = (percentage - rotationPercentage);
-        rotationPercentage = percentage;
+    rotationPercentage = percentage;
 
-        double theta = (M_PI*2.0)*r + M_PI;
-        rotate(Quaternion(0,0,cos(theta/2.0), sin(theta/2.0)));
+    double theta = (M_PI*2.0)*r + M_PI;
+    Vec axis = Vec(0,0,1);
+
+    rotatePlane(axis, theta);
 }
 
 void Plane::movePlane(Vec pos){
