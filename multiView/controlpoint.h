@@ -24,6 +24,7 @@ private:
 
 class ControlPoint
 {
+
 public:
     ControlPoint(){ p = new Point(0,0,0);}
     ControlPoint(Point* p);
@@ -38,7 +39,7 @@ public:
 
 private:
     Point* p;
-    ManipulatedFrame mf;
+    ManipulatedFrame* mf;
 };
 
 #endif // CONTROLPOINT_H

@@ -17,7 +17,6 @@ class Viewer : public QGLViewer
 
 public :
     Viewer(QWidget *parent, StandardCamera *camera, int sliderMax);
-   // ~Viewer();
     void openOFF(QString f);
     Mesh mesh;
 
@@ -55,11 +54,6 @@ protected:
     int sliderMax;
 
     double angle(Vec a, Vec b);
-
-    CameraPathPlayer **player_;
-    void displayPlayers();
-    void updatePlayers();
-    int nbPlayers_;
 
 };
 

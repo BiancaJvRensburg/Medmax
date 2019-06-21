@@ -1,29 +1,32 @@
 #include "controlpoint.h"
+#include <math.h>
+
+#include <QGLViewer/manipulatedFrame.h>
 
 void CameraPathPlayer::checkIfGrabsMouse(int x, int y, const Camera *const) {
-  // Rectangular activation array - May have to be tune depending on your
-  // default font size
   setGrabsMouse((x < 80) && (y < yPos()) && ((yPos() - y) < 16));
 }
 
 ControlPoint::ControlPoint(Point* p)
 {
     this->p = p;
-    mf.setPosition(this->p->getX(), this->p->getY(), this->p->getZ());
+    mf = new ManipulatedFrame();
+    mf->setPosition(this->p->getX(), this->p->getY(), this->p->getZ());
 }
 
 ControlPoint::ControlPoint(double x, double y, double z)
 {
     this->p = new Point(x,y,z);
-    mf.setPosition(x,y,z);
+    mf = new ManipulatedFrame();
+    mf->setPosition(x,y,z);
 }
 
 void ControlPoint::draw(){
 
     glPushMatrix();
-    glMultMatrixd(mf.matrix());
+    glMultMatrixd(mf->matrix());
 
-    if(mf.grabsMouse()) glColor3f(0, 1, 1);
+    if(mf->grabsMouse()) glColor3f(0, 1, 1);
     else glColor3f(1, 0, 1);
 
     glPointSize(10.0);
