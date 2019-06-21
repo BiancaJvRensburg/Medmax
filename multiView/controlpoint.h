@@ -23,7 +23,14 @@ public:
     double getY(){ return p->getY(); }
     double getZ(){ return p->getZ(); }
 
+    void initialise();
     void draw();
+
+public Q_SLOTS:
+    void cntrlMoved();
+
+Q_SIGNALS:
+    void cntrlPointTranslated();
 
 private:
     Point* p;

@@ -6,15 +6,19 @@
 ControlPoint::ControlPoint(Point* p)
 {
     this->p = p;
-    mf = new ManipulatedFrame();
-    mf->setPosition(this->p->getX(), this->p->getY(), this->p->getZ());
+    initialise();
 }
 
 ControlPoint::ControlPoint(double x, double y, double z)
 {
     this->p = new Point(x,y,z);
+    initialise();
+}
+
+void ControlPoint::initialise(){
     mf = new ManipulatedFrame();
-    mf->setPosition(x,y,z);
+    mf->setPosition(this->p->getX(), this->p->getY(), this->p->getZ());
+    connect(mf, &ManipulatedFrame::manipulated, this, &ControlPoint::cntrlMoved);
 }
 
 void ControlPoint::draw(){
@@ -34,4 +38,15 @@ void ControlPoint::draw(){
     glColor3f(0,0,0);
 
     glPopMatrix();
+}
+
+void ControlPoint::cntrlMoved(){
+    double x,y,z;
+
+    mf->getPosition(x,y,z);
+    p->setX(x);
+    p->setY(y);
+    p->setZ(z);
+
+    Q_EMIT ControlPoint::cntrlPointTranslated();
 }
