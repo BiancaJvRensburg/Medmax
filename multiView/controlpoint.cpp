@@ -1,5 +1,11 @@
 #include "controlpoint.h"
 
+void CameraPathPlayer::checkIfGrabsMouse(int x, int y, const Camera *const) {
+  // Rectangular activation array - May have to be tune depending on your
+  // default font size
+  setGrabsMouse((x < 80) && (y < yPos()) && ((yPos() - y) < 16));
+}
+
 ControlPoint::ControlPoint(Point* p)
 {
     this->p = p;
@@ -29,22 +35,4 @@ void ControlPoint::draw(){
     glColor3f(0,0,0);
 
     glPopMatrix();
-}
-
-Point* ControlPoint::getPoint(){
-    return p;
-}
-
-double ControlPoint::getX(){
-   return p->getX();
-}
-
-double ControlPoint::getY(){
-
-    return p->getY();
-}
-
-double ControlPoint::getZ(){
-
-    return p->getZ();
 }

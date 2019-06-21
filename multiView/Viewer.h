@@ -56,6 +56,11 @@ protected:
 
     double angle(Vec a, Vec b);
 
+    CameraPathPlayer **player_;
+    void displayPlayers();
+    void updatePlayers();
+    int nbPlayers_;
+
 };
 
 #endif // VIEWER_H

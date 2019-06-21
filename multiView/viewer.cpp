@@ -31,10 +31,16 @@ void Viewer::draw() {
     curve->drawControl();
     //curve->drawTangent(curveIndexL);
 
+    updatePlayers();
+    displayPlayers();
+
     glPopMatrix();    // Bring back the modelView
 }
 
 void Viewer::init() {
+    // For the mouse tracker
+    setMouseTracking(true);
+
   // Restore previous viewer state.
   restoreStateFromFile();
 
@@ -154,6 +160,11 @@ void Viewer::initCurve(){
     curve->generateBezierCasteljau(nbU);
 
     initPlanes();
+
+    nbPlayers_ = nbCP;
+    player_ = new CameraPathPlayer *[nbPlayers_];
+    for (int i = 0; i < nbPlayers_; ++i)
+      player_[i] = NULL;
 }
 
 void Viewer::initPlanes(){
@@ -223,5 +234,40 @@ double Viewer::angle(Vec a, Vec b){
     return acos(nab / (na*nb));
 }
 
+void Viewer::displayPlayers() {
+  for (int i = 0; i < nbPlayers_; ++i) {
+    CameraPathPlayer *cpp = player_[i];
+    if (cpp) {
+      QString s;
+      if (cpp->grabsMouse()) {
+        glColor3f(1, 1, 1);
+        if (camera()->keyFrameInterpolator(i)->numberOfKeyFrames() > 1)
+          s = "Play path F" + QString::number(i);
+        else
+          s = "Restore pos F" + QString::number(i);
+      } else {
+        glColor3f(0.6f, 0.6f, 0.6f);
+        if (camera()->keyFrameInterpolator(i)->numberOfKeyFrames() > 1)
+          s = "Path F" + QString::number(i);
+        else
+          s = "Pos F" + QString::number(i);
+      }
+      drawText(10, cpp->yPos() - 3, s);
+    }
+  }
+}
+
+void Viewer::updatePlayers() {
+  for (int i = 0; i < nbPlayers_; ++i) {
+    // Check if CameraPathPlayer is still valid
+    if ((player_[i]) && (!camera()->keyFrameInterpolator(i))) {
+      delete player_[i];
+      player_[i] = NULL;
+    }
+    // Or add it if needed
+    if ((camera()->keyFrameInterpolator(i)) && (!player_[i]))
+      player_[i] = new CameraPathPlayer(i);
+  }
+}
 
 
