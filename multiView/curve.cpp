@@ -10,6 +10,9 @@ Curve::Curve(long nbCP)
     for(int i=0; i<nbCP; i++){
         TabControlPoint[i] = new ControlPoint();
     }
+
+    initConnections();
+
 }
 
 Curve::Curve(long nbCP, Point cntrlPoints[]){
@@ -19,6 +22,14 @@ Curve::Curve(long nbCP, Point cntrlPoints[]){
     for(int i=0; i<nbCP; i++){
         TabControlPoint[i] = new ControlPoint(cntrlPoints[i].getX(), cntrlPoints[i].getY(), cntrlPoints[i].getZ());
     }
+
+    initConnections();
+}
+
+void Curve::initConnections(){
+    for(int i=0; i<nbControlPoint; i++){
+        connect(TabControlPoint[i], &ControlPoint::cntrlPointTranslated, this, &Curve::reintialiseCurve);
+    }
 }
 
 void Curve::generateBezierCasteljau(long n)
@@ -26,6 +37,10 @@ void Curve::generateBezierCasteljau(long n)
     curve = casteljau(TabControlPoint, nbControlPoint, n);
     dt = derivative();
     d2t = secondDerivative();
+}
+
+void Curve::reintialiseCurve(){
+    generateBezierCasteljau(nbU);
 }
 
 Point* Curve::casteljau(ControlPoint **TabControlPoint, long nbControlPoint, long n){

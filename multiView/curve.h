@@ -7,8 +7,10 @@
 
 using namespace qglviewer;
 
-class Curve
+class Curve : public QObject
 {
+    Q_OBJECT
+
 public:
     Curve(){}
     Curve(long nbCP);
@@ -27,6 +29,9 @@ public:
     void drawControl();
     void drawTangent(int index);
 
+public Q_SLOTS:
+    void reintialiseCurve();
+
 private:
     ControlPoint **TabControlPoint;
     long nbControlPoint;
@@ -35,6 +40,8 @@ private:
 
     Point* casteljau(ControlPoint *TabControlPoint[], long nbControlPoint, long n);
     Point* finalPoint(ControlPoint *TabControlPoint[], long nbControlPoint, double u);
+
+    void initConnections();
 
     // Frenet frame
     Point* derivative();
