@@ -3,10 +3,6 @@
 
 #include <QGLViewer/manipulatedFrame.h>
 
-void CameraPathPlayer::checkIfGrabsMouse(int x, int y, const Camera *const) {
-  setGrabsMouse((x < 80) && (y < yPos()) && ((yPos() - y) < 16));
-}
-
 ControlPoint::ControlPoint(Point* p)
 {
     this->p = p;

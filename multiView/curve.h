@@ -28,13 +28,13 @@ public:
     void drawTangent(int index);
 
 private:
-    ControlPoint* TabControlPoint;
+    ControlPoint **TabControlPoint;
     long nbControlPoint;
     Point* curve;
     long nbU;
 
-    Point* casteljau(ControlPoint TabControlPoint[], long nbControlPoint, long n);
-    Point* finalPoint(ControlPoint TabControlPoint[], long nbControlPoint, double u);
+    Point* casteljau(ControlPoint *TabControlPoint[], long nbControlPoint, long n);
+    Point* finalPoint(ControlPoint *TabControlPoint[], long nbControlPoint, double u);
 
     // Frenet frame
     Point* derivative();

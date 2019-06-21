@@ -2,28 +2,16 @@
 #define CONTROLPOINT_H
 
 #include "point.h"
+#include "camerapathplayer.h"
 #include <QGLViewer/qglviewer.h>
 #include <QGLViewer/manipulatedFrame.h>
 
 using namespace qglviewer;
 
-class CameraPathPlayer : public qglviewer::MouseGrabber {
-public:
-  CameraPathPlayer(int nb) : pathNb(nb) {}
-  void checkIfGrabsMouse(int x, int y, const qglviewer::Camera *const camera);
-  int yPos() { return 25 * pathNb; }
-
-protected:
-  void mousePressEvent(QMouseEvent *const, qglviewer::Camera *const camera) {
-    camera->playPath(static_cast<unsigned int>(pathNb));
-  }
-
-private:
-  int pathNb;
-};
-
-class ControlPoint
+class ControlPoint : public QObject
 {
+
+    Q_OBJECT
 
 public:
     ControlPoint(){ p = new Point(0,0,0);}

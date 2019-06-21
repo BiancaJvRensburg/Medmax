@@ -4,16 +4,20 @@
 
 Curve::Curve(long nbCP)
 {
-    TabControlPoint = new ControlPoint[nbCP];
-    nbControlPoint = nbCP;
-}
-
-Curve::Curve(long nbCP, Point cntrlPoints[]){
-    TabControlPoint = new ControlPoint[nbCP];
+    TabControlPoint = new ControlPoint*[nbCP];
     nbControlPoint = nbCP;
 
     for(int i=0; i<nbCP; i++){
-        TabControlPoint[i] = ControlPoint(cntrlPoints[i].getX(), cntrlPoints[i].getY(), cntrlPoints[i].getZ());
+        TabControlPoint[i] = new ControlPoint();
+    }
+}
+
+Curve::Curve(long nbCP, Point cntrlPoints[]){
+    TabControlPoint = new ControlPoint*[nbCP];
+    nbControlPoint = nbCP;
+
+    for(int i=0; i<nbCP; i++){
+        TabControlPoint[i] = new ControlPoint(cntrlPoints[i].getX(), cntrlPoints[i].getY(), cntrlPoints[i].getZ());
     }
 }
 
@@ -24,7 +28,7 @@ void Curve::generateBezierCasteljau(long n)
     d2t = secondDerivative();
 }
 
-Point* Curve::casteljau(ControlPoint TabControlPoint[], long nbControlPoint, long n){
+Point* Curve::casteljau(ControlPoint **TabControlPoint, long nbControlPoint, long n){
     nbU = n;
     Point* c = new Point[nbU];
 
@@ -43,17 +47,17 @@ Point* Curve::casteljau(ControlPoint TabControlPoint[], long nbControlPoint, lon
     return c;
 }
 
-Point* Curve::finalPoint(ControlPoint TabControlPoint[], long nbControlPoint, double u){
-  if(nbControlPoint==1) return TabControlPoint[0].getPoint();
+Point* Curve::finalPoint(ControlPoint **TabControlPoint, long nbControlPoint, double u){
+  if(nbControlPoint==1) return TabControlPoint[0]->getPoint();
   else{
-    ControlPoint newPoints[nbControlPoint-1];
+    ControlPoint *newPoints[nbControlPoint-1];
     double x,y,z;
 
     for(int i=0; i<nbControlPoint-1; i++){
-      x = (1-u) * TabControlPoint[i].getX() + u * TabControlPoint[i+1].getX();
-      y = (1-u) * TabControlPoint[i].getY() + u * TabControlPoint[i+1].getY();
-      z = (1-u) * TabControlPoint[i].getZ() + u * TabControlPoint[i+1].getZ();
-      newPoints[i] = ControlPoint(x,y,z);
+      x = (1-u) * TabControlPoint[i]->getX() + u * TabControlPoint[i+1]->getX();
+      y = (1-u) * TabControlPoint[i]->getY() + u * TabControlPoint[i+1]->getY();
+      z = (1-u) * TabControlPoint[i]->getZ() + u * TabControlPoint[i+1]->getZ();
+      newPoints[i] = new ControlPoint(x,y,z);
     }
     return finalPoint(newPoints, nbControlPoint-1, u);
   }
@@ -76,14 +80,14 @@ void Curve::drawControl(){
       glColor3f(0.0, 0.0, 1.0);
 
       for(int i=0; i<nbControlPoint; i++){
-        Point *p = TabControlPoint[i].getPoint();
+        Point *p = TabControlPoint[i]->getPoint();
         glVertex3f(p->getX(), p->getY(), p->getZ());
       }
 
       glEnd();
 
       for(int i=0; i<nbControlPoint; i++){
-          TabControlPoint[i].draw();
+          TabControlPoint[i]->draw();
       }
 }
 
@@ -93,12 +97,12 @@ Point* Curve::derivative(){
 
     if(nbCP<1) return NULL;
 
-    ControlPoint control[nbCP];
+    ControlPoint *control[nbCP];
 
     for(int i=0; i<nbCP; i++){
-        control[i] = ControlPoint( (TabControlPoint[i+1].getX() - TabControlPoint[i].getX()) * nbCP,
-                (TabControlPoint[i+1].getY() - TabControlPoint[i].getY()) * nbCP,
-                (TabControlPoint[i+1].getZ() - TabControlPoint[i].getZ()) * nbCP);
+        control[i] = new ControlPoint( (TabControlPoint[i+1]->getX() - TabControlPoint[i]->getX()) * nbCP,
+                (TabControlPoint[i+1]->getY() - TabControlPoint[i]->getY()) * nbCP,
+                (TabControlPoint[i+1]->getZ() - TabControlPoint[i]->getZ()) * nbCP);
     }
 
     return casteljau(control, nbCP, nbU);
@@ -109,12 +113,12 @@ Point* Curve::secondDerivative(){
 
     if(nbCP<1) return NULL;
 
-    ControlPoint control[nbCP];
+    ControlPoint *control[nbCP];
 
     for(int i=0; i<nbCP; i++){
-        control[i] = ControlPoint( (TabControlPoint[i+2].getX() - 2.0 * TabControlPoint[i+1].getX() + TabControlPoint[i].getX()) * static_cast<double>(nbCP),
-                (TabControlPoint[i+2].getY() - 2.0 * TabControlPoint[i+1].getY() + TabControlPoint[i].getY()) * static_cast<double>(nbCP),
-                (TabControlPoint[i+2].getZ() - 2.0 * TabControlPoint[i+1].getZ() + TabControlPoint[i].getZ()) * static_cast<double>(nbCP));
+        control[i] = new ControlPoint( (TabControlPoint[i+2]->getX() - 2.0 * TabControlPoint[i+1]->getX() + TabControlPoint[i]->getX()) * static_cast<double>(nbCP),
+                (TabControlPoint[i+2]->getY() - 2.0 * TabControlPoint[i+1]->getY() + TabControlPoint[i]->getY()) * static_cast<double>(nbCP),
+                (TabControlPoint[i+2]->getZ() - 2.0 * TabControlPoint[i+1]->getZ() + TabControlPoint[i]->getZ()) * static_cast<double>(nbCP));
     }
 
     return casteljau(control, nbCP, nbU);
