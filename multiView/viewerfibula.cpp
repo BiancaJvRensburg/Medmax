@@ -61,5 +61,7 @@ void ViewerFibula::initCurve(){
     nbU = 500;
     curve->generateBezierCasteljau(nbU);
 
+    connect(curve, &Curve::curveReinitialised, this, &Viewer::updatePlanes);
+
     initPlanes();
 }

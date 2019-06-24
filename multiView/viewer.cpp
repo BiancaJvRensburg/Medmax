@@ -14,8 +14,8 @@ Viewer::Viewer(QWidget *parent, StandardCamera *cam, int sliderMax) : QGLViewer(
 }
 
 void Viewer::draw() {
-    glPushMatrix();   // Push the current modelView
-    glMultMatrixd(manipulatedFrame()->matrix());  // Multiply the modelView by a manipulated frame
+    glPushMatrix();
+    glMultMatrixd(manipulatedFrame()->matrix());
     drawAxis();
 
     glColor3f(1.,1.,1.);
@@ -29,19 +29,16 @@ void Viewer::draw() {
 
     curve->draw();
     curve->drawControl();
-    //curve->drawTangent(curveIndexL);
+    curve->drawTangent(curveIndexL);
 
-    glPopMatrix();    // Bring back the modelView
+    glPopMatrix();
 }
 
 void Viewer::init() {
-    // For the mouse tracker
-    setMouseTracking(true);
+  setMouseTracking(true);
 
-  // Restore previous viewer state.
   restoreStateFromFile();
 
-  // Create the manipulated frame which will allow us to rotate the view
   setManipulatedFrame(new ManipulatedFrame());
 
   setAxisIsDrawn();
@@ -78,6 +75,7 @@ void Viewer::moveLeftPlane(int position){
 
         leftPlane->setPosition(curve->getPoint(curveIndexL));
         leftPlane->setOrientation(getNewOrientation(curveIndexL));
+        matchPlanes(curveIndexL);
 
         update();
         Q_EMIT leftPosChanged(percentage);
@@ -162,6 +160,18 @@ void Viewer::initCurve(){
     initPlanes();
 }
 
+void Viewer::matchPlanes(int index){
+    Vec yAxis = Vec(0,1,0);
+    Vec t = curve->tangent(curveIndexL);
+   // t.z = -t.z;
+    double theta = 2.0*M_PI - angle(yAxis, t);
+
+    //std::cout << t.x << " " << t.y << " " << t.z << std::endl;
+    //std::cout << (theta)*180.0/M_PI << std::endl;
+
+    leftPlane->rotatePlane(Vec(0,0,1), theta);
+}
+
 void Viewer::initPlanes(){
     curveIndexR = nbU - 1;
     curveIndexL = 0;
@@ -175,12 +185,7 @@ void Viewer::initPlanes(){
     leftPlane->setOrientation(getNewOrientation(curveIndexL));
     rightPlane->setOrientation(getNewOrientation(curveIndexR));
 
-    /*Vec yAxis = Vec(0,1,0);
-    Vec t = curve->tangent(curveIndexL);
-
-    double theta = angle(t, yAxis);
-
-    leftPlane->rotatePlane(Vec(0,0,1), theta);*/
+    matchPlanes(0);
 
 }
 
@@ -196,24 +201,23 @@ void Viewer::updatePlanes(){
 
     leftPlane->setOrientation(getNewOrientation(curveIndexL));
     rightPlane->setOrientation(getNewOrientation(curveIndexR));
+    matchPlanes(curveIndexL);
 
     update();
 }
 
 Quaternion Viewer::getNewOrientation(int index){
-    Quaternion s;
+    Quaternion s = Quaternion(Vec(0,0,1.0), curve->normal(index));
+    //s = Quaternion(Vec(1.0/3.0, 1.0/3.0, 1.0/3.0), curve->orientation(index));
 
-    Vec norm = curve->normal(index);
-
-    s = Quaternion(Vec(0,0,1.0), norm);
     return s.normalized();
 }
 
 double Viewer::angle(Vec a, Vec b){
     Vec ab = Vec(a.x*b.x, a.y*b.y, a.z*b.z);
-    double na = a.normalize();
-    double nb = b.normalize();
-    double nab = ab.normalize();
+    double na = a.norm();
+    double nb = b.norm();
+    double nab = ab.norm();
 
     return acos(nab / (na*nb));
 }
