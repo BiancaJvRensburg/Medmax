@@ -15,12 +15,12 @@ Curve::Curve(long nbCP)
 
 }
 
-Curve::Curve(long nbCP, Vec cntrlPoints[]){
+Curve::Curve(long nbCP, ControlPoint *cntrlPoints[]){
     TabControlPoint = new ControlPoint*[nbCP];
     nbControlPoint = nbCP;
 
     for(int i=0; i<nbCP; i++){
-        TabControlPoint[i] = new ControlPoint(cntrlPoints[i].x, cntrlPoints[i].y, cntrlPoints[i].z);
+        TabControlPoint[i] = cntrlPoints[i];
     }
 
     initConnections();
@@ -41,6 +41,8 @@ void Curve::generateBezierCasteljau(long n)
 
 void Curve::reintialiseCurve(){
     generateBezierCasteljau(nbU);
+
+    Q_EMIT curveReinitialised();
 }
 
 Vec** Curve::casteljau(ControlPoint **TabControlPoint, long nbControlPoint, long n){

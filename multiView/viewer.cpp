@@ -18,8 +18,6 @@ void Viewer::draw() {
     glMultMatrixd(manipulatedFrame()->matrix());  // Multiply the modelView by a manipulated frame
     drawAxis();
 
-    //updatePlanes();
-
     glColor3f(1.,1.,1.);
     mesh.draw();
 
@@ -144,17 +142,19 @@ void Viewer::wheelEvent(QWheelEvent *e) {
 
 void Viewer::initCurve(){
     const long nbCP = 4;
-    Vec control[nbCP];
+    ControlPoint *control[nbCP];
 
-    Vec startPoint = Vec(-50, -30, -30);
-    Vec endPoint = Vec(50, -30, -30);
+    ControlPoint *startPoint = new ControlPoint(-50, -30, -30);
+    ControlPoint *endPoint = new ControlPoint(50, -30, -30);
 
     control[0] = startPoint;
-    control[1] = Vec(-30, -120, -100);
-    control[2] = Vec(20, -120, -100);
+    control[1] = new ControlPoint(-30, -120, -100);
+    control[2] = new ControlPoint(20, -120, -100);
     control[3] = endPoint;
 
     curve = new Curve(nbCP, control);
+
+    connect(curve, &Curve::curveReinitialised, this, &Viewer::updatePlanes);
 
     nbU = 100;
     curve->generateBezierCasteljau(nbU);
@@ -196,6 +196,8 @@ void Viewer::updatePlanes(){
 
     leftPlane->setOrientation(getNewOrientation(curveIndexL));
     rightPlane->setOrientation(getNewOrientation(curveIndexR));
+
+    update();
 }
 
 Quaternion Viewer::getNewOrientation(int index){

@@ -46,14 +46,14 @@ void ViewerFibula::moveRightPlane(double percentage){
 
 void ViewerFibula::initCurve(){
     const long nbCP = 4;
-    Vec control[nbCP];
+    ControlPoint* control[nbCP];
 
-    Vec startPoint = Vec(70, 70, -800);
-    Vec endPoint = Vec(80, 90, -1200);
+    ControlPoint* startPoint = new ControlPoint(70, 70, -800);
+    ControlPoint* endPoint = new ControlPoint(80, 90, -1200);
 
     control[0] = startPoint;
-    control[1] = Vec(80, 100, -900);
-    control[2] = Vec(75, 95, -1100);
+    control[1] = new ControlPoint(80, 100, -900);
+    control[2] = new ControlPoint(75, 95, -1100);
     control[3] = endPoint;
 
     curve = new Curve(nbCP, control);

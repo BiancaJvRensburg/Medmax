@@ -13,7 +13,7 @@ class Curve : public QObject
 public:
     Curve(){}
     Curve(long nbCP);
-    Curve(long nbCP, Vec cntrlPoints[]);
+    Curve(long nbCP, ControlPoint *cntrlPoints[]);
 
     void generateBezierCasteljau(long nbU);
     Vec** getCurve(){ return curve; }
@@ -31,6 +31,9 @@ public:
 
 public Q_SLOTS:
     void reintialiseCurve();
+
+Q_SIGNALS:
+    void curveReinitialised();
 
 private:
     ControlPoint **TabControlPoint;
