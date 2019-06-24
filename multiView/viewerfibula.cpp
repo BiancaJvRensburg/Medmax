@@ -16,7 +16,6 @@ void ViewerFibula::movePlanes(int position){
         rightPlane->setPosition(curve->getCurve()[curveIndexR + indexOffset]);
     }
 
-
     update();
 
 }

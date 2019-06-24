@@ -78,7 +78,7 @@ void Viewer::moveLeftPlane(int position){
         else if(curveIndexL < 0) curveIndexL = 0;   // shouldn't ever happen
 
         leftPlane->setPosition(curve->getCurve()[curveIndexL]);
-        leftPlane->setOrientation(getNewOrientationL());
+        leftPlane->setOrientation(getNewOrientation(curveIndexL));
 
         update();
         Q_EMIT leftPosChanged(percentage);
@@ -111,7 +111,7 @@ void Viewer::moveRightPlane(int position){
         else if(curveIndexR < 0) curveIndexR = 0;   // shouldn't ever happen
 
         rightPlane->setPosition(curve->getCurve()[curveIndexR]);
-        rightPlane->setOrientation(getNewOrientationR());
+        rightPlane->setOrientation(getNewOrientation(curveIndexR));
 
         update();
         Q_EMIT rightPosChanged(percentage);
@@ -171,8 +171,8 @@ void Viewer::initPlanes(){
     curveIndexR = nbU - 1;
     curveIndexL = 0;
 
-    leftPlane->setOrientation(getNewOrientationL());
-    rightPlane->setOrientation(getNewOrientationR());
+    leftPlane->setOrientation(getNewOrientation(curveIndexL));
+    rightPlane->setOrientation(getNewOrientation(curveIndexR));
 
     /*Vec yAxis = Vec(0,1,0);
     Vec t = curve->tangent(curveIndexL);
@@ -189,34 +189,13 @@ void Viewer::updateCamera(const Vec3Df & center, float radius){
     camera()->showEntireScene();
 }
 
-Quaternion Viewer::getNewOrientationL(){
-    Quaternion s,q,r;
-    Vec current, next;
+Quaternion Viewer::getNewOrientation(int index){
+    Quaternion s;
 
-    current = Vec(curve->getCurve()[curveIndexL]);
-    if(curveIndexL < nbU-1) next = Vec(curve->getCurve()[curveIndexL+1]);
-    else next = current;
+    Vec norm = curve->normal(index);
 
-    Vec norm = curve->normal(curveIndexL);
-
-    // s = Quaternion(Vec(1.0/0.3,1.0/0.3,1.0/0.3), curve->orientation(curveIndexL));
     s = Quaternion(Vec(0,0,1.0), norm);
     return s.normalized();
-}
-
-Quaternion Viewer::getNewOrientationR(){
-    Quaternion q,s;
-    Vec rot, current, next;
-
-    current = Vec(curve->getCurve()[curveIndexR]);
-    if(curveIndexR > 0) next = Vec(curve->getCurve()[curveIndexR-1]);
-    else next = current;
-
-    Vec norm = curve->normal(curveIndexR);
-
-    s = Quaternion(Vec(0,0,1), norm);
-    return s.normalized();
-
 }
 
 double Viewer::angle(Vec a, Vec b){
