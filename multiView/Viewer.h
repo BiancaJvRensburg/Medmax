@@ -24,6 +24,7 @@ public Q_SLOTS:
     virtual void moveRightPlane(int);
     virtual void rotateLeftPlane(int);
     virtual void rotateRightPlane(int);
+    virtual void updatePlanes();
 
 Q_SIGNALS:
     void leftPosChanged(double);
@@ -39,14 +40,13 @@ protected:
     virtual void initCurve();
     void initPlanes();
     Quaternion getNewOrientation(int index);
-    void updatePlane();
 
     Plane *leftPlane;
     Plane *rightPlane;
     Curve *curve;
 
-    Vec startPoint;
-    Vec endPoint;
+   // Vec startPoint;
+   // Vec endPoint;
     int curveIndexL;
     int curveIndexR;
     int nbU;

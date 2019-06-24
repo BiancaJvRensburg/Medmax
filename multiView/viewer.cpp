@@ -18,7 +18,7 @@ void Viewer::draw() {
     glMultMatrixd(manipulatedFrame()->matrix());  // Multiply the modelView by a manipulated frame
     drawAxis();
 
-    updatePlane();
+    //updatePlanes();
 
     glColor3f(1.,1.,1.);
     mesh.draw();
@@ -57,6 +57,7 @@ void Viewer::init() {
   glEnable (GL_POLYGON_OFFSET_LINE);
   glPolygonMode (GL_FRONT_AND_BACK, GL_FILL);
   glLineWidth (1.0f);
+
 }
 
 QString Viewer::helpString() const {
@@ -77,7 +78,7 @@ void Viewer::moveLeftPlane(int position){
         if(curveIndexL >= nbU) curveIndexL = nbU-1;
         else if(curveIndexL < 0) curveIndexL = 0;   // shouldn't ever happen
 
-        //leftPlane->setPosition(curve->getPoint(curveIndexL));
+        leftPlane->setPosition(curve->getPoint(curveIndexL));
         leftPlane->setOrientation(getNewOrientation(curveIndexL));
 
         update();
@@ -110,7 +111,7 @@ void Viewer::moveRightPlane(int position){
         if(curveIndexR >= nbU) curveIndexR = nbU-1;
         else if(curveIndexR < 0) curveIndexR = 0;   // shouldn't ever happen
 
-        //rightPlane->setPosition(curve->getPoint(curveIndexR));
+        rightPlane->setPosition(curve->getPoint(curveIndexR));
         rightPlane->setOrientation(getNewOrientation(curveIndexR));
 
         update();
@@ -145,8 +146,8 @@ void Viewer::initCurve(){
     const long nbCP = 4;
     Vec control[nbCP];
 
-    startPoint = Vec(-50, -30, -30);
-    endPoint = Vec(50, -30, -30);
+    Vec startPoint = Vec(-50, -30, -30);
+    Vec endPoint = Vec(50, -30, -30);
 
     control[0] = startPoint;
     control[1] = Vec(-30, -120, -100);
@@ -168,8 +169,8 @@ void Viewer::initPlanes(){
     leftPlane = new Plane(10.0);
     rightPlane = new Plane(10.0);
 
-    /*leftPlane->setPosition(curve->getPoint(curveIndexL));
-    rightPlane->setPosition(curve->getPoint(curveIndexR));*/
+    leftPlane->setPosition(curve->getPoint(curveIndexL));
+    rightPlane->setPosition(curve->getPoint(curveIndexR));
 
     leftPlane->setOrientation(getNewOrientation(curveIndexL));
     rightPlane->setOrientation(getNewOrientation(curveIndexR));
@@ -189,12 +190,12 @@ void Viewer::updateCamera(const Vec3Df & center, float radius){
     camera()->showEntireScene();
 }
 
-void Viewer::updatePlane(){
+void Viewer::updatePlanes(){
     leftPlane->setPosition(curve->getPoint(curveIndexL));
     rightPlane->setPosition(curve->getPoint(curveIndexR));
 
-    /*leftPlane->setOrientation(getNewOrientation(curveIndexL));
-    rightPlane->setOrientation(getNewOrientation(curveIndexR));*/
+    leftPlane->setOrientation(getNewOrientation(curveIndexL));
+    rightPlane->setOrientation(getNewOrientation(curveIndexR));
 }
 
 Quaternion Viewer::getNewOrientation(int index){

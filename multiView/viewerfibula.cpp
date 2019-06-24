@@ -48,8 +48,8 @@ void ViewerFibula::initCurve(){
     const long nbCP = 4;
     Vec control[nbCP];
 
-    startPoint = Vec(70, 70, -800);
-    endPoint = Vec(80, 90, -1200);
+    Vec startPoint = Vec(70, 70, -800);
+    Vec endPoint = Vec(80, 90, -1200);
 
     control[0] = startPoint;
     control[1] = Vec(80, 100, -900);
