@@ -5,6 +5,8 @@ Plane::Plane(double s)
     position = new Vec(0, 0, 0);
     size = s;
     rotationPercentage = 0;
+    mf = new ManipulatedFrame();
+    //mf->setPosition(position->x, position->y, position->z);
 
     initBasePlane();
 }
@@ -18,7 +20,7 @@ void Plane::initBasePlane(){
 
 void Plane::draw(){
     glPushMatrix();
-    glMultMatrixd(normalFrame.matrix());
+    glMultMatrixd(mf->matrix());
 
     glBegin(GL_QUADS);
         glVertex3f(points[0]->x, points[0]->y, points[0]->z);
@@ -47,6 +49,7 @@ void Plane::rotatePlaneZ(double percentage){
     rotatePlane(axis, theta);
 }
 
-void Plane::movePlane(Vec pos){
-    normalFrame.translate(pos);
+void Plane::setPosition(Vec* pos){
+    position = pos;
+    mf->setPosition(position->x, position->y, position->z);
 }

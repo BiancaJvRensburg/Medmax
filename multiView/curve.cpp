@@ -43,9 +43,9 @@ void Curve::reintialiseCurve(){
     generateBezierCasteljau(nbU);
 }
 
-Vec* Curve::casteljau(ControlPoint **TabControlPoint, long nbControlPoint, long n){
+Vec** Curve::casteljau(ControlPoint **TabControlPoint, long nbControlPoint, long n){
     nbU = n;
-    Vec* c = new Vec[nbU];
+    Vec** c = new Vec*[nbU];
 
     double x, y, z;
     for(int i=0; i<nbU; i++){
@@ -56,7 +56,7 @@ Vec* Curve::casteljau(ControlPoint **TabControlPoint, long nbControlPoint, long 
         x = p->x * coef;
         y = p->y * coef;
         z = p->z * coef;
-        c[i] = Vec(x,y,z);
+        c[i] = new Vec(x,y,z);
     }
 
     return c;
@@ -83,8 +83,8 @@ void Curve::draw(){
       glColor3f(0.0, 1.0, 0.0);
 
       for(int i=0; i<nbU; i++){
-        Vec p = curve[i];
-        glVertex3f(p.x, p.y, p.z);
+        Vec *p = curve[i];
+        glVertex3f(p->x, p->y, p->z);
       }
 
       glEnd();
@@ -107,7 +107,7 @@ void Curve::drawControl(){
 }
 
 // Frenet frame
-Vec* Curve::derivative(){
+Vec** Curve::derivative(){
     const long nbCP = nbControlPoint - 1;
 
     if(nbCP<1) return NULL;
@@ -123,7 +123,7 @@ Vec* Curve::derivative(){
     return casteljau(control, nbCP, nbU);
 }
 
-Vec* Curve::secondDerivative(){
+Vec** Curve::secondDerivative(){
     const long nbCP = nbControlPoint - 2;
 
     if(nbCP<1) return NULL;
@@ -140,7 +140,7 @@ Vec* Curve::secondDerivative(){
 }
 
 Vec Curve::tangent(int index){
-    Vec t = Vec(dt[index].x, dt[index].y, dt[index].z);
+    Vec t = Vec(dt[index]->x, dt[index]->y, dt[index]->z);
     t.normalize();
 
     return t;
@@ -151,7 +151,7 @@ Vec Curve::normal(int index){
 }
 
 Vec Curve::binormal(int index){
-    Vec b = cross(Vec(dt[index].x, dt[index].y, dt[index].z), Vec(d2t[index].x, d2t[index].y, d2t[index].z));
+    Vec b = cross(Vec(dt[index]->x, dt[index]->y, dt[index]->z), Vec(d2t[index]->x, d2t[index]->y, d2t[index]->z));
     b.normalize();
 
     return b;
@@ -176,20 +176,20 @@ void Curve::drawTangent(int index){
     glLineWidth(3);
 
     glBegin(GL_LINES);
-      glVertex3f(curve[index].x, curve[index].y, curve[index].z);
-      glVertex3f(curve[index].x + t.x*10, curve[index].y + t.y*10, curve[index].z + t.z*10);
+      glVertex3f(curve[index]->x, curve[index]->y, curve[index]->z);
+      glVertex3f(curve[index]->x + t.x*10, curve[index]->y + t.y*10, curve[index]->z + t.z*10);
     glEnd();
 
     glColor3f(1.0, 0.0, 1.0);
     glBegin(GL_LINES);
-      glVertex3f(curve[index].x, curve[index].y, curve[index].z);
-      glVertex3f(curve[index].x + n.x*10, curve[index].y + n.y*10, curve[index].z + n.z*10);
+      glVertex3f(curve[index]->x, curve[index]->y, curve[index]->z);
+      glVertex3f(curve[index]->x + n.x*10, curve[index]->y + n.y*10, curve[index]->z + n.z*10);
     glEnd();
 
     glColor3f(1.0, 1.0, 0.0);
     glBegin(GL_LINES);
-      glVertex3f(curve[index].x, curve[index].y, curve[index].z);
-      glVertex3f(curve[index].x + b.x*10, curve[index].y + b.y*10, curve[index].z + b.z*10);
+      glVertex3f(curve[index]->x, curve[index]->y, curve[index]->z);
+      glVertex3f(curve[index]->x + b.x*10, curve[index]->y + b.y*10, curve[index]->z + b.z*10);
     glEnd();
 
    /* glColor3f(1.0, 0.0, 0.0);

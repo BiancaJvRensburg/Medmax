@@ -16,7 +16,8 @@ public:
     Curve(long nbCP, Vec cntrlPoints[]);
 
     void generateBezierCasteljau(long nbU);
-    Vec* getCurve(){ return curve; }
+    Vec** getCurve(){ return curve; }
+    Vec* getPoint(int index){ return curve[index]; }
 
     Vec tangent(int index);
     Vec binormal(int index);
@@ -34,20 +35,20 @@ public Q_SLOTS:
 private:
     ControlPoint **TabControlPoint;
     long nbControlPoint;
-    Vec* curve;
+    Vec **curve;
     long nbU;
 
-    Vec* casteljau(ControlPoint *TabControlPoint[], long nbControlPoint, long n);
+    Vec** casteljau(ControlPoint *TabControlPoint[], long nbControlPoint, long n);
     Vec* finalPoint(ControlPoint *TabControlPoint[], long nbControlPoint, double u);
 
     void initConnections();
 
     // Frenet frame
-    Vec* derivative();
-    Vec* dt;
+    Vec** derivative();
+    Vec** dt;
 
-    Vec* secondDerivative();
-    Vec* d2t;
+    Vec** secondDerivative();
+    Vec** d2t;
 
 };
 

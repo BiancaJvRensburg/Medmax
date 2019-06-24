@@ -18,6 +18,8 @@ void Viewer::draw() {
     glMultMatrixd(manipulatedFrame()->matrix());  // Multiply the modelView by a manipulated frame
     drawAxis();
 
+    updatePlane();
+
     glColor3f(1.,1.,1.);
     mesh.draw();
 
@@ -45,8 +47,6 @@ void Viewer::init() {
   setManipulatedFrame(new ManipulatedFrame());
 
   setAxisIsDrawn();
-
-  //setMouseBinding(Qt::NoModifier, Qt::RightButton, QGLViewer::FRAME, QGLViewer::TRANSLATE);
 
   initCurve();
 
@@ -77,7 +77,7 @@ void Viewer::moveLeftPlane(int position){
         if(curveIndexL >= nbU) curveIndexL = nbU-1;
         else if(curveIndexL < 0) curveIndexL = 0;   // shouldn't ever happen
 
-        leftPlane->setPosition(curve->getCurve()[curveIndexL]);
+        //leftPlane->setPosition(curve->getPoint(curveIndexL));
         leftPlane->setOrientation(getNewOrientation(curveIndexL));
 
         update();
@@ -110,7 +110,7 @@ void Viewer::moveRightPlane(int position){
         if(curveIndexR >= nbU) curveIndexR = nbU-1;
         else if(curveIndexR < 0) curveIndexR = 0;   // shouldn't ever happen
 
-        rightPlane->setPosition(curve->getCurve()[curveIndexR]);
+        //rightPlane->setPosition(curve->getPoint(curveIndexR));
         rightPlane->setOrientation(getNewOrientation(curveIndexR));
 
         update();
@@ -162,14 +162,14 @@ void Viewer::initCurve(){
 }
 
 void Viewer::initPlanes(){
+    curveIndexR = nbU - 1;
+    curveIndexL = 0;
 
     leftPlane = new Plane(10.0);
     rightPlane = new Plane(10.0);
 
-    leftPlane->setPosition(startPoint);
-    rightPlane->setPosition(endPoint);
-    curveIndexR = nbU - 1;
-    curveIndexL = 0;
+    /*leftPlane->setPosition(curve->getPoint(curveIndexL));
+    rightPlane->setPosition(curve->getPoint(curveIndexR));*/
 
     leftPlane->setOrientation(getNewOrientation(curveIndexL));
     rightPlane->setOrientation(getNewOrientation(curveIndexR));
@@ -187,6 +187,14 @@ void Viewer::updateCamera(const Vec3Df & center, float radius){
     camera()->setSceneCenter(Vec(static_cast<double>(center[0]), static_cast<double>(center[1]), static_cast<double>(center[2])));
     camera()->setSceneRadius(static_cast<double>(radius*1.05f));
     camera()->showEntireScene();
+}
+
+void Viewer::updatePlane(){
+    leftPlane->setPosition(curve->getPoint(curveIndexL));
+    rightPlane->setPosition(curve->getPoint(curveIndexR));
+
+    /*leftPlane->setOrientation(getNewOrientation(curveIndexL));
+    rightPlane->setOrientation(getNewOrientation(curveIndexR));*/
 }
 
 Quaternion Viewer::getNewOrientation(int index){

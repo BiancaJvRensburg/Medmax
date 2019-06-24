@@ -12,8 +12,8 @@ void ViewerFibula::movePlanes(int position){
 
     if(curveIndexL + offset < nbU && curveIndexL + offset > 0 && curveIndexR + offset < nbU && curveIndexR + offset > 0){
         indexOffset = offset;
-        leftPlane->setPosition(curve->getCurve()[curveIndexL + indexOffset]);
-        rightPlane->setPosition(curve->getCurve()[curveIndexR + indexOffset]);
+        leftPlane->setPosition(curve->getPoint(curveIndexL + indexOffset));
+        rightPlane->setPosition(curve->getPoint(curveIndexR + indexOffset));
     }
 
     update();
