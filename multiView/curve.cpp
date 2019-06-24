@@ -63,7 +63,7 @@ Point* Curve::casteljau(ControlPoint **TabControlPoint, long nbControlPoint, lon
 }
 
 Point* Curve::finalPoint(ControlPoint **TabControlPoint, long nbControlPoint, double u){
-  if(nbControlPoint==1) return TabControlPoint[0]->getPoint();
+  if(nbControlPoint==1) return new Point(TabControlPoint[0]->getX(), TabControlPoint[0]->getY(), TabControlPoint[0]->getZ());
   else{
     ControlPoint *newPoints[nbControlPoint-1];
     double x,y,z;
@@ -95,7 +95,7 @@ void Curve::drawControl(){
       glColor3f(0.0, 0.0, 1.0);
 
       for(int i=0; i<nbControlPoint; i++){
-        Point *p = TabControlPoint[i]->getPoint();
+        Point *p = new Point(TabControlPoint[i]->getX(), TabControlPoint[i]->getY(), TabControlPoint[i]->getZ());
         glVertex3f(p->getX(), p->getY(), p->getZ());
       }
 

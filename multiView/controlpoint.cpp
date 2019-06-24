@@ -3,7 +3,7 @@
 
 #include <QGLViewer/manipulatedFrame.h>
 
-ControlPoint::ControlPoint(Point* p)
+ControlPoint::ControlPoint(Vec* p)
 {
     this->p = p;
     initialise();
@@ -11,13 +11,13 @@ ControlPoint::ControlPoint(Point* p)
 
 ControlPoint::ControlPoint(double x, double y, double z)
 {
-    this->p = new Point(x,y,z);
+    this->p = new Vec(x,y,z);
     initialise();
 }
 
 void ControlPoint::initialise(){
     mf = new ManipulatedFrame();
-    mf->setPosition(this->p->getX(), this->p->getY(), this->p->getZ());
+    mf->setPosition(this->p->x, this->p->y, this->p->z);
     connect(mf, &ManipulatedFrame::manipulated, this, &ControlPoint::cntrlMoved);
 }
 
@@ -44,9 +44,9 @@ void ControlPoint::cntrlMoved(){
     double x,y,z;
 
     mf->getPosition(x,y,z);
-    p->setX(x);
-    p->setY(y);
-    p->setZ(z);
+    p->x = x;
+    p->y = y;
+    p->z = z;
 
     Q_EMIT ControlPoint::cntrlPointTranslated();
 }

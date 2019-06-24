@@ -1,7 +1,7 @@
 #ifndef CONTROLPOINT_H
 #define CONTROLPOINT_H
 
-#include "point.h"
+//#include "point.h"
 #include "camerapathplayer.h"
 #include <QGLViewer/qglviewer.h>
 #include <QGLViewer/manipulatedFrame.h>
@@ -14,14 +14,14 @@ class ControlPoint : public QObject
     Q_OBJECT
 
 public:
-    ControlPoint(){ p = new Point(0,0,0);}
-    ControlPoint(Point* p);
+    ControlPoint(){ p = new Vec(0,0,0);}
+    ControlPoint(Vec* p);
     ControlPoint(double x, double y, double z);
 
-    Point* getPoint(){ return p; }
-    double getX(){ return p->getX(); }
-    double getY(){ return p->getY(); }
-    double getZ(){ return p->getZ(); }
+    Vec* getPoint(){ return p; }
+    double getX(){ return p->x; }
+    double getY(){ return p->y; }
+    double getZ(){ return p->z; }
 
     void initialise();
     void draw();
@@ -33,7 +33,7 @@ Q_SIGNALS:
     void cntrlPointTranslated();
 
 private:
-    Point* p;
+    Vec* p;
     ManipulatedFrame* mf;
 };
 
