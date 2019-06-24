@@ -77,7 +77,7 @@ void Viewer::moveLeftPlane(int position){
         if(curveIndexL >= nbU) curveIndexL = nbU-1;
         else if(curveIndexL < 0) curveIndexL = 0;   // shouldn't ever happen
 
-        leftPlane->setPosition(curve->getCurve()[curveIndexL].toVec());
+        leftPlane->setPosition(curve->getCurve()[curveIndexL]);
         leftPlane->setOrientation(getNewOrientationL());
 
         update();
@@ -110,7 +110,7 @@ void Viewer::moveRightPlane(int position){
         if(curveIndexR >= nbU) curveIndexR = nbU-1;
         else if(curveIndexR < 0) curveIndexR = 0;   // shouldn't ever happen
 
-        rightPlane->setPosition(curve->getCurve()[curveIndexR].toVec());
+        rightPlane->setPosition(curve->getCurve()[curveIndexR]);
         rightPlane->setOrientation(getNewOrientationR());
 
         update();
@@ -143,14 +143,14 @@ void Viewer::wheelEvent(QWheelEvent *e) {
 
 void Viewer::initCurve(){
     const long nbCP = 4;
-    Point control[nbCP];
+    Vec control[nbCP];
 
-    startPoint = Point(-50, -30, -30);
-    endPoint = Point(50, -30, -30);
+    startPoint = Vec(-50, -30, -30);
+    endPoint = Vec(50, -30, -30);
 
     control[0] = startPoint;
-    control[1] = Point(-30, -120, -100);
-    control[2] = Point(20, -120, -100);
+    control[1] = Vec(-30, -120, -100);
+    control[2] = Vec(20, -120, -100);
     control[3] = endPoint;
 
     curve = new Curve(nbCP, control);
@@ -166,8 +166,8 @@ void Viewer::initPlanes(){
     leftPlane = new Plane(10.0);
     rightPlane = new Plane(10.0);
 
-    leftPlane->setPosition(startPoint.toVec());
-    rightPlane->setPosition(endPoint.toVec());
+    leftPlane->setPosition(startPoint);
+    rightPlane->setPosition(endPoint);
     curveIndexR = nbU - 1;
     curveIndexL = 0;
 
@@ -193,8 +193,8 @@ Quaternion Viewer::getNewOrientationL(){
     Quaternion s,q,r;
     Vec current, next;
 
-    current = Vec(curve->getCurve()[curveIndexL].toVec());
-    if(curveIndexL < nbU-1) next = Vec(curve->getCurve()[curveIndexL+1].toVec());
+    current = Vec(curve->getCurve()[curveIndexL]);
+    if(curveIndexL < nbU-1) next = Vec(curve->getCurve()[curveIndexL+1]);
     else next = current;
 
     Vec norm = curve->normal(curveIndexL);
@@ -208,8 +208,8 @@ Quaternion Viewer::getNewOrientationR(){
     Quaternion q,s;
     Vec rot, current, next;
 
-    current = Vec(curve->getCurve()[curveIndexR].toVec());
-    if(curveIndexR > 0) next = Vec(curve->getCurve()[curveIndexR-1].toVec());
+    current = Vec(curve->getCurve()[curveIndexR]);
+    if(curveIndexR > 0) next = Vec(curve->getCurve()[curveIndexR-1]);
     else next = current;
 
     Vec norm = curve->normal(curveIndexR);

@@ -7,7 +7,6 @@
 #include "standardcamera.h"
 #include "plane.h"
 #include "curve.h"
-#include "point.h"
 
 using namespace qglviewer;
 
@@ -46,8 +45,8 @@ protected:
     Plane *rightPlane;
     Curve *curve;
 
-    Point startPoint;
-    Point endPoint;
+    Vec startPoint;
+    Vec endPoint;
     int curveIndexL;
     int curveIndexR;
     int nbU;

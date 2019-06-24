@@ -1,7 +1,6 @@
 #ifndef CURVE_H
 #define CURVE_H
 
-#include "point.h"
 #include <QGLViewer/qglviewer.h>
 #include "controlpoint.h"
 
@@ -14,10 +13,10 @@ class Curve : public QObject
 public:
     Curve(){}
     Curve(long nbCP);
-    Curve(long nbCP, Point cntrlPoints[]);
+    Curve(long nbCP, Vec cntrlPoints[]);
 
     void generateBezierCasteljau(long nbU);
-    Point* getCurve(){ return curve; }
+    Vec* getCurve(){ return curve; }
 
     Vec tangent(int index);
     Vec binormal(int index);
@@ -35,20 +34,20 @@ public Q_SLOTS:
 private:
     ControlPoint **TabControlPoint;
     long nbControlPoint;
-    Point* curve;
+    Vec* curve;
     long nbU;
 
-    Point* casteljau(ControlPoint *TabControlPoint[], long nbControlPoint, long n);
-    Point* finalPoint(ControlPoint *TabControlPoint[], long nbControlPoint, double u);
+    Vec* casteljau(ControlPoint *TabControlPoint[], long nbControlPoint, long n);
+    Vec* finalPoint(ControlPoint *TabControlPoint[], long nbControlPoint, double u);
 
     void initConnections();
 
     // Frenet frame
-    Point* derivative();
-    Point* dt;
+    Vec* derivative();
+    Vec* dt;
 
-    Point* secondDerivative();
-    Point* d2t;
+    Vec* secondDerivative();
+    Vec* d2t;
 
 };
 

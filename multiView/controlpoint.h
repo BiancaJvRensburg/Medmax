@@ -1,7 +1,6 @@
 #ifndef CONTROLPOINT_H
 #define CONTROLPOINT_H
 
-//#include "point.h"
 #include "camerapathplayer.h"
 #include <QGLViewer/qglviewer.h>
 #include <QGLViewer/manipulatedFrame.h>

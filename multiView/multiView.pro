@@ -17,7 +17,6 @@ HEADERS  = \
     mesh.h \
     meshreader.h \
     plane.h \
-    point.h \
     standardcamera.h \
     viewer.h \
     Triangle.h \
@@ -30,7 +29,6 @@ SOURCES  = main.cpp \
     mainwindow.cpp \
     mesh.cpp \
     plane.cpp \
-    point.cpp \
     standardcamera.cpp \
     viewer.cpp \
     viewerfibula.cpp
