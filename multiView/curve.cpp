@@ -40,6 +40,12 @@ void Curve::generateBezierCasteljau(long n)
 }
 
 void Curve::reintialiseCurve(){
+    for(int i=0; i<nbU; i++){
+        delete curve[i];
+        delete dt[i];
+        delete d2t[i];
+    }
+
     generateBezierCasteljau(nbU);
 
     Q_EMIT curveReinitialised();

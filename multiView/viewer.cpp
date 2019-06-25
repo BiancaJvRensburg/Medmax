@@ -14,12 +14,17 @@ Viewer::Viewer(QWidget *parent, StandardCamera *cam, int sliderMax) : QGLViewer(
 }
 
 void Viewer::draw() {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
     glPushMatrix();
     glMultMatrixd(manipulatedFrame()->matrix());
-    drawAxis();
+    //drawAxis();
 
     glColor3f(1.,1.,1.);
     mesh.draw();
+
+    glEnable(GL_DEPTH);
+    glEnable(GL_DEPTH_TEST);
 
     glColor3f(1.0, 0, 0);
     leftPlane->draw();
@@ -28,8 +33,11 @@ void Viewer::draw() {
     rightPlane->draw();
 
     curve->draw();
-    curve->drawControl();
-    curve->drawTangent(curveIndexL);
+
+    glDisable(GL_DEPTH);
+    glDisable(GL_DEPTH_TEST);
+
+    curve->drawControl(); // We want to visualise this at all times
 
     glPopMatrix();
 }
@@ -41,13 +49,12 @@ void Viewer::init() {
 
   setManipulatedFrame(new ManipulatedFrame());
 
-  setAxisIsDrawn();
+  setAxisIsDrawn(false);
 
   initCurve();
 
   // Set up gl settings
   glEnable(GL_LIGHTING);
-  glEnable(GL_LIGHT0);
 
   glEnable (GL_POLYGON_OFFSET_LINE);
   glPolygonMode (GL_FRONT_AND_BACK, GL_FILL);
@@ -75,7 +82,6 @@ void Viewer::moveLeftPlane(int position){
 
         leftPlane->setPosition(curve->getPoint(curveIndexL));
         leftPlane->setOrientation(getNewOrientation(curveIndexL));
-        matchPlanes(curveIndexL);
 
         update();
         Q_EMIT leftPosChanged(percentage);
@@ -85,14 +91,14 @@ void Viewer::moveLeftPlane(int position){
 void Viewer::rotateLeftPlane(int position){
     double percentage = static_cast<double>(position) / static_cast<double>(sliderMax);
 
-    leftPlane->rotatePlaneZ(percentage);
+    leftPlane->rotatePlaneYZ(percentage);
     update();
 }
 
 void Viewer::rotateRightPlane(int position){
     double percentage = static_cast<double>(position) / static_cast<double>(sliderMax);
 
-    rightPlane->rotatePlaneZ(percentage);
+    rightPlane->rotatePlaneYZ(percentage);
     update();
 }
 
@@ -160,41 +166,18 @@ void Viewer::initCurve(){
     initPlanes();
 }
 
-void Viewer::matchPlanes(int index){
-    /*Vec yAxis = Vec(0,0,1);
-    Vec t = curve->tangent(curveIndexL);
-   // t.z = -t.z;
-    double theta = angle(yAxis, t) + M_PI;
-
-   // Vec axis = Vec(1.0/3.0, 1.0/3.0, 1.0/3.0);
-    Vec axis = Vec(0,0,1);
-
-    //std::cout << t.x << " " << t.y << " " << t.z << std::endl;
-    //std::cout << (theta)*180.0/M_PI << std::endl;
-
-    leftPlane->rotatePlane(axis, theta);*/
-
-   // leftPlane->setRotation(Quaternion(yAxis, t));
-
-    /*Quaternion q = Quaternion(Vec(1, 1, 0), curve->tangent(index)+curve->binormal(index));
-
-    leftPlane->setOrientationWithConstraint(q.normalized());*/
-}
-
 void Viewer::initPlanes(){
     curveIndexR = nbU - 1;
     curveIndexL = 0;
 
-    leftPlane = new Plane(10.0);
-    rightPlane = new Plane(10.0);
+    leftPlane = new Plane(15.0);
+    rightPlane = new Plane(15.0);
 
     leftPlane->setPosition(curve->getPoint(curveIndexL));
     rightPlane->setPosition(curve->getPoint(curveIndexR));
 
     leftPlane->setOrientation(getNewOrientation(curveIndexL));
     rightPlane->setOrientation(getNewOrientation(curveIndexR));
-
-    matchPlanes(0);
 
 }
 
@@ -210,7 +193,6 @@ void Viewer::updatePlanes(){
 
     leftPlane->setOrientation(getNewOrientation(curveIndexL));
     rightPlane->setOrientation(getNewOrientation(curveIndexR));
-    matchPlanes(curveIndexL);
 
     update();
 }

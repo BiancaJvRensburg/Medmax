@@ -39,7 +39,6 @@ protected:
 
     virtual void initCurve();
     void initPlanes();
-    void matchPlanes(int index);
     Quaternion getNewOrientation(int index);
 
     Plane *leftPlane;

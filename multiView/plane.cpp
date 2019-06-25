@@ -6,20 +6,15 @@ Plane::Plane(double s)
     size = s;
     rotationPercentage = 0;
     mf = new Frame();
-    //mf->setPosition(position->x, position->y, position->z);
-
-    constraint = new LocalConstraint();
-    constraint->setRotationConstraint(AxisPlaneConstraint::AXIS, Vec(0,0,1));
-    mf->setConstraint(constraint);
 
     initBasePlane();
 }
 
 void Plane::initBasePlane(){
-        points[0] = new Vec(position->x - size, position->y, position->z - size);
-        points[1] = new Vec(position->x + size, position->y, position->z - size);
-        points[2] = new Vec(position->x + size, position->y, position->z + size);
-        points[3] = new Vec(position->x - size, position->y, position->z + size);
+        points[0] = new Vec(position->x - size, position->y - size, position->z);
+        points[1] = new Vec(position->x - size, position->y + size, position->z);
+        points[2] = new Vec(position->x + size, position->y + size, position->z);
+        points[3] = new Vec(position->x + size, position->y - size, position->z);
 }
 
 void Plane::draw(){
@@ -33,8 +28,8 @@ void Plane::draw(){
         glVertex3f(points[3]->x, points[3]->y, points[3]->z);
     glEnd();
 
-    glColor3f(1,1,1);
-    QGLViewer::drawAxis(15.0);
+    /*glColor3f(1,1,1);
+    QGLViewer::drawAxis(15.0);*/
 
     glPopMatrix();
 }
@@ -43,12 +38,12 @@ void Plane::rotatePlane(Vec axis, double theta){
     rotate(Quaternion(cos(theta/2.0)*axis.x, cos(theta/2.0)*axis.y, cos(theta/2.0)*axis.z, sin(theta/2.0)));
 }
 
-void Plane::rotatePlaneZ(double percentage){
+void Plane::rotatePlaneYZ(double percentage){
     double r = (percentage - rotationPercentage);
     rotationPercentage = percentage;
 
     double theta = (M_PI*2.0)*r + M_PI;
-    Vec axis = Vec(0,0,1);
+    Vec axis = Vec(1,0,0);
 
     rotatePlane(axis, theta);
 }
