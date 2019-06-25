@@ -16,9 +16,6 @@ public:
 
     void setPosition(Vec *pos); // { normalFrame.setPosition(pos); }
     void setOrientation(Quaternion q){ mf->setOrientation(q); }
-    void setOrientationWithConstraint(Quaternion q){ mf->setOrientationWithConstraint(q); }
-    void rotate(Quaternion q) { mf->rotate(q); }
-    void setRotation(Quaternion q){ mf->setRotationWithConstraint(q);}
     Quaternion fromRotatedBasis(Vec x, Vec y, Vec z);
 
     Vec coordinatesInRef(Vec v){ return mf->coordinatesOfIn(v, mf->referenceFrame()); }
@@ -36,6 +33,7 @@ private:
     Frame* mf;
     double rotationPercentage;
     void initBasePlane();
+    void rotate(Quaternion q) { mf->rotate(q); }
 };
 
 #endif // PLANE_H
