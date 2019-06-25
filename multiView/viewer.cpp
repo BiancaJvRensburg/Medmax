@@ -161,15 +161,24 @@ void Viewer::initCurve(){
 }
 
 void Viewer::matchPlanes(int index){
-    Vec yAxis = Vec(0,1,0);
+    /*Vec yAxis = Vec(0,0,1);
     Vec t = curve->tangent(curveIndexL);
    // t.z = -t.z;
-    double theta = 2.0*M_PI - angle(yAxis, t);
+    double theta = angle(yAxis, t) + M_PI;
+
+   // Vec axis = Vec(1.0/3.0, 1.0/3.0, 1.0/3.0);
+    Vec axis = Vec(0,0,1);
 
     //std::cout << t.x << " " << t.y << " " << t.z << std::endl;
     //std::cout << (theta)*180.0/M_PI << std::endl;
 
-    leftPlane->rotatePlane(Vec(0,0,1), theta);
+    leftPlane->rotatePlane(axis, theta);*/
+
+   // leftPlane->setRotation(Quaternion(yAxis, t));
+
+    /*Quaternion q = Quaternion(Vec(1, 1, 0), curve->tangent(index)+curve->binormal(index));
+
+    leftPlane->setOrientationWithConstraint(q.normalized());*/
 }
 
 void Viewer::initPlanes(){
@@ -207,19 +216,22 @@ void Viewer::updatePlanes(){
 }
 
 Quaternion Viewer::getNewOrientation(int index){
-    Quaternion s = Quaternion(Vec(0,0,1.0), curve->normal(index));
-    //s = Quaternion(Vec(1.0/3.0, 1.0/3.0, 1.0/3.0), curve->orientation(index));
+    Quaternion s;
+
+    // Both planes need the same coordinate system
+    s = leftPlane->fromRotatedBasis(curve->normal(index), curve->binormal(index), curve->tangent(index));
 
     return s.normalized();
 }
 
 double Viewer::angle(Vec a, Vec b){
-    Vec ab = Vec(a.x*b.x, a.y*b.y, a.z*b.z);
-    double na = a.norm();
-    double nb = b.norm();
-    double nab = ab.norm();
 
-    return acos(nab / (na*nb));
+    double na = a.normalize();
+    double nb = b.normalize();
+
+    double ab = a*b;
+
+    return acos(ab / (na*nb));
 }
 
 

@@ -16,9 +16,11 @@ public:
 
     void setPosition(Vec *pos); // { normalFrame.setPosition(pos); }
     void setOrientation(Quaternion q){ mf->setOrientation(q); }
+    void setOrientationWithConstraint(Quaternion q){ mf->setOrientationWithConstraint(q); }
     void rotate(Quaternion q) { mf->rotate(q); }
     //void setRotation(Vec to, Vec from){ normalFrame.setRotation(Quaternion(to, from));}
-    void setRotation(Quaternion q){ mf->setRotation(q);}
+    void setRotation(Quaternion q){ mf->setRotationWithConstraint(q);}
+    Quaternion fromRotatedBasis(Vec x, Vec y, Vec z);
 
     Vec coordinatesInRef(Vec v){ return mf->coordinatesOfIn(v, mf->referenceFrame()); }
     Vec refCoordinatesInFrame(Vec v){ return mf->coordinatesOfFrom(v, mf->referenceFrame()); }
@@ -29,11 +31,13 @@ public:
     void draw();
 
 private:
-    Vec *position;  // In relation to the normal, this is what will be adjusted with the manipulators
+    Vec* position;  // In relation to the normal, this is what will be adjusted with the manipulators
     Vec* points[4];
     double size;
-    ManipulatedFrame* mf;
-    double rotationPercentage;    // Between 0 and 2.0*M_PI
+    Frame* mf;
+    double rotationPercentage;    // Between 0 and 2.0*M_PI  
+
+    AxisPlaneConstraint* constraint;
 
     void initBasePlane();
 };

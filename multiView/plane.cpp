@@ -5,8 +5,12 @@ Plane::Plane(double s)
     position = new Vec(0, 0, 0);
     size = s;
     rotationPercentage = 0;
-    mf = new ManipulatedFrame();
+    mf = new Frame();
     //mf->setPosition(position->x, position->y, position->z);
+
+    constraint = new LocalConstraint();
+    constraint->setRotationConstraint(AxisPlaneConstraint::AXIS, Vec(0,0,1));
+    mf->setConstraint(constraint);
 
     initBasePlane();
 }
@@ -52,4 +56,12 @@ void Plane::rotatePlaneZ(double percentage){
 void Plane::setPosition(Vec* pos){
     position = pos;
     mf->setPosition(position->x, position->y, position->z);
+}
+
+Quaternion Plane::fromRotatedBasis(Vec x, Vec y, Vec z){
+    Quaternion q = Quaternion();
+
+    q.setFromRotatedBasis(x,y,z);
+
+   return q;
 }
