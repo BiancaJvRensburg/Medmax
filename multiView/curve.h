@@ -16,6 +16,7 @@ public:
     Curve(long nbCP, ControlPoint *cntrlPoints[]);
 
     void generateBezierCasteljau(long nbU);
+    void generateBSpline(long nbU, int degree);
     Vec** getCurve(){ return curve; }
     Vec* getPoint(int index){ return curve[index]; }
 
@@ -41,8 +42,18 @@ private:
     Vec **curve;
     long nbU;
 
+    // BSpline
+    int degree;
+    double *knotVector;
+    int knotIndex;
+
     Vec** casteljau(ControlPoint *TabControlPoint[], long nbControlPoint, long n);
     Vec* finalPoint(ControlPoint *TabControlPoint[], long nbControlPoint, double u);
+
+    // BSpline
+    void generateUniformKnotVector();
+    Vec** basis(long nbU);
+    Vec deBoor(double u, int i, int r);
 
     void initConnections();
 
