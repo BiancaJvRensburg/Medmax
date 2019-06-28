@@ -51,9 +51,12 @@ private:
     Vec* finalPoint(ControlPoint *TabControlPoint[], long nbControlPoint, double u);
 
     // BSpline
-    void generateUniformKnotVector();
+    double* generateUniformKnotVector(int k);
     Vec** basis(long nbU);
     Vec deBoor(double u, int i, int r);
+    Vec** splineDerivative(int k);
+    Vec derivePoint(int k, int j);
+    Vec deBoorDerivative(double u, int i, int r, int k, double* kv);
 
     void initConnections();
 

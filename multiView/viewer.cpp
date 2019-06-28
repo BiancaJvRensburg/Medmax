@@ -145,7 +145,7 @@ void Viewer::wheelEvent(QWheelEvent *e) {
 }
 
 void Viewer::initCurve(){
-    const long nbCP = 4;
+    /*const long nbCP = 4;
     ControlPoint *control[nbCP];
 
     ControlPoint *startPoint = new ControlPoint(-50, -30, -30);
@@ -154,9 +154,9 @@ void Viewer::initCurve(){
     control[0] = startPoint;
     control[1] = new ControlPoint(-30, -120, -100);
     control[2] = new ControlPoint(20, -120, -100);
-    control[3] = endPoint;
+    control[3] = endPoint;*/
 
-   /* const long nbCP = 7;
+   const long nbCP = 7;
     ControlPoint *control[nbCP];
 
     control[0] = new ControlPoint(10,0,0);
@@ -165,16 +165,16 @@ void Viewer::initCurve(){
     control[3] = new ControlPoint(100, 80, 0);
     control[4] = new ControlPoint(130, 60, 0);
     control[5] = new ControlPoint(170, 40, 0);
-    control[6] = new ControlPoint(200, 0, 0);*/
+    control[6] = new ControlPoint(200, 0, 0);
 
 
     curve = new Curve(nbCP, control);
 
     connect(curve, &Curve::curveReinitialised, this, &Viewer::updatePlanes);
 
-    nbU = 100;
+    nbU = 10;
    //curve->generateBezierCasteljau(nbU);
-   curve->generateBSpline(nbU, 2);
+   curve->generateBSpline(nbU, 3);
 
    initPlanes();
 }

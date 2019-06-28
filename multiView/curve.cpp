@@ -44,27 +44,26 @@ void Curve::generateBSpline(long nbU, int degree){
     this->degree = degree;
     this->knotIndex = 0;
 
-    generateUniformKnotVector();
+    this->knotVector = generateUniformKnotVector(0);
 
-    curve = basis(nbU);
+    curve = splineDerivative(0); // basis(nbU);
+    /*dt =  splineDerivative(1);
+    d2t = splineDerivative(2);*/
     dt = derivative();
     d2t = secondDerivative();
 }
 
 Vec** Curve::basis(long nbU){
     Vec** c = new Vec*[nbU];
-    int m = nbControlPoint + degree;    // The last possible index in this context
+    //int m = nbControlPoint + degree;    // The last possible index in this context
 
     for(int i=0; i<nbU; i++){
         double u = (1.0 / static_cast<double>(nbU-1)) * static_cast<double>(i);
         c[i] = new Vec();
 
         while(u >= knotVector[knotIndex+1] && knotVector[knotIndex+1] != 1) knotIndex++;        // TODO : relook at this condition
-        // std::cout << "Knot index " << knotIndex << std::endl;
 
         *c[i] += Vec(deBoor(u, knotIndex, degree));
-        // std::cout << i << " : " << c[i]->x << " " << c[i]->y << " " << c[i]->z << std::endl;
-
     }
     return c;
 }
@@ -76,29 +75,79 @@ Vec Curve::deBoor(double u, int j, int r){
 
     double alpha = (u - knotVector[j]) / (knotVector[j+degree-(r-1)] - knotVector[j]);
 
-   // std::cout << "Alpha : " << alpha << " where j,r = " << j << " " << r << " with u : " << u << std::endl;
-
     return (1.0 - alpha) * deBoor(u, j-1, r-1) + alpha * deBoor(u, j, r-1);
 }
 
-void Curve::generateUniformKnotVector(){
-    int k = degree;
-    int n = nbControlPoint;
+Vec Curve::deBoorDerivative(double u, int j, int r, int k, double* kv){
+    if(r==0) return derivePoint(k, j);
+
+    double alpha = (u - kv[j]) / (kv[j+(degree-k)-(r-1)] - kv[j]);
+
+   // std::cout << "Alpha : " << alpha << " where j,r = " << j << " " << r << " with u : " << u << " and kv[j] " << kv[j] << std::endl;
+
+    return (1.0 - alpha) * deBoorDerivative(u, j-1, r-1, k, kv) + alpha * deBoorDerivative(u, j, r-1, k, kv);
+}
+
+// Returns the kth derivative of a point u
+Vec** Curve::splineDerivative(int k){
+    double* knotDerivative = generateUniformKnotVector(k);
+
+    int newDegree = degree - k;
+   /* Vec sumPoint = Vec(0,0,0);
+
+    for(int j=0; j<nbControlPoint - k; j++){    // could be nbControl point - 1
+        //double alpha = static_cast<double>(degree - k + 1) / knotVector[j+degree+1] - knotVector[j+k];
+
+        //Vec point = deBoor(u, j+1, k-1) + deBoor(u, j, k-1);
+
+        // basis function
+       // sumPoint += point * alpha; // * basis function
+    }
+    return sumPoint;*/
+
+    Vec** c = new Vec*[nbU];
+    //int m = nbControlPoint + degree;    // The last possible index in this context
+
+    for(int i=0; i<nbU; i++){
+        double u = (1.0 / static_cast<double>(nbU-1)) * static_cast<double>(i);
+        c[i] = new Vec();
+
+        while(u >= knotDerivative[knotIndex+1] && knotDerivative[knotIndex+1] != 1) knotIndex++;
+
+         //std::cout << "Knot index " << knotIndex << " with u " << u << std::endl;
+
+        *c[i] += Vec(deBoorDerivative(u, knotIndex, newDegree, k, knotDerivative));
+
+        //std::cout << i << " : " << c[i]->x << " " << c[i]->y << " " << c[i]->z << std::endl;
+    }
+    return c;
+}
+
+Vec Curve::derivePoint(int k, int j){
+    if(k==0) return Vec(TabControlPoint[j]->getX(), TabControlPoint[j]->getY(), TabControlPoint[j]->getZ());
+
+    double alpha = static_cast<double>(degree - k + 1) / (knotVector[j+degree+1] + knotVector[j+k]);
+
+    return alpha * (derivePoint(k-1, j+1) + derivePoint(k-1, j));
+}
+
+double* Curve::generateUniformKnotVector(int a){
+    int k = degree - a;
+    int n = nbControlPoint - a;
     int m = n + k + 1;
-    this->knotVector = new double[m];
+    double* kv = new double[m];
 
     double denom = static_cast<double>(m) - 2.0* static_cast<double>(k) - 1.0;
 
-    /*std::cout << "n " << n << std::endl;
-    std::cout << "k " << k << std::endl;*/
+    for(int i=0; i<=k; i++) kv[i] = 0;
+    for(int i=k+1; i<m-k-1; i++) kv[i] = static_cast<double>(i-k) / denom;
+    for(int i=m-k-1; i<m; i++) kv[i] = 1.0;
 
-    for(int i=0; i<=k; i++) knotVector[i] = 0;
-    for(int i=k+1; i<m-k-1; i++) knotVector[i] = static_cast<double>(i-k) / denom;
-    for(int i=m-k-1; i<m; i++) knotVector[i] = 1.0;
+   /* std::cout << " KNOT VECTOR " << std::endl;
+        for(int i=0; i<m; i++) std::cout << kv[i] << std::endl;
+        std::cout << " DONE " << std::endl;*/
 
-    /*std::cout << " KNOT VECTOR " << std::endl;
-    for(int i=0; i<m; i++) std::cout << knotVector[i] << std::endl;
-    std::cout << " DONE " << std::endl;*/
+    return kv;
 }
 
 void Curve::reintialiseCurve(){
