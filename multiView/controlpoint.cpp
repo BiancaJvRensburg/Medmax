@@ -37,6 +37,8 @@ void ControlPoint::draw(){
     glPointSize(1.0);
     glColor3f(0,0,0);
 
+    //std::cout << p->x << " " << p->y << " " << p->z << std::endl;
+
     glPopMatrix();
 }
 

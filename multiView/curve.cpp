@@ -47,10 +47,10 @@ void Curve::generateBSpline(long nbU, int degree){
     this->knotVector = generateUniformKnotVector(0);
 
     curve = splineDerivative(0); // basis(nbU);
-    /*dt =  splineDerivative(1);
-    d2t = splineDerivative(2);*/
-    dt = derivative();
-    d2t = secondDerivative();
+    dt =  splineDerivative(1);
+    d2t = splineDerivative(2);
+    // dt = derivative();
+   // d2t = secondDerivative();
 }
 
 Vec** Curve::basis(long nbU){
@@ -78,18 +78,11 @@ Vec Curve::deBoor(double u, int j, int r){
     return (1.0 - alpha) * deBoor(u, j-1, r-1) + alpha * deBoor(u, j, r-1);
 }
 
-Vec Curve::deBoorDerivative(double u, int j, int r, int k, double* kv){
-    if(r==0) return derivePoint(k, j);
-
-    double alpha = (u - kv[j]) / (kv[j+(degree-k)-(r-1)] - kv[j]);
-
-   // std::cout << "Alpha : " << alpha << " where j,r = " << j << " " << r << " with u : " << u << " and kv[j] " << kv[j] << std::endl;
-
-    return (1.0 - alpha) * deBoorDerivative(u, j-1, r-1, k, kv) + alpha * deBoorDerivative(u, j, r-1, k, kv);
-}
 
 // Returns the kth derivative of a point u
 Vec** Curve::splineDerivative(int k){
+
+    this->knotIndex = 0;
     double* knotDerivative = generateUniformKnotVector(k);
 
     int newDegree = degree - k;
@@ -118,17 +111,39 @@ Vec** Curve::splineDerivative(int k){
 
         *c[i] += Vec(deBoorDerivative(u, knotIndex, newDegree, k, knotDerivative));
 
-        //std::cout << i << " : " << c[i]->x << " " << c[i]->y << " " << c[i]->z << std::endl;
+        // std::cout << i << " : " << c[i]->x << " " << c[i]->y << " " << c[i]->z << std::endl;
     }
     return c;
 }
 
+// Defined on U'
+Vec Curve::deBoorDerivative(double u, int j, int r, int k, double* kv){
+    if(r==0) return derivePoint(k, j);
+
+    double alpha = (u - kv[j]) / (kv[j+(degree-k)-(r-1)] - kv[j]);
+
+    // std::cout << "Alpha : " << alpha << " where j,r = " << j << " " << r << " with u : " << u << " and kv[j] " << kv[j] << std::endl;
+
+    return (1.0 - alpha) * deBoorDerivative(u, j-1, r-1, k, kv) + alpha * deBoorDerivative(u, j, r-1, k, kv);
+
+
+    /*if(r > degree - k){
+        double alpha = - static_cast<double>(r) / (knotVector[j+degree-r] - knotVector[j]);
+        double beta = static_cast<double>(r) / (knotVector[j+degree-r] - knotVector[j+1]);
+        return alpha * deBoorDerivative(u, j-1, r-1, k, kv) + beta * deBoorDerivative(u, j, r-1, k, kv);
+    }
+
+    else return deBoor(u, j, r);*/
+}
+
+// Defined on U
 Vec Curve::derivePoint(int k, int j){
     if(k==0) return Vec(TabControlPoint[j]->getX(), TabControlPoint[j]->getY(), TabControlPoint[j]->getZ());
 
     double alpha = static_cast<double>(degree - k + 1) / (knotVector[j+degree+1] + knotVector[j+k]);
 
     return alpha * (derivePoint(k-1, j+1) + derivePoint(k-1, j));
+
 }
 
 double* Curve::generateUniformKnotVector(int a){
@@ -143,7 +158,7 @@ double* Curve::generateUniformKnotVector(int a){
     for(int i=k+1; i<m-k-1; i++) kv[i] = static_cast<double>(i-k) / denom;
     for(int i=m-k-1; i<m; i++) kv[i] = 1.0;
 
-   /* std::cout << " KNOT VECTOR " << std::endl;
+    /*std::cout << " KNOT VECTOR " << std::endl;
         for(int i=0; i<m; i++) std::cout << kv[i] << std::endl;
         std::cout << " DONE " << std::endl;*/
 

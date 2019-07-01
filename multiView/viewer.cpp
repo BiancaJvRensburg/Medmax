@@ -38,6 +38,7 @@ void Viewer::draw() {
     glDisable(GL_DEPTH_TEST);
 
     curve->drawControl(); // We want to visualise this at all times
+    //curve->drawTangent(curveIndexL);
 
     glPopMatrix();
 }
@@ -145,10 +146,10 @@ void Viewer::wheelEvent(QWheelEvent *e) {
 }
 
 void Viewer::initCurve(){
-    /*const long nbCP = 4;
+    const long nbCP = 4;
     ControlPoint *control[nbCP];
 
-    ControlPoint *startPoint = new ControlPoint(-50, -30, -30);
+    /*ControlPoint *startPoint = new ControlPoint(-50, -30, -30);
     ControlPoint *endPoint = new ControlPoint(50, -30, -30);
 
     control[0] = startPoint;
@@ -156,24 +157,32 @@ void Viewer::initCurve(){
     control[2] = new ControlPoint(20, -120, -100);
     control[3] = endPoint;*/
 
-   const long nbCP = 7;
+    ControlPoint *startPoint = new ControlPoint(-45.7, -28.2, -36);
+        ControlPoint *endPoint = new ControlPoint(37.2, -39, -41.5);
+
+        control[0] = startPoint;
+        control[1] = new ControlPoint(-20, -98.3, -90.1);
+        control[2] = new ControlPoint(17, -104.4, -98.3);
+        control[3] = endPoint;
+
+    /*const long nbCP = 7;
     ControlPoint *control[nbCP];
 
-    control[0] = new ControlPoint(10,0,0);
+    control[0] = new ControlPoint(10,0,0); // No problem if value changed (problem with (10, 0, 0) on the derivative)
     control[1] = new ControlPoint(30, 40, 0);
     control[2] = new ControlPoint(70, 60, 0);
     control[3] = new ControlPoint(100, 80, 0);
     control[4] = new ControlPoint(130, 60, 0);
     control[5] = new ControlPoint(170, 40, 0);
-    control[6] = new ControlPoint(200, 0, 0);
+    control[6] = new ControlPoint(200, 0, 0);*/
 
 
     curve = new Curve(nbCP, control);
 
     connect(curve, &Curve::curveReinitialised, this, &Viewer::updatePlanes);
 
-    nbU = 10;
-   //curve->generateBezierCasteljau(nbU);
+    nbU = 100;
+   // curve->generateBezierCasteljau(nbU);
    curve->generateBSpline(nbU, 3);
 
    initPlanes();
