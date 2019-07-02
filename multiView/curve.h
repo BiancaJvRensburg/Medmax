@@ -57,6 +57,7 @@ private:
     Vec** splineDerivative(int k);
     Vec derivePoint(int k, int j);
     Vec deBoorDerivative(double u, int i, int r, int k, double* kv);
+    Vec firstDeriv(double u, int i, int r);
 
     void initConnections();
 

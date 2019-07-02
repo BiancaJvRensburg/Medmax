@@ -26,13 +26,15 @@ void Viewer::draw() {
     glEnable(GL_DEPTH);
     glEnable(GL_DEPTH_TEST);
 
-    glColor3f(1.0, 0, 0);
+    /*glColor3f(1.0, 0, 0);
     leftPlane->draw();
 
     glColor3f(0, 1.0, 0);
-    rightPlane->draw();
+    rightPlane->draw();*/
 
     curve->draw();
+
+    curve->drawTangent(curveIndexL);
 
     glDisable(GL_DEPTH);
     glDisable(GL_DEPTH_TEST);
@@ -182,8 +184,8 @@ void Viewer::initCurve(){
     connect(curve, &Curve::curveReinitialised, this, &Viewer::updatePlanes);
 
     nbU = 100;
-   // curve->generateBezierCasteljau(nbU);
-   curve->generateBSpline(nbU, 3);
+    // curve->generateBezierCasteljau(nbU);
+    curve->generateBSpline(nbU, 3);
 
    initPlanes();
 }

@@ -49,8 +49,8 @@ void Curve::generateBSpline(long nbU, int degree){
     curve = splineDerivative(0); // basis(nbU);
     dt =  splineDerivative(1);
     d2t = splineDerivative(2);
-    // dt = derivative();
-   // d2t = secondDerivative();
+  // dt = derivative();
+    //d2t = secondDerivative();
 }
 
 Vec** Curve::basis(long nbU){
@@ -105,35 +105,55 @@ Vec** Curve::splineDerivative(int k){
         double u = (1.0 / static_cast<double>(nbU-1)) * static_cast<double>(i);
         c[i] = new Vec();
 
-        while(u >= knotDerivative[knotIndex+1] && knotDerivative[knotIndex+1] != 1) knotIndex++;
+        while(u >= knotVector[knotIndex+1] && knotVector[knotIndex+1] != 1) knotIndex++;
 
          //std::cout << "Knot index " << knotIndex << " with u " << u << std::endl;
 
-        *c[i] += Vec(deBoorDerivative(u, knotIndex, newDegree, k, knotDerivative));
+        //*c[i] += Vec(deBoorDerivative(u, knotIndex, newDegree, k, knotDerivative));
+        *c[i] += Vec(deBoorDerivative(u, knotIndex, degree, k, knotVector));
 
         // std::cout << i << " : " << c[i]->x << " " << c[i]->y << " " << c[i]->z << std::endl;
     }
     return c;
 }
 
+Vec Curve::firstDeriv(double u, int j, int r){
+    if(r==0) return Vec(TabControlPoint[j]->getX(), TabControlPoint[j]->getY(), TabControlPoint[j]->getZ());
+
+    double beta = static_cast<double>(r) / knotVector[j+1] - knotVector[j];
+
+    double alpha = (u - knotVector[j]) / (knotVector[j+degree-(r-1)] - knotVector[j]);
+
+    return ((1.0 - alpha) * deBoor(u, j-1, r-1) + alpha * deBoor(u, j, r-1)) * beta;
+}
+
 // Defined on U'
 Vec Curve::deBoorDerivative(double u, int j, int r, int k, double* kv){
-    if(r==0) return derivePoint(k, j);
+    /* if(r==0) return derivePoint(k, j);
 
     double alpha = (u - kv[j]) / (kv[j+(degree-k)-(r-1)] - kv[j]);
 
     // std::cout << "Alpha : " << alpha << " where j,r = " << j << " " << r << " with u : " << u << " and kv[j] " << kv[j] << std::endl;
 
-    return (1.0 - alpha) * deBoorDerivative(u, j-1, r-1, k, kv) + alpha * deBoorDerivative(u, j, r-1, k, kv);
+    return (1.0 - alpha) * deBoorDerivative(u, j-1, r-1, k, kv) + alpha * deBoorDerivative(u, j, r-1, k, kv);*/
 
-
-    /*if(r > degree - k){
-        double alpha = - static_cast<double>(r) / (knotVector[j+degree-r] - knotVector[j]);
-        double beta = static_cast<double>(r) / (knotVector[j+degree-r] - knotVector[j+1]);
-        return alpha * deBoorDerivative(u, j-1, r-1, k, kv) + beta * deBoorDerivative(u, j, r-1, k, kv);
+    if(r > degree - k){
+        double denom = static_cast<double>(degree + nbControlPoint + 1) - 2.0* static_cast<double>(degree) - 1.0;
+        double rnorm = static_cast<double>(r) / denom;
+        //std::cout << "r " <<  rnorm << " denom " << denom << std::endl;
+        if(k==2){
+                double alpha = - rnorm / (knotVector[j+degree-r] - knotVector[j-1]);
+                double beta = rnorm / (knotVector[j+degree-r] - knotVector[j-1]);
+                return alpha * deBoorDerivative(u, j-1, r-1, k, kv) + beta * deBoorDerivative(u, j, r-1, k, kv);
+            }
+        else if(k==1){
+            double beta = rnorm / knotVector[j+1] - knotVector[j];
+            //std::cout << "beta " <<  beta << std::endl;
+            return beta * (deBoor(u, j, r-1) - deBoor(u, j-1, r-1));
+        }
     }
 
-    else return deBoor(u, j, r);*/
+    return deBoor(u, j, r);
 }
 
 // Defined on U
