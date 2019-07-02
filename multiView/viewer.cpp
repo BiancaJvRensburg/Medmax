@@ -80,13 +80,16 @@ void Viewer::moveLeftPlane(int position){
 
         if(curveIndexL >= nbU) curveIndexL = nbU-1;
         else if(curveIndexL < 0) curveIndexL = 0;   // shouldn't ever happen
+    }
+    else if(curveIndexL == curveIndexR - 1) return;
+    else curveIndexL = curveIndexR - 1;
 
         leftPlane->setPosition(curve->getPoint(curveIndexL));
         leftPlane->setOrientation(getNewOrientation(curveIndexL));
 
         update();
         Q_EMIT leftPosChanged(percentage);
-    }
+
 }
 
 void Viewer::rotateLeftPlane(int position){
@@ -113,13 +116,15 @@ void Viewer::moveRightPlane(int position){
 
         if(curveIndexR >= nbU) curveIndexR = nbU-1;
         else if(curveIndexR < 0) curveIndexR = 0;   // shouldn't ever happen
+    }
+    else if(curveIndexR == curveIndexL + 1) return;
+    else curveIndexR = curveIndexL + 1;
 
         rightPlane->setPosition(curve->getPoint(curveIndexR));
         rightPlane->setOrientation(getNewOrientation(curveIndexR));
 
         update();
         Q_EMIT rightPosChanged(percentage);
-    }
 }
 
 void Viewer::openOFF(QString filename) {
