@@ -28,8 +28,8 @@ void Plane::draw(){
         glVertex3f(points[3]->x, points[3]->y, points[3]->z);
     glEnd();
 
-    glColor3f(1,1,1);
-    QGLViewer::drawAxis(15.0);
+    /*glColor3f(1,1,1);
+    QGLViewer::drawAxis(15.0);*/
 
     glPopMatrix();
 }

@@ -149,15 +149,12 @@ void Viewer::initCurve(){
     const long nbCP = 4;
     ControlPoint *control[nbCP];
 
-    ControlPoint *startPoint = new ControlPoint(-45.7, -28.2, -36);
-        ControlPoint *endPoint = new ControlPoint(37.2, -39, -41.5);
+    control[0] = new ControlPoint(-45.7, -28.2, -36);
+    control[1] = new ControlPoint(-20, -98.3, -90.1);
+    control[2] = new ControlPoint(17, -104.4, -98.3);
+    control[3] = new ControlPoint(37.2, -39, -41.5);
 
-        control[0] = startPoint;
-        control[1] = new ControlPoint(-20, -98.3, -90.1);
-        control[2] = new ControlPoint(17, -104.4, -98.3);
-        control[3] = endPoint;
-
-        int degree = 3;
+    int degree = 3;
 
     /*const long nbCP = 7;
     ControlPoint *control[nbCP];

@@ -50,13 +50,15 @@ void ViewerFibula::initCurve(){
     const long nbCP = 4;
     ControlPoint* control[nbCP];
 
-    ControlPoint* startPoint = new ControlPoint(70, 70, -800);
-    ControlPoint* endPoint = new ControlPoint(80, 90, -1200);
-
-    control[0] = startPoint;
+    /*control[0] = new ControlPoint(70, 70, -800);
     control[1] = new ControlPoint(80, 100, -900);
     control[2] = new ControlPoint(75, 95, -1100);
-    control[3] = endPoint;
+    control[3] = new ControlPoint(80, 90, -1200);*/
+
+    control[0] = new ControlPoint(102.4, 82.5, -864);
+    control[1] = new ControlPoint(91.5, 95.1, -926.9);
+    control[2] = new ControlPoint(81.2, 94.4, -1071);
+    control[3] = new ControlPoint(80.9, 90.1, -1155);
 
     curve = new Curve(nbCP, control);
 
