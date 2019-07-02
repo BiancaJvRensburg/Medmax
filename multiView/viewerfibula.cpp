@@ -14,6 +14,8 @@ void ViewerFibula::movePlanes(int position){
         indexOffset = offset;
         leftPlane->setPosition(curve->getPoint(curveIndexL + indexOffset));
         rightPlane->setPosition(curve->getPoint(curveIndexR + indexOffset));
+        leftPlane->setOrientation(getNewOrientation(curveIndexL + indexOffset));
+        rightPlane->setOrientation(getNewOrientation(curveIndexR + indexOffset));
     }
 
     update();
