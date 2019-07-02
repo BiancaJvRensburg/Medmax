@@ -26,11 +26,11 @@ void Viewer::draw() {
     glEnable(GL_DEPTH);
     glEnable(GL_DEPTH_TEST);
 
-    /*glColor3f(1.0, 0, 0);
+    glColor3f(1.0, 0, 0);
     leftPlane->draw();
 
     glColor3f(0, 1.0, 0);
-    rightPlane->draw();*/
+    rightPlane->draw();
 
     curve->draw();
 
@@ -151,14 +151,6 @@ void Viewer::initCurve(){
     const long nbCP = 4;
     ControlPoint *control[nbCP];
 
-    /*ControlPoint *startPoint = new ControlPoint(-50, -30, -30);
-    ControlPoint *endPoint = new ControlPoint(50, -30, -30);
-
-    control[0] = startPoint;
-    control[1] = new ControlPoint(-30, -120, -100);
-    control[2] = new ControlPoint(20, -120, -100);
-    control[3] = endPoint;*/
-
     ControlPoint *startPoint = new ControlPoint(-45.7, -28.2, -36);
         ControlPoint *endPoint = new ControlPoint(37.2, -39, -41.5);
 
@@ -166,6 +158,8 @@ void Viewer::initCurve(){
         control[1] = new ControlPoint(-20, -98.3, -90.1);
         control[2] = new ControlPoint(17, -104.4, -98.3);
         control[3] = endPoint;
+
+        int degree = 3;
 
     /*const long nbCP = 7;
     ControlPoint *control[nbCP];
@@ -176,7 +170,9 @@ void Viewer::initCurve(){
     control[3] = new ControlPoint(100, 80, 0);
     control[4] = new ControlPoint(130, 60, 0);
     control[5] = new ControlPoint(170, 40, 0);
-    control[6] = new ControlPoint(200, 0, 0);*/
+    control[6] = new ControlPoint(200, 0, 0);
+
+    int degree = 5;*/
 
 
     curve = new Curve(nbCP, control);
@@ -185,7 +181,7 @@ void Viewer::initCurve(){
 
     nbU = 100;
     // curve->generateBezierCasteljau(nbU);
-    curve->generateBSpline(nbU, 3);
+    curve->generateBSpline(nbU, degree);
 
    initPlanes();
 }

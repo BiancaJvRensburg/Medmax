@@ -49,7 +49,7 @@ void Curve::generateBSpline(long nbU, int degree){
     curve = splineDerivative(0); // basis(nbU);
     dt =  splineDerivative(1);
     d2t = splineDerivative(2);
-  // dt = derivative();
+    //dt = derivative();
     //d2t = secondDerivative();
 }
 
@@ -142,9 +142,9 @@ Vec Curve::deBoorDerivative(double u, int j, int r, int k, double* kv){
         double rnorm = static_cast<double>(r) / denom;
         //std::cout << "r " <<  rnorm << " denom " << denom << std::endl;
         if(k==2){
-                double alpha = - rnorm / (knotVector[j+degree-r] - knotVector[j-1]);
-                double beta = rnorm / (knotVector[j+degree-r] - knotVector[j-1]);
-                return alpha * deBoorDerivative(u, j-1, r-1, k, kv) + beta * deBoorDerivative(u, j, r-1, k, kv);
+                double beta = rnorm / (knotVector[j+degree-(r-1)] - knotVector[j]);
+                // std::cout << "Knot  result " <<  knotVector[j+degree-r] - knotVector[j-1] << std::endl;
+                return - beta * deBoorDerivative(u, j-1, r-1, k, kv) + beta * deBoorDerivative(u, j, r-1, k, kv);
             }
         else if(k==1){
             double beta = rnorm / knotVector[j+1] - knotVector[j];
