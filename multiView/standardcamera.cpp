@@ -27,7 +27,7 @@
 using namespace qglviewer;
 
 StandardCamera::StandardCamera() {
-  standard = true;
+  standard = false;
   orthoSize = 1.0;
 }
 

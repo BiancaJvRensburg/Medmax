@@ -95,22 +95,9 @@ void Mesh::glTriangle(unsigned int i){
 
 }
 
-Axis Mesh::computeAxis(){
-    if(isInit){
-        float x = abs(BBMax[0] - BBMin[0]);
-        float y = abs(BBMax[1] - BBMin[1]);
-        float z = abs(BBMax[2] - BBMin[2]);
-
-        if(x>y && x>z) return Axis::X;
-        else if(y>z) return Axis::Y;
-        else return Axis::Z;
-    }
-    else return Axis::Z;
-}
-
 void Mesh::draw()
 {
-    recomputeNormals();
+    //recomputeNormals();
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_DEPTH);

@@ -57,8 +57,10 @@ void Viewer::init() {
   // Set up gl settings
   glEnable(GL_LIGHTING);
 
-  glEnable (GL_POLYGON_OFFSET_LINE);
   glPolygonMode (GL_FRONT_AND_BACK, GL_FILL);
+
+  //glEnable (GL_POLYGON_OFFSET_LINE);
+  //glPolygonOffset (-1.0, 1.0);
   glLineWidth (1.0f);
 
 }
@@ -132,6 +134,8 @@ void Viewer::openOFF(QString filename) {
     std::vector<Triangle> &triangles = mesh.getTriangles();
 
     FileIO::openOFF(filename.toStdString(), vertices, triangles);
+
+    mesh.update();
 
     // Set the camera
     Vec3Df center;

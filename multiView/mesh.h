@@ -30,9 +30,6 @@ public:
     void update();
     void clear();
 
-    // Zero();
-    Axis computeAxis();
-
     float getBBRadius();
 
     typedef std::priority_queue< std::pair< float , int > , std::deque< std::pair< float , int > > , std::greater< std::pair< float , int > > > FacesQueue;
@@ -48,8 +45,6 @@ protected:
     Vec3Df computeTriangleNormal(int t);
     void computeVerticesNormals();
     void glTriangle(unsigned int i);
-
-    //void sortFaces( FacesQueue & facesQueue );
 
     std::vector <Vec3Df> vertices;
     std::vector <Triangle> triangles;
