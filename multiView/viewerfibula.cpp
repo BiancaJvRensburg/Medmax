@@ -28,6 +28,7 @@ void ViewerFibula::moveLeftPlane(double percentage){
     else if(curveIndexL + indexOffset < 0) curveIndexL = - indexOffset;
 
     leftPlane->setPosition(curve->getCurve()[curveIndexL + indexOffset]);
+    leftPlane->setOrientation(getNewOrientation(curveIndexL + indexOffset));
 
     update();
 }
@@ -40,6 +41,7 @@ void ViewerFibula::moveRightPlane(double percentage){
     else if(curveIndexR < 0) curveIndexR = 0;   // shouldn't ever happen
 
     rightPlane->setPosition(curve->getCurve()[curveIndexR + indexOffset]);
+    rightPlane->setOrientation(getNewOrientation(curveIndexR + indexOffset));
 
     update();
 }
@@ -59,7 +61,7 @@ void ViewerFibula::initCurve(){
     curve = new Curve(nbCP, control);
 
     nbU = 100;
-    //curve->generateBezierCasteljau(nbU);
+
     curve->generateBSpline(nbU, 3);
     connect(curve, &Curve::curveReinitialised, this, &Viewer::updatePlanes);
 

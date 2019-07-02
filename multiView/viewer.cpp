@@ -34,8 +34,6 @@ void Viewer::draw() {
 
     curve->draw();
 
-    curve->drawTangent(curveIndexL);
-
     glDisable(GL_DEPTH);
     glDisable(GL_DEPTH_TEST);
 
