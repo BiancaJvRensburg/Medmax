@@ -52,12 +52,12 @@ private:
 
     // BSpline
     double* generateUniformKnotVector(int k);
-    Vec** basis(long nbU);
+    // Vec** basis(long nbU);
     Vec deBoor(double u, int i, int r);
     Vec** splineDerivative(int k);
-    Vec derivePoint(int k, int j);
-    Vec deBoorDerivative(double u, int i, int r, int k, double* kv);
-    Vec firstDeriv(double u, int i, int r);
+    // Vec derivePoint(int k, int j);
+    Vec deBoorDerivative(double u, int i, int r, int k);
+    // Vec firstDeriv(double u, int i, int r);
 
     void initConnections();
 
