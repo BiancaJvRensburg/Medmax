@@ -65,6 +65,9 @@ private:
     Vec** secondDerivative();
     Vec** d2t;
 
+    double discreteLength(int indexS, int indexE);      // Returns the discrete length between 2 points (One cut)
+    int indexForLength(double indexS, double length);   // Returns the end index which will create a segment of a certain length
+
 };
 
 #endif // CURVE_H

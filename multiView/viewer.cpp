@@ -183,7 +183,7 @@ void Viewer::initCurve(){
 
     connect(curve, &Curve::curveReinitialised, this, &Viewer::updatePlanes);
 
-    nbU = 100;
+    nbU = 1000;
     // curve->generateBezierCasteljau(nbU);
     curve->generateBSpline(nbU, degree);
 

@@ -124,6 +124,26 @@ void Curve::reintialiseCurve(){
     Q_EMIT curveReinitialised();
 }
 
+double Curve::discreteLength(int indexS, int indexE){
+    /*double l = 0;
+
+    for(int i=indexS; i<indexE; i++){
+        l += sqrt( pow((curve[i+1]->x - curve[i]->x), 2) + pow((curve[i+1]->y - curve[i]->y), 2) + pow((curve[i+1]->z - curve[i]->z), 2));
+    }
+
+    return l;*/
+
+    return sqrt( pow((curve[indexE]->x - curve[indexS]->x), 2) + pow((curve[indexE]->y - curve[indexS]->y), 2) + pow((curve[indexE]->z - curve[indexS]->z), 2));
+}
+
+int Curve::indexForLength(double indexS, double length){
+    int i=0;
+
+    while(discreteLength(indexS, indexS+i) < length) i++;
+
+    return indexS+i;
+}
+
 Vec** Curve::casteljau(ControlPoint **TabControlPoint, long nbControlPoint, long n){
     nbU = n;
     Vec** c = new Vec*[nbU];

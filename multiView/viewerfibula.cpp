@@ -52,11 +52,6 @@ void ViewerFibula::initCurve(){
     const long nbCP = 4;
     ControlPoint* control[nbCP];
 
-    /*control[0] = new ControlPoint(70, 70, -800);
-    control[1] = new ControlPoint(80, 100, -900);
-    control[2] = new ControlPoint(75, 95, -1100);
-    control[3] = new ControlPoint(80, 90, -1200);*/
-
     control[0] = new ControlPoint(102.4, 82.5, -864);
     control[1] = new ControlPoint(91.5, 95.1, -926.9);
     control[2] = new ControlPoint(81.2, 94.4, -1071);
@@ -64,7 +59,7 @@ void ViewerFibula::initCurve(){
 
     curve = new Curve(nbCP, control);
 
-    nbU = 100;
+    nbU = 1000;
 
     curve->generateBSpline(nbU, 3);
     connect(curve, &Curve::curveReinitialised, this, &Viewer::updatePlanes);
