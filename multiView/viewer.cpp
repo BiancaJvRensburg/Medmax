@@ -168,7 +168,7 @@ void Viewer::initCurve(){
     /*const long nbCP = 7;
     ControlPoint *control[nbCP];
 
-    control[0] = new ControlPoint(10,0,0); // No problem if value changed (problem with (10, 0, 0) on the derivative)
+    control[0] = new ControlPoint(10,0,0);
     control[1] = new ControlPoint(30, 40, 0);
     control[2] = new ControlPoint(70, 60, 0);
     control[3] = new ControlPoint(100, 80, 0);
@@ -186,6 +186,8 @@ void Viewer::initCurve(){
     nbU = 1000;
     // curve->generateBezierCasteljau(nbU);
     curve->generateBSpline(nbU, degree);
+
+    curve->addControlPoint(control[1]);
 
    initPlanes();
 }

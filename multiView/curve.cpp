@@ -4,8 +4,9 @@
 
 Curve::Curve(long nbCP)
 {
-    TabControlPoint = new ControlPoint*[nbCP];
-    nbControlPoint = nbCP;
+    TabControlPoint = new ControlPoint*[MAX_CNTRL_POINTS];
+    if(nbCP <= MAX_CNTRL_POINTS) nbControlPoint = nbCP;
+    else nbControlPoint = MAX_CNTRL_POINTS;
 
     for(int i=0; i<nbCP; i++){
         TabControlPoint[i] = new ControlPoint();
@@ -15,8 +16,9 @@ Curve::Curve(long nbCP)
 }
 
 Curve::Curve(long nbCP, ControlPoint *cntrlPoints[]){
-    TabControlPoint = new ControlPoint*[nbCP];
-    nbControlPoint = nbCP;
+    TabControlPoint = new ControlPoint*[MAX_CNTRL_POINTS];
+    if(nbCP <= MAX_CNTRL_POINTS) nbControlPoint = nbCP;
+    else nbControlPoint = MAX_CNTRL_POINTS;
 
     for(int i=0; i<nbCP; i++){
         TabControlPoint[i] = cntrlPoints[i];
@@ -29,6 +31,10 @@ void Curve::initConnections(){
     for(int i=0; i<nbControlPoint; i++){
         connect(TabControlPoint[i], &ControlPoint::cntrlPointTranslated, this, &Curve::reintialiseCurve);
     }
+}
+
+void Curve::updateConnections(ControlPoint* p){
+    connect(p, &ControlPoint::cntrlPointTranslated, this, &Curve::reintialiseCurve);
 }
 
 void Curve::generateBezierCasteljau(long n)
@@ -124,19 +130,35 @@ void Curve::reintialiseCurve(){
     Q_EMIT curveReinitialised();
 }
 
+void Curve::addControlPoint(ControlPoint* p){
+    if(isSpace()==-1) return;
+
+    int i = 0;
+    ControlPoint* nextP;
+
+    while(TabControlPoint[i]->getPoint() != p->getPoint()) i++;
+    if(i < nbU-1) nextP = TabControlPoint[i+1];
+    else return;    // don't do anything for the end point
+
+    ControlPoint* halfway = new ControlPoint( (nextP->getX() + p->getX())/2.0, (nextP->getY() + p->getY())/2.0, (nextP->getZ() + p->getZ())/2.0);
+
+    for(int j=nbControlPoint; j>i+1; j--) TabControlPoint[j] = TabControlPoint[j-1];
+    TabControlPoint[i+1] = halfway;
+    nbControlPoint++;
+    generateBSpline(nbU, degree);
+    updateConnections(halfway);
+}
+
+int Curve::isSpace(){
+    if(nbControlPoint < MAX_CNTRL_POINTS) return 0;
+    else return -1;
+}
+
 double Curve::discreteLength(int indexS, int indexE){
-    /*double l = 0;
-
-    for(int i=indexS; i<indexE; i++){
-        l += sqrt( pow((curve[i+1]->x - curve[i]->x), 2) + pow((curve[i+1]->y - curve[i]->y), 2) + pow((curve[i+1]->z - curve[i]->z), 2));
-    }
-
-    return l;*/
-
     return sqrt( pow((curve[indexE]->x - curve[indexS]->x), 2) + pow((curve[indexE]->y - curve[indexS]->y), 2) + pow((curve[indexE]->z - curve[indexS]->z), 2));
 }
 
-int Curve::indexForLength(double indexS, double length){
+int Curve::indexForLength(int indexS, double length){
     int i=0;
 
     while(discreteLength(indexS, indexS+i) < length) i++;
