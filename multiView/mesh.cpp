@@ -18,14 +18,11 @@ void Mesh::computeBB(){
     radius = (BBMax - BBMin).norm();
 
     BBCentre = (BBMax + BBMin)/2.0f;
-
-    isInit = true;
 }
 
 void Mesh::update(){
     computeBB();
     recomputeNormals();
-    std::cout << "Mesh : " << vertices.size() << " vertices, " << triangles.size() << " triangles " << std::endl;
 }
 
 void Mesh::clear(){
@@ -88,7 +85,6 @@ void Mesh::glTriangle(unsigned int i){
 
     const Triangle & t = triangles[i];
     for( int j = 0 ; j < 3 ; j++ ){
-        //std::cout << "Normal : " << verticesNormals.size() << std::endl;
         glNormal(verticesNormals[t.getVertex(j)]*normalDirection);
         glVertex(vertices[t.getVertex(j)]);
     }
@@ -97,7 +93,6 @@ void Mesh::glTriangle(unsigned int i){
 
 void Mesh::draw()
 {
-    //recomputeNormals();
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_DEPTH);

@@ -37,13 +37,6 @@ void Curve::updateConnections(ControlPoint* p){
     connect(p, &ControlPoint::cntrlPointTranslated, this, &Curve::reintialiseCurve);
 }
 
-void Curve::generateBezierCasteljau(long n)
-{
-    curve = casteljau(TabControlPoint, nbControlPoint, n);
-    dt = derivative();
-    d2t = secondDerivative();
-}
-
 void Curve::generateBSpline(long nbU, int degree){
     this->nbU = nbU;
     this->degree = degree;
@@ -166,41 +159,6 @@ int Curve::indexForLength(int indexS, double length){
     return indexS+i;
 }
 
-Vec** Curve::casteljau(ControlPoint **TabControlPoint, long nbControlPoint, long n){
-    nbU = n;
-    Vec** c = new Vec*[nbU];
-
-    double x, y, z;
-    for(int i=0; i<nbU; i++){
-        double u = 1 / double(nbU-1) * i;
-        //double coef = pow(1.0 - u, nbControlPoint);
-        double coef = 1.0;
-        Vec *p = finalPoint(TabControlPoint, nbControlPoint, u);
-        x = p->x * coef;
-        y = p->y * coef;
-        z = p->z * coef;
-        c[i] = new Vec(x,y,z);
-    }
-
-    return c;
-}
-
-Vec* Curve::finalPoint(ControlPoint **TabControlPoint, long nbControlPoint, double u){
-  if(nbControlPoint==1) return new Vec(TabControlPoint[0]->getX(), TabControlPoint[0]->getY(), TabControlPoint[0]->getZ());
-  else{
-    ControlPoint *newPoints[nbControlPoint-1];
-    double x,y,z;
-
-    for(int i=0; i<nbControlPoint-1; i++){
-      x = (1-u) * TabControlPoint[i]->getX() + u * TabControlPoint[i+1]->getX();
-      y = (1-u) * TabControlPoint[i]->getY() + u * TabControlPoint[i+1]->getY();
-      z = (1-u) * TabControlPoint[i]->getZ() + u * TabControlPoint[i+1]->getZ();
-      newPoints[i] = new ControlPoint(x,y,z);
-    }
-    return finalPoint(newPoints, nbControlPoint-1, u);
-  }
-}
-
 void Curve::draw(){
       glBegin(GL_LINE_STRIP);
       glColor3f(0.0, 1.0, 0.0);
@@ -230,37 +188,6 @@ void Curve::drawControl(){
 }
 
 // Frenet frame
-Vec** Curve::derivative(){
-    const long nbCP = nbControlPoint - 1;
-
-    if(nbCP<1) return NULL;
-
-    ControlPoint *control[nbCP];
-
-    for(int i=0; i<nbCP; i++){
-        control[i] = new ControlPoint( (TabControlPoint[i+1]->getX() - TabControlPoint[i]->getX()) * nbCP,
-                (TabControlPoint[i+1]->getY() - TabControlPoint[i]->getY()) * nbCP,
-                (TabControlPoint[i+1]->getZ() - TabControlPoint[i]->getZ()) * nbCP);
-    }
-
-    return casteljau(control, nbCP, nbU);
-}
-
-Vec** Curve::secondDerivative(){
-    const long nbCP = nbControlPoint - 2;
-
-    if(nbCP<1) return NULL;
-
-    ControlPoint *control[nbCP];
-
-    for(int i=0; i<nbCP; i++){
-        control[i] = new ControlPoint( (TabControlPoint[i+2]->getX() - 2.0 * TabControlPoint[i+1]->getX() + TabControlPoint[i]->getX()) * static_cast<double>(nbCP),
-                (TabControlPoint[i+2]->getY() - 2.0 * TabControlPoint[i+1]->getY() + TabControlPoint[i]->getY()) * static_cast<double>(nbCP),
-                (TabControlPoint[i+2]->getZ() - 2.0 * TabControlPoint[i+1]->getZ() + TabControlPoint[i]->getZ()) * static_cast<double>(nbCP));
-    }
-
-    return casteljau(control, nbCP, nbU);
-}
 
 Vec Curve::tangent(int index){
     Vec t = Vec(dt[index]->x, dt[index]->y, dt[index]->z);

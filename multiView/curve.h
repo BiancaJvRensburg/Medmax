@@ -15,7 +15,6 @@ public:
     Curve(long nbCP);
     Curve(long nbCP, ControlPoint *cntrlPoints[]);
 
-    void generateBezierCasteljau(long nbU);
     void generateBSpline(long nbU, int degree);
     Vec** getCurve(){ return curve; }
     Vec* getPoint(int index){ return curve[index]; }
@@ -48,9 +47,6 @@ private:
     double *knotVector;
     int knotIndex;
 
-    Vec** casteljau(ControlPoint *TabControlPoint[], long nbControlPoint, long n);
-    Vec* finalPoint(ControlPoint *TabControlPoint[], long nbControlPoint, double u);
-
     // BSpline
     double* generateUniformKnotVector(int k);
     Vec deBoor(double u, int i, int r);
@@ -61,10 +57,7 @@ private:
     void updateConnections(ControlPoint*);
 
     // Frenet frame
-    Vec** derivative();
     Vec** dt;
-
-    Vec** secondDerivative();
     Vec** d2t;
 
     double discreteLength(int indexS, int indexE);      // Returns the discrete length between 2 points (One cut)

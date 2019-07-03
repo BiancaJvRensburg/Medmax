@@ -24,7 +24,6 @@ public:
     const std::vector<Triangle> &getTriangles()const {return triangles;}
 
     void draw();
-    //void draw( std::vector<bool> & selected, std::vector<bool> & fixed);
 
     void recomputeNormals();
     void update();
@@ -38,8 +37,6 @@ public:
 protected:
     void init();
     void computeBB();
-
-    //void collectOneRing (std::vector<std::vector<unsigned int> > & oneRing) const;
 
     void computeTriangleNormals();
     Vec3Df computeTriangleNormal(int t);
@@ -56,8 +53,6 @@ protected:
     Vec3Df BBMax;
     Vec3Df BBCentre;
     float radius;
-
-    boolean isInit = false;
 
     int normalDirection;
 };
