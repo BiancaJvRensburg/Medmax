@@ -48,6 +48,13 @@ void ViewerFibula::moveRightPlane(double percentage){
     update();
 }
 
+void ViewerFibula::movePlaneDistance(double distance){
+    curveIndexR = curve->indexForLength(curveIndexL, distance);
+    rightPlane->setPosition(curve->getCurve()[curveIndexR]);
+    rightPlane->setOrientation(getNewOrientation(curveIndexR));
+    update();
+}
+
 void ViewerFibula::initCurve(){
     const long nbCP = 4;
     ControlPoint* control[nbCP];

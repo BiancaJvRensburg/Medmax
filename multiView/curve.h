@@ -29,6 +29,9 @@ public:
     void drawControl();
     void drawTangent(int index);
 
+    double discreteLength(int indexS, int indexE);      // Returns the discrete length between 2 points (One cut)
+    int indexForLength(int indexS, double length);   // Returns the end index which will create a segment of a certain length
+
 public Q_SLOTS:
     void reintialiseCurve();
     void addControlPoint(ControlPoint*);
@@ -59,9 +62,6 @@ private:
     // Frenet frame
     Vec** dt;
     Vec** d2t;
-
-    double discreteLength(int indexS, int indexE);      // Returns the discrete length between 2 points (One cut)
-    int indexForLength(int indexS, double length);   // Returns the end index which will create a segment of a certain length
 
     int isSpace();  // Is there space for another control point?
 

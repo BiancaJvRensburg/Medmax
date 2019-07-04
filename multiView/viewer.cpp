@@ -89,6 +89,8 @@ void Viewer::moveLeftPlane(int position){
         leftPlane->setPosition(curve->getPoint(curveIndexL));
         leftPlane->setOrientation(getNewOrientation(curveIndexL));
 
+        percentage = curve->discreteLength(curveIndexL, curveIndexR);
+
         update();
         Q_EMIT leftPosChanged(percentage);
 
@@ -124,6 +126,8 @@ void Viewer::moveRightPlane(int position){
 
         rightPlane->setPosition(curve->getPoint(curveIndexR));
         rightPlane->setOrientation(getNewOrientation(curveIndexR));
+
+        percentage = curve->discreteLength(curveIndexL, curveIndexR);
 
         update();
         Q_EMIT rightPosChanged(percentage);
