@@ -103,7 +103,6 @@ void MainWindow::initDisplayDockWidgets(){
     // Add the slider (fibula)
     QSlider *fibulaSlider = new QSlider(Qt::Horizontal);
     contentLayoutFibula->addRow("Fibula position slider", fibulaSlider);
-    fibulaSlider->setMinimum(-fibulaOffsetMax);
     fibulaSlider->setMaximum(fibulaOffsetMax);
 
     // Connect the fibula slider
