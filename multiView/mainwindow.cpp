@@ -67,27 +67,32 @@ void MainWindow::initDisplayDockWidgets(){
 
     skullDockWidget = new QDockWidget("Plane controls");
 
+    QHBoxLayout* layout = new QHBoxLayout();
+
     // The contents of the dockWidget
-    QWidget *contents = new QWidget();
-    QFormLayout *contentLayout = new QFormLayout();
+    QWidget *contentsMand = new QWidget();
+    QFormLayout *contentLayoutMand = new QFormLayout();
+
+    QWidget *contentsFibula = new QWidget();
+    QFormLayout *contentLayoutFibula = new QFormLayout();
 
     // Add the sliders (skull)
     QSlider *leftPlaneSilder = new QSlider(Qt::Horizontal);
     leftPlaneSilder->setMaximum(sliderMax);
-    contentLayout->addRow("Left slider", leftPlaneSilder);
+    contentLayoutMand->addRow("Left slider", leftPlaneSilder);
 
     QSlider *rightPlaneSilder = new QSlider(Qt::Horizontal);
     rightPlaneSilder->setMaximum(sliderMax);
-    contentLayout->addRow("Right slider", rightPlaneSilder);
+    contentLayoutMand->addRow("Right slider", rightPlaneSilder);
 
     // PlaneRotation sliders (skull)
     QSlider *leftPlaneRotationSlider = new QSlider(Qt::Horizontal);
     leftPlaneRotationSlider->setMaximum(sliderMax);
-    contentLayout->addRow("Left rotation", leftPlaneRotationSlider);
+    contentLayoutMand->addRow("Left rotation", leftPlaneRotationSlider);
 
     QSlider *rightPlaneRotationSlider = new QSlider(Qt::Horizontal);
     rightPlaneRotationSlider->setMaximum(sliderMax);
-    contentLayout->addRow("Right rotation", rightPlaneRotationSlider);
+    contentLayoutMand->addRow("Right rotation", rightPlaneRotationSlider);
 
     // Connect the skull sliders
     connect(leftPlaneSilder, static_cast<void (QSlider::*)(int)>(&QSlider::sliderMoved), skullViewer, &Viewer::moveLeftPlane);
@@ -97,7 +102,7 @@ void MainWindow::initDisplayDockWidgets(){
 
     // Add the slider (fibula)
     QSlider *fibulaSlider = new QSlider(Qt::Horizontal);
-    contentLayout->addRow("Fibula position slider", fibulaSlider);
+    contentLayoutFibula->addRow("Fibula position slider", fibulaSlider);
     fibulaSlider->setMinimum(-fibulaOffsetMax);
     fibulaSlider->setMaximum(fibulaOffsetMax);
 
@@ -108,8 +113,16 @@ void MainWindow::initDisplayDockWidgets(){
     connect(skullViewer, &Viewer::leftPosChanged, fibulaViewer, &ViewerFibula::moveLeftPlane);
     connect(skullViewer, &Viewer::rightPosChanged, fibulaViewer, &ViewerFibula::moveRightPlane);
 
-    contents->setLayout(contentLayout);
-    skullDockWidget->setWidget(contents);
+    contentsMand->setLayout(contentLayoutMand);
+    contentsFibula->setLayout(contentLayoutFibula);
+
+    layout->addWidget(contentsMand);
+    layout->addWidget(contentsFibula);
+
+    QWidget* controlWidget = new QWidget();
+    controlWidget->setLayout(layout);
+
+    skullDockWidget->setWidget(controlWidget);
 
     this->addDockWidget(Qt::BottomDockWidgetArea, skullDockWidget);
 }

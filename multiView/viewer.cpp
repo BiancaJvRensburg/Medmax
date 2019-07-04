@@ -187,7 +187,7 @@ void Viewer::initCurve(){
     // curve->generateBezierCasteljau(nbU);
     curve->generateBSpline(nbU, degree);
 
-    curve->addControlPoint(control[1]);
+    //curve->addControlPoint(control[1]);
 
    initPlanes();
 }
