@@ -5,6 +5,7 @@
 #include <QGLViewer/manipulatedFrame.h>
 
 #include "mesh.h"
+#include "curvepoint.h"
 
 using namespace qglviewer;
 
@@ -27,10 +28,11 @@ public:
     void draw();
 
 private:
+    CurvePoint* cp;
     Vec* position;
     Vec* points[4];
     double size;
-    Frame* mf;
+    ManipulatedFrame* mf;
     double rotationPercentage;
     void initBasePlane();
     void rotate(Quaternion q) { mf->rotate(q); }

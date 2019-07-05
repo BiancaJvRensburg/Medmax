@@ -23,7 +23,7 @@ public:
     double getZ(){ return p->z; }
 
     void initialise();
-    void draw();
+    virtual void draw();
 
 public Q_SLOTS:
     void cntrlMoved();
@@ -31,9 +31,11 @@ public Q_SLOTS:
 Q_SIGNALS:
     void cntrlPointTranslated();
 
+protected:
+    ManipulatedFrame* mf;
+
 private:
     Vec* p;
-    ManipulatedFrame* mf;
 };
 
 #endif // CONTROLPOINT_H

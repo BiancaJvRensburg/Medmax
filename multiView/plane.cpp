@@ -5,7 +5,9 @@ Plane::Plane(double s)
     position = new Vec(0, 0, 0);
     size = s;
     rotationPercentage = 0;
-    mf = new Frame();
+    mf = new ManipulatedFrame();
+
+    cp = new CurvePoint(mf);
 
     initBasePlane();
 }
@@ -27,6 +29,8 @@ void Plane::draw(){
         glVertex3f(points[2]->x, points[2]->y, points[2]->z);
         glVertex3f(points[3]->x, points[3]->y, points[3]->z);
     glEnd();
+
+    cp->draw();
 
     /*glColor3f(1,1,1);
     QGLViewer::drawAxis(15.0);*/

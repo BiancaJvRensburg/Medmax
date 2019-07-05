@@ -27,7 +27,7 @@ void ControlPoint::draw(){
     glMultMatrixd(mf->matrix());
 
     if(mf->grabsMouse()) glColor3f(0, 1, 1);
-    else glColor3f(1, 0, 1);
+    else glColor3f(0, 0, 1);
 
     glPointSize(10.0);
     glBegin(GL_POINTS);
