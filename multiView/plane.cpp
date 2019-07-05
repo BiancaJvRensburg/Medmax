@@ -7,7 +7,11 @@ Plane::Plane(double s)
     rotationPercentage = 0;
     mf = new ManipulatedFrame();
 
-    cp = new CurvePoint(mf);
+    t = new double();
+
+    *t = 0; // TODO: This is only temporary
+
+    cp = new CurvePoint(position, mf, t);
 
     initBasePlane();
 }
@@ -29,6 +33,8 @@ void Plane::draw(){
         glVertex3f(points[2]->x, points[2]->y, points[2]->z);
         glVertex3f(points[3]->x, points[3]->y, points[3]->z);
     glEnd();
+
+    // std::cout << "position " << position->x << " " << position->y << " " << position->z << std::endl;
 
     cp->draw();
 
@@ -52,9 +58,12 @@ void Plane::rotatePlaneYZ(double percentage){
     rotatePlane(axis, theta);
 }
 
-void Plane::setPosition(Vec* pos){
+void Plane::setPosition(Vec* pos, double t){
     position = pos;
     mf->setPosition(position->x, position->y, position->z);
+    cp->setPosition(pos);
+
+    *this->t = t;
 }
 
 Quaternion Plane::fromRotatedBasis(Vec x, Vec y, Vec z){

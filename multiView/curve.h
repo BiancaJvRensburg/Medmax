@@ -35,6 +35,7 @@ public:
 public Q_SLOTS:
     void reintialiseCurve();
     void addControlPoint(ControlPoint*);
+    void moveToPoint(Vec, double);
 
 Q_SIGNALS:
     void curveReinitialised();

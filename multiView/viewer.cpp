@@ -86,13 +86,13 @@ void Viewer::moveLeftPlane(int position){
     else if(curveIndexL == curveIndexR - 1) return;
     else curveIndexL = curveIndexR - 1;
 
-        leftPlane->setPosition(curve->getPoint(curveIndexL));
+        leftPlane->setPosition(curve->getPoint(curveIndexL), percentage);
         leftPlane->setOrientation(getNewOrientation(curveIndexL));
 
-        percentage = curve->discreteLength(curveIndexL, curveIndexR);
+        double distance = curve->discreteLength(curveIndexL, curveIndexR);
 
         update();
-        Q_EMIT leftPosChanged(percentage);
+        Q_EMIT leftPosChanged(distance);
 
 }
 
@@ -124,13 +124,13 @@ void Viewer::moveRightPlane(int position){
     else if(curveIndexR == curveIndexL + 1) return;
     else curveIndexR = curveIndexL + 1;
 
-        rightPlane->setPosition(curve->getPoint(curveIndexR));
+        rightPlane->setPosition(curve->getPoint(curveIndexR), percentage);
         rightPlane->setOrientation(getNewOrientation(curveIndexR));
 
-        percentage = curve->discreteLength(curveIndexL, curveIndexR);
+        double distance = curve->discreteLength(curveIndexL, curveIndexR);
 
         update();
-        Q_EMIT rightPosChanged(percentage);
+        Q_EMIT rightPosChanged(distance);
 }
 
 void Viewer::openOFF(QString filename) {
@@ -203,11 +203,14 @@ void Viewer::initPlanes(){
     leftPlane = new Plane(15.0);
     rightPlane = new Plane(15.0);
 
-    leftPlane->setPosition(curve->getPoint(curveIndexL));
-    rightPlane->setPosition(curve->getPoint(curveIndexR));
+
+    leftPlane->setPosition(curve->getPoint(curveIndexL), 0);
+    rightPlane->setPosition(curve->getPoint(curveIndexR), 1);
 
     leftPlane->setOrientation(getNewOrientation(curveIndexL));
     rightPlane->setOrientation(getNewOrientation(curveIndexR));
+
+    connect(leftPlane->cp, &CurvePoint::curvePointTranslated, curve, &Curve::moveToPoint);
 
 }
 
@@ -218,8 +221,11 @@ void Viewer::updateCamera(const Vec3Df & center, float radius){
 }
 
 void Viewer::updatePlanes(){
-    leftPlane->setPosition(curve->getPoint(curveIndexL));
-    rightPlane->setPosition(curve->getPoint(curveIndexR));
+    double percentageL = static_cast<double>(curveIndexL) / static_cast<double>(nbU);
+    double percentageR = static_cast<double>(curveIndexR) / static_cast<double>(nbU);
+
+    leftPlane->setPosition(curve->getPoint(curveIndexL), percentageL);
+    rightPlane->setPosition(curve->getPoint(curveIndexR), percentageR);
 
     leftPlane->setOrientation(getNewOrientation(curveIndexL));
     rightPlane->setOrientation(getNewOrientation(curveIndexR));

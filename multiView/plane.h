@@ -15,7 +15,7 @@ public:
     Plane(double s);
     void setSize(double s){ size = s; }
 
-    void setPosition(Vec *pos); // { normalFrame.setPosition(pos); }
+    void setPosition(Vec *pos, double t); // { normalFrame.setPosition(pos); }
     void setOrientation(Quaternion q){ mf->setOrientation(q); }
     Quaternion fromRotatedBasis(Vec x, Vec y, Vec z);
 
@@ -25,10 +25,12 @@ public:
     void rotatePlaneYZ(double percentage);   // rotate around the z axis
     void rotatePlane(Vec axis, double angle);
 
+    double getT(){ return *t; }
     void draw();
 
-private:
     CurvePoint* cp;
+
+private:
     Vec* position;
     Vec* points[4];
     double size;
@@ -36,6 +38,7 @@ private:
     double rotationPercentage;
     void initBasePlane();
     void rotate(Quaternion q) { mf->rotate(q); }
+    double* t; // parametre
 };
 
 #endif // PLANE_H

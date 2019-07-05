@@ -43,7 +43,6 @@ void Curve::generateBSpline(long nbU, int degree){
     this->knotIndex = 0;
 
     this->knotVector = generateUniformKnotVector(0);
-
     curve = splineDerivative(0);
     dt =  splineDerivative(1);
     d2t = splineDerivative(2);
@@ -72,6 +71,7 @@ Vec** Curve::splineDerivative(int k){
         c[i] = new Vec();
 
         while(u >= knotVector[knotIndex+1] && knotVector[knotIndex+1] != 1) knotIndex++;
+
         *c[i] += Vec(deBoorDerivative(u, knotIndex, degree, k));
     }
     return c;
@@ -107,6 +107,10 @@ double* Curve::generateUniformKnotVector(int a){
     for(int i=m-k-1; i<m; i++) kv[i] = 1.0;
 
     return kv;
+}
+
+void Curve::moveToPoint(Vec offset, double t){
+    //std::cout << t << " : (" << offset.x << " , " << offset.y << " , " << offset.z << "  )" << std::endl;
 }
 
 void Curve::reintialiseCurve(){

@@ -1,8 +1,11 @@
 #include "curvepoint.h"
 
-CurvePoint::CurvePoint(ManipulatedFrame* mf)
+CurvePoint::CurvePoint(Vec* p, ManipulatedFrame* mf, double* t)
 {
+    this->p = p;
     this->mf = mf;
+    this->t = t;
+    connect(mf, &ManipulatedFrame::manipulated, this, &ControlPoint::cntrlMoved);
 }
 
 void CurvePoint::draw(){
@@ -18,4 +21,19 @@ void CurvePoint::draw(){
     glPointSize(1.0);
     glColor3f(0,0,0);
 
+}
+
+void CurvePoint::cntrlMoved(){
+    double x,y,z;
+
+    mf->getPosition(x,y,z);
+
+    // std::cout << p->x << " " << p->y << " " << p->z << std::endl;
+    Vec offset = Vec(x - p->x, y - p->y , z - p->z);
+
+    Q_EMIT CurvePoint::curvePointTranslated(offset, *this->t);
+
+    p->x = x;
+    p->y = y;
+    p->z = z;
 }

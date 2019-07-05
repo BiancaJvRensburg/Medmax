@@ -12,8 +12,11 @@ void ViewerFibula::movePlanes(int position){
 
     if(curveIndexL + offset < nbU && curveIndexL + offset > 0 && curveIndexR + offset < nbU && curveIndexR + offset > 0){
         indexOffset = offset;
-        leftPlane->setPosition(curve->getPoint(curveIndexL + indexOffset));
-        rightPlane->setPosition(curve->getPoint(curveIndexR + indexOffset));
+        double percentageL = static_cast<double>(curveIndexL + offset) / static_cast<double>(nbU);
+        double percentageR = static_cast<double>(curveIndexR + offset) / static_cast<double>(nbU);
+
+        leftPlane->setPosition(curve->getPoint(curveIndexL + indexOffset), percentageL);
+        rightPlane->setPosition(curve->getPoint(curveIndexR + indexOffset), percentageR);
         leftPlane->setOrientation(getNewOrientation(curveIndexL + indexOffset));
         rightPlane->setOrientation(getNewOrientation(curveIndexR + indexOffset));
     }
@@ -24,7 +27,8 @@ void ViewerFibula::movePlanes(int position){
 
 void ViewerFibula::movePlaneDistance(double distance){
     curveIndexR = curve->indexForLength(curveIndexL, distance);
-    rightPlane->setPosition(curve->getCurve()[curveIndexR + indexOffset]);
+    double percentage = static_cast<double>(curveIndexR + indexOffset) / static_cast<double>(nbU);
+    rightPlane->setPosition(curve->getCurve()[curveIndexR + indexOffset], percentage);
     rightPlane->setOrientation(getNewOrientation(curveIndexR + indexOffset));
     update();
 }

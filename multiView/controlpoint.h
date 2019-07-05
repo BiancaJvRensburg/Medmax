@@ -26,15 +26,13 @@ public:
     virtual void draw();
 
 public Q_SLOTS:
-    void cntrlMoved();
+    virtual void cntrlMoved();
 
 Q_SIGNALS:
     void cntrlPointTranslated();
 
 protected:
     ManipulatedFrame* mf;
-
-private:
     Vec* p;
 };
 
