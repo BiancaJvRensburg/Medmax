@@ -110,7 +110,25 @@ double* Curve::generateUniformKnotVector(int a){
 }
 
 void Curve::moveToPoint(Vec offset, double t){
-    //std::cout << t << " : (" << offset.x << " , " << offset.y << " , " << offset.z << "  )" << std::endl;
+    int kIndex = 0;
+
+    while(t >= knotVector[kIndex+1] && knotVector[kIndex+1] != 1) kIndex++;
+
+    getModVec(kIndex, degree, t, offset);
+
+    //reintialiseCurve();
+}
+
+void Curve::getModVec(int j, int r, double t, Vec offset){
+    if(r==0){
+        TabControlPoint[j]->getPoint()->x += offset.x;
+        TabControlPoint[j]->getPoint()->y += offset.y;
+        TabControlPoint[j]->getPoint()->z += offset.z;
+        return;
+    }
+    double alpha = (t - knotVector[j]) / (knotVector[j + degree - (r-1)] - knotVector[j]);
+    getModVec(j-1, r-1, t, (1.0 - alpha)*offset);
+    getModVec(j, r-1, t, alpha*offset);
 }
 
 void Curve::reintialiseCurve(){

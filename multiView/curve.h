@@ -64,6 +64,8 @@ private:
     Vec** dt;
     Vec** d2t;
 
+    void getModVec(int j, int r, double t, Vec offset);
+
     int isSpace();  // Is there space for another control point?
 
     const int MAX_CNTRL_POINTS = 20;
