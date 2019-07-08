@@ -64,7 +64,7 @@ private:
     Vec** dt;
     Vec** d2t;
 
-    void getModVec(int j, int r, double t, int kI, Vec offset, Vec* newPoints);
+    void getModVec(int j, int r, double t, int kI, double offset, double* newPoints);
 
     int isSpace();  // Is there space for another control point?
 

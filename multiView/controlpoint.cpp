@@ -62,6 +62,8 @@ void ControlPoint::cntrlMoved(){
     p->y = y;
     p->z = z;
 
+    //std::cout << p->x << " " << p->y << " " << p->z << std::endl;
+
     Q_EMIT ControlPoint::cntrlPointTranslated();
-    //moveControlPoint(Vec(x,y,z));
+
 }

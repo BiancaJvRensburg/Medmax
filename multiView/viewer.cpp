@@ -159,13 +159,26 @@ void Viewer::wheelEvent(QWheelEvent *e) {
 }
 
 void Viewer::initCurve(){
-    const long nbCP = 4;
+    /*const long nbCP = 4;
     ControlPoint *control[nbCP];
 
     control[0] = new ControlPoint(-45.7, -28.2, -36);
     control[1] = new ControlPoint(-20, -98.3, -90.1);
     control[2] = new ControlPoint(17, -104.4, -98.3);
     control[3] = new ControlPoint(37.2, -39, -41.5);
+
+    int degree = 3;*/
+
+    const long nbCP = 6;
+    ControlPoint *control[nbCP];
+
+    control[0] = new ControlPoint(-51.946, -19.1294, -18.4682);
+    control[1] = new ControlPoint(-37.6025, -32.6819, -51.5346);
+    control[2] = new ControlPoint(-20, -98.3, -90.1);
+    //control[3] = new ControlPoint(-2.32336, -98.9059, -77.1516);
+    control[3] = new ControlPoint(17, -104.4, -98.3);
+    control[4] = new ControlPoint(39.5625, -36.1016, -48.5586);
+    control[5] = new ControlPoint(44.4578, -24.7785, -19.9623);
 
     int degree = 3;
 
@@ -180,7 +193,7 @@ void Viewer::initCurve(){
     control[5] = new ControlPoint(170, 40, 0);
     control[6] = new ControlPoint(200, 0, 0);
 
-    int degree = 5;*/
+    int degree = 4;*/
 
 
     curve = new Curve(nbCP, control);
