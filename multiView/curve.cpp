@@ -114,21 +114,39 @@ void Curve::moveToPoint(Vec offset, double t){
 
     while(t >= knotVector[kIndex+1] && knotVector[kIndex+1] != 1) kIndex++;
 
-    getModVec(kIndex, degree, t, offset);
+    //std::cout << "OFFSET " << offset.x << " " << offset.y << " " << offset.z << std::endl;
 
-    //reintialiseCurve();
+    Vec* offsetPoints = new Vec[4];
+
+    for(int i=0; i<4; i++) offsetPoints[i] = Vec(0,0,0);
+
+    getModVec(kIndex, degree, t, kIndex, offset, offsetPoints);
+
+    for(int i=0; i<4; i++){
+        int j = i + (kIndex - degree);
+        TabControlPoint[j]->moveControlPoint( Vec(TabControlPoint[j]->getX() + offsetPoints[i].x, TabControlPoint[j]->getY() + offsetPoints[i].y, TabControlPoint[j]->getZ() + offsetPoints[i].z) );
+       // std::cout << i + (kIndex - degree) << " : " << offsetPoints[i].x << " " << offsetPoints[i].y << " " <<  offsetPoints[i].z << " " << std::endl;
+    }
+
+    reintialiseCurve();
 }
 
-void Curve::getModVec(int j, int r, double t, Vec offset){
+void Curve::getModVec(int j, int r, double t, int kI, Vec offset, Vec* offsetPoints){
     if(r==0){
-        TabControlPoint[j]->getPoint()->x += offset.x;
+        /*TabControlPoint[j]->getPoint()->x += offset.x;
         TabControlPoint[j]->getPoint()->y += offset.y;
-        TabControlPoint[j]->getPoint()->z += offset.z;
+        TabControlPoint[j]->getPoint()->z += offset.z;*/
+        // std::cout << "Old : " << TabControlPoint[j]->getX() << " " << TabControlPoint[j]->getY() << " " << TabControlPoint[j]->getZ() << " " << std::endl;
+        //TabControlPoint[j]->moveControlPoint(Vec(TabControlPoint[j]->getX()+offset.x, TabControlPoint[j]->getY()+offset.y, TabControlPoint[j]->getZ()+offset.z));
+        // std::cout << "New : " << TabControlPoint[j]->getX() << " " << TabControlPoint[j]->getY() << " " << TabControlPoint[j]->getZ() << " " << std::endl;
+        //std::cout << j << " : " << offset.x << " " << offset.y << " " << offset.z << std::endl;
+
+        offsetPoints[j - (kI-degree)] += offset;
         return;
     }
     double alpha = (t - knotVector[j]) / (knotVector[j + degree - (r-1)] - knotVector[j]);
-    getModVec(j-1, r-1, t, (1.0 - alpha)*offset);
-    getModVec(j, r-1, t, alpha*offset);
+    getModVec(j-1, r-1, t, kI, (1.0 - alpha)*offset, offsetPoints);
+    getModVec(j, r-1, t, kI, alpha*offset, offsetPoints);
 }
 
 void Curve::reintialiseCurve(){

@@ -22,6 +22,8 @@ public:
     double getY(){ return p->y; }
     double getZ(){ return p->z; }
 
+    void moveControlPoint(Vec newPos);
+
     void initialise();
     virtual void draw();
 

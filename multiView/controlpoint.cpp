@@ -21,6 +21,18 @@ void ControlPoint::initialise(){
     connect(mf, &ManipulatedFrame::manipulated, this, &ControlPoint::cntrlMoved);
 }
 
+void ControlPoint::moveControlPoint(Vec newPos){
+    p->x = newPos.x;
+    p->y = newPos.y;
+    p->z = newPos.z;
+
+    mf->setPosition(this->p->x, this->p->y, this->p->z);
+
+    //std::cout << "                                        moved" << std::endl;
+
+    // Q_EMIT ControlPoint::cntrlPointTranslated();
+}
+
 void ControlPoint::draw(){
 
     glPushMatrix();
@@ -51,4 +63,5 @@ void ControlPoint::cntrlMoved(){
     p->z = z;
 
     Q_EMIT ControlPoint::cntrlPointTranslated();
+    //moveControlPoint(Vec(x,y,z));
 }

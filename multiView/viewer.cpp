@@ -29,8 +29,8 @@ void Viewer::draw() {
     glColor3f(1.0, 0, 0);
     leftPlane->draw();
 
-    glColor3f(0, 1.0, 0);
-    rightPlane->draw();
+    /*glColor3f(0, 1.0, 0);
+    rightPlane->draw();*/
 
     curve->draw();
 
