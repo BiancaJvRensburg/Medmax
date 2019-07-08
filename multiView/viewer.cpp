@@ -29,8 +29,8 @@ void Viewer::draw() {
     glColor3f(1.0, 0, 0);
     leftPlane->draw();
 
-    /*glColor3f(0, 1.0, 0);
-    rightPlane->draw();*/
+    glColor3f(0, 1.0, 0);
+    rightPlane->draw();
 
     curve->draw();
 
@@ -59,8 +59,6 @@ void Viewer::init() {
 
   glPolygonMode (GL_FRONT_AND_BACK, GL_FILL);
 
-  //glEnable (GL_POLYGON_OFFSET_LINE);
-  //glPolygonOffset (-1.0, 1.0);
   glLineWidth (1.0f);
 
 }
@@ -124,7 +122,9 @@ void Viewer::moveRightPlane(int position){
     else if(curveIndexR == curveIndexL + 1) return;
     else curveIndexR = curveIndexL + 1;
 
-        rightPlane->setPosition(curve->getPoint(curveIndexR), percentage);
+    double percentageR = static_cast<double>(curveIndexR) / static_cast<double>(nbU);
+
+        rightPlane->setPosition(curve->getPoint(curveIndexR), percentageR);
         rightPlane->setOrientation(getNewOrientation(curveIndexR));
 
         double distance = curve->discreteLength(curveIndexL, curveIndexR);
@@ -188,7 +188,6 @@ void Viewer::initCurve(){
     connect(curve, &Curve::curveReinitialised, this, &Viewer::updatePlanes);
 
     nbU = 1000;
-    // curve->generateBezierCasteljau(nbU);
     curve->generateBSpline(nbU, degree);
 
     //curve->addControlPoint(control[1]);
@@ -211,6 +210,7 @@ void Viewer::initPlanes(){
     rightPlane->setOrientation(getNewOrientation(curveIndexR));
 
     connect(leftPlane->cp, &CurvePoint::curvePointTranslated, curve, &Curve::moveToPoint);
+    connect(rightPlane->cp, &CurvePoint::curvePointTranslated, curve, &Curve::moveToPoint);
 
 }
 

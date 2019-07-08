@@ -18,12 +18,6 @@ void CurvePoint::draw(){
         glVertex3d(0, 0, 0);
     glEnd();
 
-    /*double x,y,z;
-
-    mf->getPosition(x,y,z);
-
-    std::cout << x << " " << y << " " << z << std::endl;*/
-
     glPointSize(1.0);
     glColor3f(0,0,0);
 
@@ -34,12 +28,7 @@ void CurvePoint::cntrlMoved(){
 
     mf->getPosition(x,y,z);
 
-   // std::cout << "MOVED    " << x << " " << y << " " << z << std::endl;
     Vec offset = Vec(x - p->x, y - p->y , z - p->z);
-
-    //std::cout << "-- offset " << offset.x << " " << offset.y << " " << offset.z << std::endl;
-
-    // std::cout << "-- prev pos : " << x - offset.x << " " << y - offset.y << " " << z - offset.z << std::endl;
 
     p->x = x;
     p->y = y;
