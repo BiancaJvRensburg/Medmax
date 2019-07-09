@@ -34,7 +34,6 @@ protected:
     void draw();
     void init();
     QString helpString() const;
-    void wheelEvent(QWheelEvent *e);
     void updateCamera(const Vec3Df & center, float radius);
 
     virtual void initCurve();
@@ -45,8 +44,6 @@ protected:
     Plane *rightPlane;
     Curve *curve;
 
-   // Vec startPoint;
-   // Vec endPoint;
     int curveIndexL;
     int curveIndexR;
     int nbU;

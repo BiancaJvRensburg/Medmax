@@ -17,12 +17,12 @@ public:
     Plane(double s, Movable status);
     void setSize(double s){ size = s; }
 
-    void setPosition(Vec *pos, double t); // { normalFrame.setPosition(pos); }
+    void setPosition(Vec *pos, double t);
     void setOrientation(Quaternion q){ mf->setOrientation(q); }
     Quaternion fromRotatedBasis(Vec x, Vec y, Vec z);
 
-    Vec coordinatesInRef(Vec v){ return mf->coordinatesOfIn(v, mf->referenceFrame()); }
-    Vec refCoordinatesInFrame(Vec v){ return mf->coordinatesOfFrom(v, mf->referenceFrame()); }
+    /*Vec coordinatesInRef(Vec v){ return mf->coordinatesOfIn(v, mf->referenceFrame()); }
+    Vec refCoordinatesInFrame(Vec v){ return mf->coordinatesOfFrom(v, mf->referenceFrame()); }*/
 
     void rotatePlaneYZ(double percentage);   // rotate around the z axis
     void rotatePlane(Vec axis, double angle);

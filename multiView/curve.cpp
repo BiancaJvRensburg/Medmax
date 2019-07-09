@@ -4,7 +4,7 @@
 
 Curve::Curve(long nbCP)
 {
-    TabControlPoint = new ControlPoint*[MAX_CNTRL_POINTS];
+    TabControlPoint = new ControlPoint*[static_cast<unsigned long long>(MAX_CNTRL_POINTS)];
     if(nbCP <= MAX_CNTRL_POINTS) nbControlPoint = nbCP;
     else nbControlPoint = MAX_CNTRL_POINTS;
 
@@ -16,7 +16,7 @@ Curve::Curve(long nbCP)
 }
 
 Curve::Curve(long nbCP, ControlPoint *cntrlPoints[]){
-    TabControlPoint = new ControlPoint*[MAX_CNTRL_POINTS];
+    TabControlPoint = new ControlPoint*[static_cast<unsigned long long>(MAX_CNTRL_POINTS)];
     if(nbCP <= MAX_CNTRL_POINTS) nbControlPoint = nbCP;
     else nbControlPoint = MAX_CNTRL_POINTS;
 
@@ -64,13 +64,13 @@ Vec** Curve::splineDerivative(int k){
 
     this->knotIndex = 0;
 
-    Vec** c = new Vec*[nbU];
+    Vec** c = new Vec*[static_cast<unsigned long long>(nbU)];
 
     for(int i=0; i<nbU; i++){
         double u = (1.0 / static_cast<double>(nbU-1)) * static_cast<double>(i);
         c[i] = new Vec();
 
-        while(u >= knotVector[knotIndex+1] && knotVector[knotIndex+1] != 1) knotIndex++;
+        while(u >= knotVector[knotIndex+1] && knotVector[knotIndex+1] != 1.0) knotIndex++;
 
         *c[i] += Vec(deBoorDerivative(u, knotIndex, degree, k));
     }
@@ -98,7 +98,7 @@ double* Curve::generateUniformKnotVector(int a){
     int k = degree - a;
     int n = nbControlPoint - a;
     int m = n + k + 1;
-    double* kv = new double[m];
+    double* kv = new double[static_cast<unsigned long long>(m)];
 
     double denom = static_cast<double>(m) - 2.0* static_cast<double>(k) - 1.0;
 
@@ -112,17 +112,17 @@ double* Curve::generateUniformKnotVector(int a){
 void Curve::moveToPoint(Vec offset, double t){
     int kIndex = 0;
 
-    while(t >= knotVector[kIndex+1] && knotVector[kIndex+1] != 1) kIndex++;
+    while(t >= knotVector[kIndex+1] && knotVector[kIndex+1] != 1.0) kIndex++;
 
-    double* offsetPoints = new double[degree+1];
-    for(int i=0; i<4; i++) offsetPoints[i] = 0;
+    double* offsetPoints = new double[static_cast<unsigned long long>(degree+1)];
+    for(int i=0; i<(degree+1); i++) offsetPoints[i] = 0;
 
     getModVec(kIndex, degree, t, kIndex, 1, offsetPoints);
 
     double maxOffset = 0;
     int maxJ = 0;
 
-    for(int i=0; i<4; i++){
+    for(int i=0; i<(degree+1); i++){
         int j = i + (kIndex - degree);
         if(offsetPoints[i] > maxOffset){
             maxOffset = offsetPoints[i];
@@ -215,7 +215,7 @@ void Curve::draw(){
 
       for(int i=0; i<nbU; i++){
         Vec *p = curve[i];
-        glVertex3f(p->x, p->y, p->z);
+        glVertex3f(static_cast<float>(p->x), static_cast<float>(p->y), static_cast<float>(p->z));
       }
 
       glEnd();
@@ -227,7 +227,7 @@ void Curve::drawControl(){
 
       for(int i=0; i<nbControlPoint; i++){
         Vec *p = new Vec(TabControlPoint[i]->getX(), TabControlPoint[i]->getY(), TabControlPoint[i]->getZ());
-        glVertex3f(p->x, p->y, p->z);
+        glVertex3f(static_cast<float>(p->x), static_cast<float>(p->y), static_cast<float>(p->z));
       }
 
       glEnd();
@@ -276,28 +276,21 @@ void Curve::drawTangent(int index){
     glLineWidth(3);
 
     glBegin(GL_LINES);
-      glVertex3f(curve[index]->x, curve[index]->y, curve[index]->z);
-      glVertex3f(curve[index]->x + t.x*10, curve[index]->y + t.y*10, curve[index]->z + t.z*10);
+      glVertex3f(static_cast<float>(curve[index]->x), static_cast<float>(curve[index]->y), static_cast<float>(curve[index]->z));
+      glVertex3f(static_cast<float>(curve[index]->x + t.x*10), static_cast<float>(curve[index]->y + t.y*10), static_cast<float>(curve[index]->z + t.z*10));
     glEnd();
 
     glColor3f(1.0, 0.0, 1.0);
     glBegin(GL_LINES);
-      glVertex3f(curve[index]->x, curve[index]->y, curve[index]->z);
-      glVertex3f(curve[index]->x + n.x*10, curve[index]->y + n.y*10, curve[index]->z + n.z*10);
+      glVertex3f(static_cast<float>(curve[index]->x), static_cast<float>(curve[index]->y), static_cast<float>(curve[index]->z));
+      glVertex3f(static_cast<float>(curve[index]->x + n.x*10), static_cast<float>(curve[index]->y + n.y*10), static_cast<float>(curve[index]->z + n.z*10));
     glEnd();
 
     glColor3f(1.0, 1.0, 0.0);
     glBegin(GL_LINES);
-      glVertex3f(curve[index]->x, curve[index]->y, curve[index]->z);
-      glVertex3f(curve[index]->x + b.x*10, curve[index]->y + b.y*10, curve[index]->z + b.z*10);
+      glVertex3f(static_cast<float>(curve[index]->x), static_cast<float>(curve[index]->y), static_cast<float>(curve[index]->z));
+      glVertex3f(static_cast<float>(curve[index]->x + b.x*10), static_cast<float>(curve[index]->y + b.y*10), static_cast<float>(curve[index]->z + b.z*10));
     glEnd();
-
-   /* glColor3f(1.0, 0.0, 0.0);
-    Vec newOrientation = orientation(index);
-    glBegin(GL_LINES);
-      glVertex3f(curve[index].x, curve[index].y, curve[index].z);
-      glVertex3f(curve[index].x + newOrientation.x*10, curve[index].y + newOrientation.y*10, curve[index].z + newOrientation.z*10);
-    glEnd();*/
 
     glLineWidth(1);
 }

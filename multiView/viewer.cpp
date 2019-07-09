@@ -150,14 +150,6 @@ void Viewer::openOFF(QString filename) {
     update();
 }
 
-void Viewer::wheelEvent(QWheelEvent *e) {
-  if ((camera()->type() == Camera::ORTHOGRAPHIC) && (((StandardCamera *)camera())->isStandard()) && (e->modifiers() & Qt::ShiftModifier)) {
-    ((StandardCamera *)camera())->changeOrthoFrustumSize(e->delta());
-    update();
-  } else
-    QGLViewer::wheelEvent(e);
-}
-
 void Viewer::initCurve(){
     /*const long nbCP = 4;
     ControlPoint *control[nbCP];
@@ -180,19 +172,6 @@ void Viewer::initCurve(){
     control[5] = new ControlPoint(44.4578, -24.7785, -19.9623);
 
     int degree = 3;
-
-    /*const long nbCP = 7;
-    ControlPoint *control[nbCP];
-
-    control[0] = new ControlPoint(10,0,0);
-    control[1] = new ControlPoint(30, 40, 0);
-    control[2] = new ControlPoint(70, 60, 0);
-    control[3] = new ControlPoint(100, 80, 0);
-    control[4] = new ControlPoint(130, 60, 0);
-    control[5] = new ControlPoint(170, 40, 0);
-    control[6] = new ControlPoint(200, 0, 0);
-
-    int degree = 4;*/
 
 
     curve = new Curve(nbCP, control);

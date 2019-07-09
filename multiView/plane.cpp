@@ -35,19 +35,16 @@ void Plane::draw(){
     glPushMatrix();
     glMultMatrixd(mf->matrix());
 
+
+
     glBegin(GL_QUADS);
-        glVertex3f(points[0]->x, points[0]->y, points[0]->z);
-        glVertex3f(points[1]->x, points[1]->y, points[1]->z);
-        glVertex3f(points[2]->x, points[2]->y, points[2]->z);
-        glVertex3f(points[3]->x, points[3]->y, points[3]->z);
+        glVertex3f(static_cast<float>(points[0]->x), static_cast<float>(points[0]->y), static_cast<float>(points[0]->z));
+        glVertex3f(static_cast<float>(points[1]->x), static_cast<float>(points[1]->y), static_cast<float>(points[1]->z));
+        glVertex3f(static_cast<float>(points[2]->x), static_cast<float>(points[2]->y), static_cast<float>(points[2]->z));
+        glVertex3f(static_cast<float>(points[3]->x), static_cast<float>(points[3]->y), static_cast<float>(points[3]->z));
     glEnd();
 
-    // std::cout << "position " << position->x << " " << position->y << " " << position->z << std::endl;
-
     if(status==Movable::DYNAMIC) cp->draw();
-
-    /*glColor3f(1,1,1);
-    QGLViewer::drawAxis(15.0);*/
 
     glPopMatrix();
 }
