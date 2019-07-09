@@ -173,11 +173,10 @@ void Viewer::initCurve(){
     ControlPoint *control[nbCP];
 
     control[0] = new ControlPoint(-51.946, -19.1294, -18.4682);
-    control[1] = new ControlPoint(-37.6025, -32.6819, -51.5346);
-    control[2] = new ControlPoint(-20, -98.3, -90.1);
-    //control[3] = new ControlPoint(-2.32336, -98.9059, -77.1516);
-    control[3] = new ControlPoint(17, -104.4, -98.3);
-    control[4] = new ControlPoint(39.5625, -36.1016, -48.5586);
+    control[1] = new ControlPoint(-35.7371, -14.8855, -63.1966);
+    control[2] = new ControlPoint(-28.9575, -98.2014, -73.3384);
+    control[3] = new ControlPoint(23.1392, -92.1965, -78.7013);
+    control[4] = new ControlPoint(46.3957, -23.0805, -54.17);
     control[5] = new ControlPoint(44.4578, -24.7785, -19.9623);
 
     int degree = 3;
@@ -205,15 +204,15 @@ void Viewer::initCurve(){
 
     //curve->addControlPoint(control[1]);
 
-   initPlanes();
+   initPlanes(Movable::DYNAMIC);
 }
 
-void Viewer::initPlanes(){
+void Viewer::initPlanes(Movable status){
     curveIndexR = nbU - 1;
     curveIndexL = 0;
 
-    leftPlane = new Plane(15.0);
-    rightPlane = new Plane(15.0);
+    leftPlane = new Plane(15.0, status);
+    rightPlane = new Plane(15.0, status);
 
 
     leftPlane->setPosition(curve->getPoint(curveIndexL), 0);
@@ -222,9 +221,10 @@ void Viewer::initPlanes(){
     leftPlane->setOrientation(getNewOrientation(curveIndexL));
     rightPlane->setOrientation(getNewOrientation(curveIndexR));
 
-    connect(leftPlane->cp, &CurvePoint::curvePointTranslated, curve, &Curve::moveToPoint);
-    connect(rightPlane->cp, &CurvePoint::curvePointTranslated, curve, &Curve::moveToPoint);
-
+    if(status == Movable::DYNAMIC){
+        connect(leftPlane->cp, &CurvePoint::curvePointTranslated, curve, &Curve::moveToPoint);
+        connect(rightPlane->cp, &CurvePoint::curvePointTranslated, curve, &Curve::moveToPoint);
+    }
 }
 
 void Viewer::updateCamera(const Vec3Df & center, float radius){

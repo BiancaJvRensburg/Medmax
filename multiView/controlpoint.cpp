@@ -21,16 +21,13 @@ void ControlPoint::initialise(){
     connect(mf, &ManipulatedFrame::manipulated, this, &ControlPoint::cntrlMoved);
 }
 
+// Call this to move a point without setting off a signal to update
 void ControlPoint::moveControlPoint(Vec newPos){
     p->x = newPos.x;
     p->y = newPos.y;
     p->z = newPos.z;
 
     mf->setPosition(this->p->x, this->p->y, this->p->z);
-
-    //std::cout << "                                        moved" << std::endl;
-
-    // Q_EMIT ControlPoint::cntrlPointTranslated();
 }
 
 void ControlPoint::draw(){
@@ -49,8 +46,6 @@ void ControlPoint::draw(){
     glPointSize(1.0);
     glColor3f(0,0,0);
 
-    //std::cout << p->x << " " << p->y << " " << p->z << std::endl;
-
     glPopMatrix();
 }
 
@@ -61,8 +56,6 @@ void ControlPoint::cntrlMoved(){
     p->x = x;
     p->y = y;
     p->z = z;
-
-    //std::cout << p->x << " " << p->y << " " << p->z << std::endl;
 
     Q_EMIT ControlPoint::cntrlPointTranslated();
 

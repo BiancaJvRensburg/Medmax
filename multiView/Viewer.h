@@ -38,7 +38,7 @@ protected:
     void updateCamera(const Vec3Df & center, float radius);
 
     virtual void initCurve();
-    void initPlanes();
+    void initPlanes(Movable status);
     Quaternion getNewOrientation(int index);
 
     Plane *leftPlane;

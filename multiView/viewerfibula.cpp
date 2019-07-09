@@ -49,5 +49,5 @@ void ViewerFibula::initCurve(){
     curve->generateBSpline(nbU, 3);
     connect(curve, &Curve::curveReinitialised, this, &Viewer::updatePlanes);
 
-    initPlanes();
+    initPlanes(Movable::STATIC);
 }

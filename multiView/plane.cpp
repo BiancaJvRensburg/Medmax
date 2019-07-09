@@ -1,17 +1,25 @@
 #include "plane.h"
 
-Plane::Plane(double s)
+Plane::Plane(double s, Movable status)
 {
     position = new Vec(0, 0, 0);
     size = s;
     rotationPercentage = 0;
-    mf = new ManipulatedFrame();
+
+    this->status = status;
 
     t = new double();
 
-    *t = 0; // TODO: This is only temporary
-
-    cp = new CurvePoint(position, mf, t);
+    if(status==Movable::DYNAMIC){
+        mf = new ManipulatedFrame();
+        *t = 0; // TODO: This is only temporary
+        cp = new CurvePoint(position, (ManipulatedFrame*)mf, t);
+    }
+    else{
+        mf = new Frame();
+        *t = 0;
+        cp = NULL;
+    }
 
     initBasePlane();
 }
@@ -36,7 +44,7 @@ void Plane::draw(){
 
     // std::cout << "position " << position->x << " " << position->y << " " << position->z << std::endl;
 
-    cp->draw();
+    if(status==Movable::DYNAMIC) cp->draw();
 
     /*glColor3f(1,1,1);
     QGLViewer::drawAxis(15.0);*/
@@ -61,9 +69,11 @@ void Plane::rotatePlaneYZ(double percentage){
 void Plane::setPosition(Vec* pos, double t){
     position = pos;
     mf->setPosition(position->x, position->y, position->z);
-    cp->setPosition(pos);
 
-    *this->t = t;
+    if(status==Movable::DYNAMIC){
+        cp->setPosition(pos);
+        *this->t = t;
+    }
 }
 
 Quaternion Plane::fromRotatedBasis(Vec x, Vec y, Vec z){

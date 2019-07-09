@@ -34,7 +34,5 @@ void CurvePoint::cntrlMoved(){
     p->y = y;
     p->z = z;
 
-    // std::cout << *this->t << std::endl;
-
     Q_EMIT CurvePoint::curvePointTranslated(offset, *this->t);
 }

@@ -7,12 +7,14 @@
 #include "mesh.h"
 #include "curvepoint.h"
 
+enum Movable {STATIC, DYNAMIC};
+
 using namespace qglviewer;
 
 class Plane
 {
 public:
-    Plane(double s);
+    Plane(double s, Movable status);
     void setSize(double s){ size = s; }
 
     void setPosition(Vec *pos, double t); // { normalFrame.setPosition(pos); }
@@ -28,13 +30,14 @@ public:
     double getT(){ return *t; }
     void draw();
 
+    Movable status;
     CurvePoint* cp;
 
 private:
     Vec* position;
     Vec* points[4];
     double size;
-    ManipulatedFrame* mf;
+    Frame* mf;
     double rotationPercentage;
     void initBasePlane();
     void rotate(Quaternion q) { mf->rotate(q); }
