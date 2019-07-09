@@ -234,7 +234,7 @@ Quaternion Viewer::getNewOrientation(int index){
     return s.normalized();
 }
 
-double Viewer::angle(Vec a, Vec b){
+/*double Viewer::angle(Vec a, Vec b){
 
     double na = a.normalize();
     double nb = b.normalize();
@@ -242,6 +242,6 @@ double Viewer::angle(Vec a, Vec b){
     double ab = a*b;
 
     return acos(ab / (na*nb));
-}
+}*/
 
 

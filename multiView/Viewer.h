@@ -49,7 +49,7 @@ protected:
     int nbU;
     int sliderMax;
 
-    double angle(Vec a, Vec b);
+    // double angle(Vec a, Vec b);
 
 };
 
