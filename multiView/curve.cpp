@@ -114,29 +114,38 @@ void Curve::moveToPoint(Vec offset, double t){
 
     while(t >= knotVector[kIndex+1] && knotVector[kIndex+1] != 1) kIndex++;
 
-    double* offsetPoints = new double[4];
+    double* offsetPoints = new double[degree+1];
     for(int i=0; i<4; i++) offsetPoints[i] = 0;
 
     getModVec(kIndex, degree, t, kIndex, 1, offsetPoints);
 
-    double limit = 0;
+    double maxOffset = 0;
+    int maxJ = 0;
 
     for(int i=0; i<4; i++){
         int j = i + (kIndex - degree);
-        //std::cout << "Offset " << offsetPoints[i] << std::endl;
-        // offsetPoints[i] *= (degree+1);
-        if(j==0 || j==nbControlPoint-1){
-            limit = offsetPoints[j];
-            continue;
+        if(offsetPoints[i] > maxOffset){
+            maxOffset = offsetPoints[i];
+            maxJ = j;
         }
-        offset *= (1.0 + limit/(1.0-limit));
-        //TabControlPoint[j]->moveControlPoint( Vec(TabControlPoint[j]->getX() + offsetPoints[i] * offset.x, TabControlPoint[j]->getY() + offsetPoints[i]*offset.y, TabControlPoint[j]->getZ() + offsetPoints[i]*offset.z) );
-        TabControlPoint[j]->moveControlPoint( Vec(TabControlPoint[j]->getX() + offset.x, TabControlPoint[j]->getY() + offset.y, TabControlPoint[j]->getZ() + offset.z) );
     }
 
-    /*std::cout << "Offset " << offset.x << " " << offset.y << " " << offset.z << " " << std::endl;
-    std::cout << "Sum " << sum.x << " " << sum.y << " " << sum.z << " " << std::endl;*/
+    // Fix the first and last points
+    if(maxJ == 0){
+        maxJ = 1;
+        maxOffset = offsetPoints[1];
+    }
 
+    if(maxJ == nbControlPoint-1){
+        maxJ = nbControlPoint-2;
+        maxOffset = offsetPoints[degree-1];
+    }
+
+    offset *= 1.0 / maxOffset;
+
+    TabControlPoint[maxJ]->moveControlPoint( Vec(TabControlPoint[maxJ]->getX() + offset.x, TabControlPoint[maxJ]->getY() + offset.y, TabControlPoint[maxJ]->getZ() + offset.z) );
+
+    delete[] offsetPoints;
     reintialiseCurve();
 }
 
