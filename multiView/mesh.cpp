@@ -81,14 +81,37 @@ void Mesh::computeVerticesNormals(){
     }
 }
 
+// Access and colour each individual vertex here
 void Mesh::glTriangle(unsigned int i){
-
     const Triangle & t = triangles[i];
+
+    // intersectionTriangles is sorted on creation
+    if(interIndex < intersectionTriangles.size() && i == intersectionTriangles[interIndex]){
+        interIndex++;
+        glColor3f(0, 0.5, 0.5);
+    }
+
     for( int j = 0 ; j < 3 ; j++ ){
         glNormal(verticesNormals[t.getVertex(j)]*normalDirection);
         glVertex(vertices[t.getVertex(j)]);
     }
 
+    glColor3f(1.0, 1.0, 1.0);
+}
+
+void Mesh::planeIntersection(Plane *p){
+    intersectionTriangles.clear();
+
+    for(unsigned int i = 0 ; i < triangles.size(); i++){
+        unsigned int t0 = triangles[i].getVertex(0);
+        unsigned int t1 = triangles[i].getVertex(1);
+        unsigned int t2 = triangles[i].getVertex(2);
+        if(p->isIntersection(Vec(vertices[t0]), Vec(vertices[t1]), Vec(vertices[t2]) )){
+            intersectionTriangles.push_back(i);
+        }
+    }
+
+    // We get the triangles in increasing order, so intersectionTriangles are in increasing order, don't need to sort.
 }
 
 void Mesh::draw()
@@ -98,6 +121,7 @@ void Mesh::draw()
     glEnable(GL_DEPTH);
 
     glBegin (GL_TRIANGLES);
+    interIndex = 0;
     for(unsigned int i = 0 ; i < triangles.size(); i++){
         glTriangle(i);
     }

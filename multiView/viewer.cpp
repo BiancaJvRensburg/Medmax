@@ -18,7 +18,7 @@ void Viewer::draw() {
 
     glPushMatrix();
     glMultMatrixd(manipulatedFrame()->matrix());
-    //drawAxis();
+    //drawAxis(20.0);
 
     glColor3f(1.,1.,1.);
     mesh.draw();
@@ -87,6 +87,8 @@ void Viewer::moveLeftPlane(int position){
         leftPlane->setPosition(curve->getPoint(curveIndexL), percentage);
         leftPlane->setOrientation(getNewOrientation(curveIndexL));
 
+        mesh.planeIntersection(leftPlane);
+
         double distance = curve->discreteLength(curveIndexL, curveIndexR);
 
         update();
@@ -98,6 +100,7 @@ void Viewer::rotateLeftPlane(int position){
     double percentage = static_cast<double>(position) / static_cast<double>(sliderMax);
 
     leftPlane->rotatePlaneYZ(percentage);
+    mesh.planeIntersection(leftPlane);
     update();
 }
 
@@ -221,6 +224,8 @@ void Viewer::updatePlanes(){
 
     leftPlane->setOrientation(getNewOrientation(curveIndexL));
     rightPlane->setOrientation(getNewOrientation(curveIndexR));
+
+    mesh.planeIntersection(leftPlane);
 
     update();
 }

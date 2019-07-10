@@ -3,9 +3,8 @@
 
 #include "Vec3D.h"
 #include "Triangle.h"
+#include "plane.h"
 #include <queue>
-
-enum Axis {X, Y, Z};
 
 class Mesh
 {
@@ -31,6 +30,8 @@ public:
 
     float getBBRadius();
 
+    void planeIntersection(Plane* p);
+
     typedef std::priority_queue< std::pair< float , int > , std::deque< std::pair< float , int > > , std::greater< std::pair< float , int > > > FacesQueue;
 
     void invertNormal(){normalDirection *= -1;}
@@ -45,6 +46,9 @@ protected:
 
     std::vector <Vec3Df> vertices;
     std::vector <Triangle> triangles;
+
+    std::vector <unsigned int> intersectionTriangles;    // Contains the index of the triangle instead of the actual triangle
+    unsigned int interIndex;    // the current index of intersectionTriangles
 
     std::vector<Vec3Df> normals;
     std::vector<Vec3Df> verticesNormals;

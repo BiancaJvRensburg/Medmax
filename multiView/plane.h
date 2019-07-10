@@ -4,7 +4,7 @@
 #include <QGLViewer/qglviewer.h>
 #include <QGLViewer/manipulatedFrame.h>
 
-#include "mesh.h"
+//#include "mesh.h"
 #include "curvepoint.h"
 
 enum Movable {STATIC, DYNAMIC};
@@ -29,6 +29,8 @@ public:
 
     double getT(){ return *t; }
     void draw();
+
+    bool isIntersection(Vec v0, Vec v1, Vec v2);
 
     Movable status;
     CurvePoint* cp;
