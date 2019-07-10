@@ -87,7 +87,8 @@ void Viewer::moveLeftPlane(int position){
         leftPlane->setPosition(curve->getPoint(curveIndexL), percentage);
         leftPlane->setOrientation(getNewOrientation(curveIndexL));
 
-        mesh.planeIntersection(leftPlane);
+       // mesh.planeIntersection(leftPlane);
+        mesh.updatePlaneIntersections(leftPlane);
 
         double distance = curve->discreteLength(curveIndexL, curveIndexR);
 
@@ -100,7 +101,8 @@ void Viewer::rotateLeftPlane(int position){
     double percentage = static_cast<double>(position) / static_cast<double>(sliderMax);
 
     leftPlane->rotatePlaneYZ(percentage);
-    mesh.planeIntersection(leftPlane);
+    //mesh.planeIntersection(leftPlane);
+    mesh.updatePlaneIntersections(leftPlane);
     update();
 }
 
@@ -108,6 +110,7 @@ void Viewer::rotateRightPlane(int position){
     double percentage = static_cast<double>(position) / static_cast<double>(sliderMax);
 
     rightPlane->rotatePlaneYZ(percentage);
+    mesh.updatePlaneIntersections(rightPlane);
     update();
 }
 
@@ -129,6 +132,8 @@ void Viewer::moveRightPlane(int position){
 
         rightPlane->setPosition(curve->getPoint(curveIndexR), percentageR);
         rightPlane->setOrientation(getNewOrientation(curveIndexR));
+
+        mesh.updatePlaneIntersections(rightPlane);
 
         double distance = curve->discreteLength(curveIndexL, curveIndexR);
 
@@ -207,6 +212,9 @@ void Viewer::initPlanes(Movable status){
         connect(leftPlane->cp, &CurvePoint::curvePointTranslated, curve, &Curve::moveToPoint);
         connect(rightPlane->cp, &CurvePoint::curvePointTranslated, curve, &Curve::moveToPoint);
     }
+
+    mesh.addPlane(leftPlane);
+    mesh.addPlane(rightPlane);
 }
 
 void Viewer::updateCamera(const Vec3Df & center, float radius){
@@ -225,7 +233,9 @@ void Viewer::updatePlanes(){
     leftPlane->setOrientation(getNewOrientation(curveIndexL));
     rightPlane->setOrientation(getNewOrientation(curveIndexR));
 
-    mesh.planeIntersection(leftPlane);
+    //mesh.planeIntersection(leftPlane);
+
+    mesh.updatePlaneIntersections();
 
     update();
 }

@@ -23,6 +23,7 @@ void Mesh::computeBB(){
 void Mesh::update(){
     computeBB();
     recomputeNormals();
+    updatePlaneIntersections();
 }
 
 void Mesh::clear(){
@@ -86,9 +87,12 @@ void Mesh::glTriangle(unsigned int i){
     const Triangle & t = triangles[i];
 
     // intersectionTriangles is sorted on creation
-    if(interIndex < intersectionTriangles.size() && i == intersectionTriangles[interIndex]){
-        interIndex++;
-        glColor3f(0, 0.5, 0.5);
+    for(int k=0; k<interIndex.size(); k++){ // check all the planes
+        if(interIndex[k] < intersectionTriangles[k].size() && static_cast<unsigned int>(i) == intersectionTriangles[k][interIndex[k]]){
+            //std::cout<< interIndex[k];
+            interIndex[k]++;
+            glColor3f(0, 0.5, 0.5);
+        }
     }
 
     for( int j = 0 ; j < 3 ; j++ ){
@@ -99,19 +103,38 @@ void Mesh::glTriangle(unsigned int i){
     glColor3f(1.0, 1.0, 1.0);
 }
 
-void Mesh::planeIntersection(Plane *p){
-    intersectionTriangles.clear();
+void Mesh::addPlane(Plane *p){
+    int index = planes.size();
+    planes.push_back(p);
+    std::vector<unsigned int> init;
+    intersectionTriangles.push_back(init);
+    planeIntersection(index);     // get the intersections
+    interIndex.push_back(0);    // at zero by default
+}
+
+void Mesh::updatePlaneIntersections(){
+    for(int i=0; i<planes.size(); i++) planeIntersection(i);
+}
+
+void Mesh::updatePlaneIntersections(Plane *p){
+    for(int i=0; i<planes.size(); i++)
+        if(p == planes[i])
+            planeIntersection(i);
+}
+
+void Mesh::planeIntersection(int index){
+    intersectionTriangles[index].clear();
 
     for(unsigned int i = 0 ; i < triangles.size(); i++){
         unsigned int t0 = triangles[i].getVertex(0);
         unsigned int t1 = triangles[i].getVertex(1);
         unsigned int t2 = triangles[i].getVertex(2);
-        if(p->isIntersection(Vec(vertices[t0]), Vec(vertices[t1]), Vec(vertices[t2]) )){
-            intersectionTriangles.push_back(i);
+        if(planes[index]->isIntersection(Vec(vertices[t0]), Vec(vertices[t1]), Vec(vertices[t2]) )){
+            intersectionTriangles[index].push_back(i);
         }
     }
 
-    // We get the triangles in increasing order, so intersectionTriangles are in increasing order, don't need to sort.
+    //std::cout << intersectionTriangles[index].size() << std::endl;
 }
 
 void Mesh::draw()
@@ -121,7 +144,7 @@ void Mesh::draw()
     glEnable(GL_DEPTH);
 
     glBegin (GL_TRIANGLES);
-    interIndex = 0;
+    for(unsigned int i = 0 ; i < interIndex.size(); i++) interIndex[i] = 0;
     for(unsigned int i = 0 ; i < triangles.size(); i++){
         glTriangle(i);
     }

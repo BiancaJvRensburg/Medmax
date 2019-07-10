@@ -30,7 +30,9 @@ public:
 
     float getBBRadius();
 
-    void planeIntersection(Plane* p);
+    void updatePlaneIntersections();    // need one for a single plane
+    void updatePlaneIntersections(Plane *p);
+    void addPlane(Plane *p);
 
     typedef std::priority_queue< std::pair< float , int > , std::deque< std::pair< float , int > > , std::greater< std::pair< float , int > > > FacesQueue;
 
@@ -44,11 +46,14 @@ protected:
     void computeVerticesNormals();
     void glTriangle(unsigned int i);
 
+    void planeIntersection(int index);
+
     std::vector <Vec3Df> vertices;
     std::vector <Triangle> triangles;
 
-    std::vector <unsigned int> intersectionTriangles;    // Contains the index of the triangle instead of the actual triangle
-    unsigned int interIndex;    // the current index of intersectionTriangles
+    std::vector <Plane*> planes;
+    std::vector <std::vector <unsigned int>> intersectionTriangles;    // Contains the index of the triangle instead of the actual triangle
+    std::vector <unsigned int> interIndex;    // the current index of intersectionTriangles
 
     std::vector<Vec3Df> normals;
     std::vector<Vec3Df> verticesNormals;

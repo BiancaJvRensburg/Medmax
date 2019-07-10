@@ -21,6 +21,8 @@ void ViewerFibula::movePlanes(int position){
         rightPlane->setOrientation(getNewOrientation(curveIndexR + indexOffset));
     }
 
+    mesh.updatePlaneIntersections();
+
     update();
 
 }
@@ -30,6 +32,7 @@ void ViewerFibula::movePlaneDistance(double distance){
     double percentage = static_cast<double>(curveIndexR + indexOffset) / static_cast<double>(nbU);
     rightPlane->setPosition(curve->getCurve()[curveIndexR + indexOffset], percentage);
     rightPlane->setOrientation(getNewOrientation(curveIndexR + indexOffset));
+    mesh.updatePlaneIntersections(rightPlane);
     update();
 }
 
