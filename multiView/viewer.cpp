@@ -198,8 +198,8 @@ void Viewer::initPlanes(Movable status){
     curveIndexR = nbU - 1;
     curveIndexL = 0;
 
-    leftPlane = new Plane(15.0, status);
-    rightPlane = new Plane(15.0, status);
+    leftPlane = new Plane(25.0, status);
+    rightPlane = new Plane(25.0, status);
 
 
     leftPlane->setPosition(curve->getPoint(curveIndexL), 0);

@@ -94,7 +94,36 @@ bool Plane::isIntersection(Vec v0, Vec v1, Vec v2){
     Vec tr1 = mf->localCoordinatesOf(v1);
     Vec tr2 = mf->localCoordinatesOf(v2);
 
-    if( (tr0.z < 0 && tr1.z < 0 && tr2.z < 0) || (tr0.z > 0 && tr1.z > 0 && tr2.z > 0) ) return false;
+    Vec tr[3] = {tr0, tr1, tr2};
 
-    return true;
+    if( (tr0.z < 0 && tr1.z < 0 && tr2.z < 0) || (tr0.z > 0 && tr1.z > 0 && tr2.z > 0) ) return false;
+    else{
+        for(int i=0; i<3; i++){
+            Vec l = tr[(i+1)%3] - tr[i];
+            Vec n = Vec(0,0,1);   // the z axis
+
+            if(l*n == 0.0){
+                if( tr[i]*n == 0.0 ){
+                    if( (tr[i].x < size && tr[i].y < size) || (tr[(i+1)%3].x < size && tr[(i+1)%3].y < size)){
+                        return true;  // the plan contains the line
+                    }
+                }
+                else continue;  // the line is parallel
+            }
+
+            double baseD = l.norm();    // the actual length of the segment
+
+            double d = (-tr[i]*n) / (l*n);
+
+            if(d > baseD) continue;     // it won't intersect without being extended
+
+            Vec intersection = d*l + tr[i];
+
+            if(abs(intersection.x) < size && abs(intersection.y) < size){
+                return true;
+            }
+        }
+    }
+
+    return false;   // if we haven't found a line that meets the criteria
 }
