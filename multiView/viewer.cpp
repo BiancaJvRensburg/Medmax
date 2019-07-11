@@ -175,7 +175,7 @@ void Viewer::initCurve(){
     control[0] = new ControlPoint(-51.946, -19.1294, -18.4682);
     control[1] = new ControlPoint(-35.7371, -14.8855, -63.1966);
     control[2] = new ControlPoint(-27.1318, -96.5289, -62.9186);
-    control[3] = new ControlPoint(25.132, -88.7449, -60.7003);
+    control[3] = new ControlPoint(23.4442, -88.4731, -61.2257);
     control[4] = new ControlPoint(46.3957, -23.0805, -54.17);
     control[5] = new ControlPoint(44.4578, -24.7785, -19.9623);
 

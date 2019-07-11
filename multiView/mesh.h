@@ -52,6 +52,7 @@ protected:
     void planeIntersection(int index);
 
     void floodNeighbour(int index, int id);     // flood the neighbours of the vertex index with the value id
+    void mergeFlood();      // to be called after flooding; merges the regions between the planes
 
     std::vector <Vec3Df> vertices;
     std::vector <Triangle> triangles;
