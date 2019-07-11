@@ -23,9 +23,6 @@ void Viewer::draw() {
     glColor3f(1.,1.,1.);
     mesh.draw();
 
-    glEnable(GL_DEPTH);
-    glEnable(GL_DEPTH_TEST);
-
     glColor3f(1.0, 0, 0);
     leftPlane->draw();
 
@@ -33,9 +30,6 @@ void Viewer::draw() {
     rightPlane->draw();
 
     curve->draw();
-
-    glDisable(GL_DEPTH);
-    glDisable(GL_DEPTH_TEST);
 
     curve->drawControl(); // We want to visualise this at all times
     //curve->drawTangent(curveIndexL);
@@ -174,8 +168,8 @@ void Viewer::initCurve(){
 
     control[0] = new ControlPoint(-51.946, -19.1294, -18.4682);
     control[1] = new ControlPoint(-35.7371, -14.8855, -63.1966);
-    control[2] = new ControlPoint(-28.9575, -98.2014, -73.3384);
-    control[3] = new ControlPoint(23.1392, -92.1965, -78.7013);
+    control[2] = new ControlPoint(-27.1318, -96.5289, -62.9186);
+    control[3] = new ControlPoint(25.132, -88.7449, -60.7003);
     control[4] = new ControlPoint(46.3957, -23.0805, -54.17);
     control[5] = new ControlPoint(44.4578, -24.7785, -19.9623);
 

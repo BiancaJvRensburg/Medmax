@@ -210,6 +210,9 @@ int Curve::indexForLength(int indexS, double length){
 }
 
 void Curve::draw(){
+    glEnable(GL_DEPTH);
+    glEnable(GL_DEPTH_TEST);
+
       glBegin(GL_LINE_STRIP);
       glColor3f(0.0, 1.0, 0.0);
 
@@ -219,6 +222,9 @@ void Curve::draw(){
       }
 
       glEnd();
+
+      glDisable(GL_DEPTH);
+      glDisable(GL_DEPTH_TEST);
 }
 
 void Curve::drawControl(){

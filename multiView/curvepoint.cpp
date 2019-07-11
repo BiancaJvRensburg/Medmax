@@ -11,7 +11,7 @@ CurvePoint::CurvePoint(Vec* p, ManipulatedFrame* mf, double* t)
 void CurvePoint::draw(){
 
     if(mf->grabsMouse()) glColor3f(0, 1, 1);
-    else glColor3f(0.2f, 0.1f, 0.7f);
+    else glColor3f(0.6f, 0, 0.4f);
 
     glPointSize(10.0);
     glBegin(GL_POINTS);
