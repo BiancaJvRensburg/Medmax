@@ -86,20 +86,13 @@ void Mesh::computeVerticesNormals(){
 void Mesh::glTriangle(unsigned int i){
     const Triangle & t = triangles[i];
 
-    // intersectionTriangles is sorted on creation
-    /*for(int k=0; k<interIndex.size(); k++){ // check all the planes
-        if(interIndex[k] < intersectionTriangles[k].size() && static_cast<unsigned int>(i) == intersectionTriangles[k][interIndex[k]]){
-            //std::cout<< interIndex[k];
-            interIndex[k]++;
-            glColor3f(0, 0.5, 0.5);
-        }
-    }*/
-
     for( int j = 0 ; j < 3 ; j++ ){
+        /* Visualisation testing */
         if(flooding[t.getVertex(j)] == 0) glColor3f(0, 0, 1);
         if(flooding[t.getVertex(j)] == 1) glColor3f(0, 0.5, 0.5);
         if(flooding[t.getVertex(j)] == planes.size()) glColor3f(1, 0, 0);
         if(flooding[t.getVertex(j)] == planes.size()+1) glColor3f(1, 1, 0);
+        /* End of visualisation testing */
         glNormal(verticesNormals[t.getVertex(j)]*normalDirection);
         glVertex(vertices[t.getVertex(j)]);
     }
@@ -108,13 +101,11 @@ void Mesh::glTriangle(unsigned int i){
 }
 
 void Mesh::addPlane(Plane *p){
-    //int index = planes.size();
     planes.push_back(p);
     planeNeighbours.push_back(-1);  // This is done once for the neg and once for the pos
     planeNeighbours.push_back(-1);
     std::vector<unsigned int> init;
     intersectionTriangles.push_back(init);
-    //planeIntersection(index);     // get the intersections
     updatePlaneIntersections(p);
     interIndex.push_back(0);    // at zero by default
 }
@@ -122,10 +113,10 @@ void Mesh::addPlane(Plane *p){
 void Mesh::updatePlaneIntersections(){
     flooding.clear();
     for(int i=0; i<vertices.size(); i++) flooding.push_back(-1);
+    for(int i=0; i<planeNeighbours.size(); i++) planeNeighbours[i] = -1;
 
     for(int i=0; i<planes.size(); i++) planeIntersection(i);
 
-    // Brute method
     for(int i=0; i<flooding.size(); i++){
         if(flooding[i] != -1){
             for(int j=0; j<vertexNeighbours[i].size(); j++)
@@ -133,12 +124,17 @@ void Mesh::updatePlaneIntersections(){
         }
     }
 
-    //std::cout << planeNeighbours.size() << std::endl;
-
-    /*int i=0;
-    while (i<planeNeighbours.size()){
-        std::cout << planeNeighbours[i] << "," << planeNeighbours[i+1] << std::endl;
-        i+=2;
+    // for each neighbour, of each vertex, of each triangle intersected, on each plane
+    /*for(int k=0; k<planes.size(); k++){
+        for(int i=0; i<intersectionTriangles[k].size(); i++){
+            for(int j=0; j<3; j++){
+                int index = triangles[intersectionTriangles[k][i]].getVertex(j);
+                if(flooding[index] != -1){
+                    for(int l=0; l<vertexNeighbours[index].size(); l++)
+                    floodNeighbour(vertexNeighbours[index][l], flooding[index]);
+                }
+            }
+        }
     }*/
 
     mergeFlood();
@@ -165,13 +161,13 @@ void Mesh::updatePlaneIntersections(Plane *p){
         }
     }*/
 
-    updatePlaneIntersections();
+    // mergeFlood
 
-    //mergeFlood();
+    updatePlaneIntersections();
 }
 
 void Mesh::floodNeighbour(int index, int id){
-    // Uninitialised
+    // Flood it
     if(flooding[index] == -1){
         flooding[index] = id;
 
@@ -189,55 +185,19 @@ void Mesh::floodNeighbour(int index, int id){
     else{
         // They're not already neighbours
         if(planeNeighbours[id]==-1){
-            /*std::cout << "Before " << planeNeighbours[id] << std::endl;
-            std::cout << "Flooding " << flooding[index] << std::endl;
-            std::cout << "Id " <<  id << std::endl;*/
-
             planeNeighbours[id] = flooding[index];     // equal to the old value
             planeNeighbours[flooding[index]] = id;
-
-            //std::cout << " " << std::endl;
-            return;
         }
 
         // They're already neighbours
         return;
-
-        /*int pNindex1, pNindex2;
-
-        // Extract the first planeNeighbour index from the id (the new plane)
-        if(id > planes.size()-1){
-            pNindex1 = 2 * (id - planes.size()) + 1;  // it's positive
-        }
-        else pNindex1 = 2 * id;
-
-        // They're not already neighbours
-        if(planeNeighbours[pNindex1]==-1){
-
-            std::cout << "Old " << pNindex1 << " = " << planeNeighbours[pNindex1] << std::endl;
-
-            if(flooding[index] > planes.size()-1){
-                pNindex2 = 2 * (flooding[index] - planes.size()) + 1;  // it's positive
-            }
-            else pNindex2 = 2 * flooding[index];
-
-            std::cout << "First " << pNindex1 << " from " << id << " = " << flooding[index] << std::endl;
-            std::cout << "Second " << pNindex2 << " from " << flooding[index] << " = " << id << std::endl;
-            std::cout << " "<< std::endl;
-
-            planeNeighbours[pNindex1] = flooding[index];
-            planeNeighbours[pNindex2] = id;
-            return;
-        }
-        // They're already neighbours
-        else if(planeNeighbours[pNindex1]!=-1) return;*/
     }
 }
 
+// Non permanent colour leak when they get too close, but they should never be allowed to be that close
 void Mesh::mergeFlood(){
     for(int i=0; i<flooding.size(); i++){
-        if(planeNeighbours[flooding[i]] !=-1 && planeNeighbours[flooding[i]] < flooding[i]){
-            //std::cout << flooding[i] << " becomes " << planeNeighbours[flooding[i]] << std::endl;
+        if(planeNeighbours[flooding[i]] != -1 && planeNeighbours[flooding[i]] < flooding[i]){
             flooding[i] = planeNeighbours[flooding[i]];
         }
     }
@@ -261,8 +221,6 @@ void Mesh::planeIntersection(int index){
             }
         }
     }
-
-    //std::cout << intersectionTriangles[index].size() << std::endl;
 }
 
 void Mesh::draw()
