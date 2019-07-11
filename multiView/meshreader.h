@@ -16,7 +16,7 @@
 namespace FileIO{
 
     template <typename Point, typename Face>
-    void openOFF( std::string const & filename  , std::vector<Point> & vertices, std::vector<Face> & triangles)
+    void openOFF( std::string const &filename, std::vector<Point> &vertices, std::vector<Face> &triangles, std::vector< std::vector<int>> &vertexNeighbours)
     {
         std::cout << "Opening " << filename << std::endl;
 
@@ -57,6 +57,12 @@ namespace FileIO{
 
         // Clear any triangles
         triangles.clear();
+        vertexNeighbours.clear();
+
+        for(int i=0; i<vertices.size(); i++){
+            std::vector<int> init;
+            vertexNeighbours.push_back(init);
+        }
 
         // Read the triangles
         for( int f = 0 ; f < n_faces ; ++f )
@@ -68,6 +74,25 @@ namespace FileIO{
                 int _v1 , _v2 , _v3;
                 myfile >> _v1 >> _v2 >> _v3;
                 triangles.push_back( Face(_v1, _v2, _v3) );
+
+                int vert[3] = {_v1, _v2, _v3};
+
+                for(int k=0; k<3; k++){
+                    bool found = false;
+
+                    for(int i=0; i<vertexNeighbours[vert[k]].size(); i++){
+                        if(vertexNeighbours[vert[k]][i] == vert[(k+1)%3]){
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if(found == false){
+                        vertexNeighbours[vert[k]].push_back(vert[(k+1)%3]);
+                        vertexNeighbours[vert[(k+1)%3]].push_back(vert[k]);
+                    }
+                }
+
             }
             else if( n_vertices_on_face == 4 )
             {
@@ -76,6 +101,44 @@ namespace FileIO{
                 myfile >> _v1 >> _v2 >> _v3 >> _v4;
                 triangles.push_back( Face(_v1, _v2, _v3) );
                 triangles.push_back( Face(_v1, _v3, _v4) );
+
+                int vert[3] = {_v1, _v2, _v3};
+
+                for(int k=0; k<3; k++){
+                    bool found = false;
+
+                    for(int i=0; i<vertexNeighbours[vert[k]].size(); i++){
+                        if(vertexNeighbours[vert[k]][i] == vert[(k+1)%3]){
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if(found == false){
+                        vertexNeighbours[vert[k]].push_back(vert[(k+1)%3]);
+                        vertexNeighbours[vert[(k+1)%3]].push_back(vert[k]);
+                    }
+                }
+
+                vert[0] = _v1;
+                vert[1] = _v3;
+                vert[3] = _v4;
+
+                for(int k=0; k<3; k++){
+                    bool found = false;
+
+                    for(int i=0; i<vertexNeighbours[vert[k]].size(); i++){
+                        if(vertexNeighbours[vert[k]][i] == vert[(k+1)%3]){
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if(found == false){
+                        vertexNeighbours[vert[k]].push_back(vert[(k+1)%3]);
+                        vertexNeighbours[vert[(k+1)%3]].push_back(vert[k]);
+                    }
+                }
             }
             else
             {

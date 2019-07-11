@@ -98,8 +98,8 @@ void Mesh::glTriangle(unsigned int i){
     for( int j = 0 ; j < 3 ; j++ ){
         if(flooding[t.getVertex(j)] == 0) glColor3f(0, 0, 1);
         if(flooding[t.getVertex(j)] == 1) glColor3f(0, 0, 1);
-        if(flooding[t.getVertex(j)] == vertices.size()) glColor3f(1, 0, 0);
-        if(flooding[t.getVertex(j)] == vertices.size()+1) glColor3f(1, 0, 0);
+        if(flooding[t.getVertex(j)] == planes.size()) glColor3f(1, 0, 0);
+        if(flooding[t.getVertex(j)] == planes.size()+1) glColor3f(1, 0, 0);
         glNormal(verticesNormals[t.getVertex(j)]*normalDirection);
         glVertex(vertices[t.getVertex(j)]);
     }
@@ -108,11 +108,14 @@ void Mesh::glTriangle(unsigned int i){
 }
 
 void Mesh::addPlane(Plane *p){
-    int index = planes.size();
+    //int index = planes.size();
     planes.push_back(p);
+    planeNeighbours.push_back(-1);  // This is done once for the neg and once for the pos
+    planeNeighbours.push_back(-1);
     std::vector<unsigned int> init;
     intersectionTriangles.push_back(init);
-    planeIntersection(index);     // get the intersections
+    //planeIntersection(index);     // get the intersections
+    updatePlaneIntersections(p);
     interIndex.push_back(0);    // at zero by default
 }
 
@@ -121,16 +124,51 @@ void Mesh::updatePlaneIntersections(){
     for(int i=0; i<vertices.size(); i++) flooding.push_back(-1);
 
     for(int i=0; i<planes.size(); i++) planeIntersection(i);
+
+    // Brute method
+    for(int i=0; i<flooding.size(); i++){
+        if(flooding[i] != -1){
+            for(int j=0; j<vertexNeighbours[i].size(); j++)
+            floodNeighbour(vertexNeighbours[i][j], flooding[i]);
+        }
+    }
 }
 
 void Mesh::updatePlaneIntersections(Plane *p){
-    for(int i=0; i<planes.size(); i++)
+    for(int i=0; i<planes.size(); i++){
         if(p == planes[i]){
             for(int j=0; j<vertices.size(); j++){
-                if(flooding[j] == i || flooding[j] == i + vertices.size()) flooding[j] = -1;
+                if(flooding[j] == i || flooding[j] == i + planes.size()) flooding[j] = -1;
             }
             planeIntersection(i);
         }
+    }
+
+    // Brute method
+    for(int i=0; i<flooding.size(); i++){
+        if(flooding[i] != -1){
+            for(int j=0; j<vertexNeighbours[i].size(); j++)
+            floodNeighbour(vertexNeighbours[i][j], flooding[i]);
+        }
+    }
+}
+
+void Mesh::floodNeighbour(int index, int id){
+    /*if(flooding[index] == id) return;   // stop if the vertex is already flooded
+
+    int pNindex;
+    if(id > vertices.size()) pNindex = 2 * (id - vertices.size()) + 1;  // it's positive
+    if(flooding[index] != -1){
+        planeNeighbours[]
+    }*/
+
+    if(flooding[index] != -1) return;
+
+    flooding[index] = id;
+
+    for(int i=0; i<vertexNeighbours[index].size(); i++){
+        floodNeighbour(vertexNeighbours[index][i], id);
+    }
 }
 
 // Finds all the intersections for plane nb index
@@ -146,7 +184,7 @@ void Mesh::planeIntersection(int index){
 
             for(int j=0; j<3; j++){
                 int sign = planes[index]->getSign(Vec(vertices[triangles[i].getVertex(j)]));
-                if(sign == 1) flooding[triangles[i].getVertex(j)] = vertices.size() + index;
+                if(sign == 1) flooding[triangles[i].getVertex(j)] = planes.size() + index;
                 else if(sign == -1) flooding[triangles[i].getVertex(j)] = index;
             }
         }

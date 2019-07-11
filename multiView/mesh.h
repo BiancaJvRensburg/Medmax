@@ -22,6 +22,9 @@ public:
     std::vector<Triangle> &getTriangles(){return triangles;}
     const std::vector<Triangle> &getTriangles()const {return triangles;}
 
+    std::vector< std::vector<int>> &getVertexNeighbours(){return vertexNeighbours;}
+    const std::vector< std::vector<int>> &getVertexNeighbours()const {return vertexNeighbours;}
+
     void draw();
 
     void recomputeNormals();
@@ -48,6 +51,8 @@ protected:
 
     void planeIntersection(int index);
 
+    void floodNeighbour(int index, int id);     // flood the neighbours of the vertex index with the value id
+
     std::vector <Vec3Df> vertices;
     std::vector <Triangle> triangles;
 
@@ -56,6 +61,8 @@ protected:
     std::vector <unsigned int> interIndex;    // the current index of intersectionTriangles
 
     std::vector <int> flooding;
+    std::vector< std::vector<int>> vertexNeighbours;
+    std::vector<int> planeNeighbours;
 
     std::vector<Vec3Df> normals;
     std::vector<Vec3Df> verticesNormals;
