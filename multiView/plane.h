@@ -31,6 +31,7 @@ public:
     void draw();
 
     bool isIntersection(Vec v0, Vec v1, Vec v2);
+    int getSign(Vec v);
 
     Movable status;
     CurvePoint* cp;

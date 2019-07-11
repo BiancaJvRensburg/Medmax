@@ -87,15 +87,19 @@ void Mesh::glTriangle(unsigned int i){
     const Triangle & t = triangles[i];
 
     // intersectionTriangles is sorted on creation
-    for(int k=0; k<interIndex.size(); k++){ // check all the planes
+    /*for(int k=0; k<interIndex.size(); k++){ // check all the planes
         if(interIndex[k] < intersectionTriangles[k].size() && static_cast<unsigned int>(i) == intersectionTriangles[k][interIndex[k]]){
             //std::cout<< interIndex[k];
             interIndex[k]++;
             glColor3f(0, 0.5, 0.5);
         }
-    }
+    }*/
 
     for( int j = 0 ; j < 3 ; j++ ){
+        if(flooding[t.getVertex(j)] == 0) glColor3f(0, 0, 1);
+        if(flooding[t.getVertex(j)] == 1) glColor3f(0, 0, 1);
+        if(flooding[t.getVertex(j)] == vertices.size()) glColor3f(1, 0, 0);
+        if(flooding[t.getVertex(j)] == vertices.size()+1) glColor3f(1, 0, 0);
         glNormal(verticesNormals[t.getVertex(j)]*normalDirection);
         glVertex(vertices[t.getVertex(j)]);
     }
@@ -113,15 +117,23 @@ void Mesh::addPlane(Plane *p){
 }
 
 void Mesh::updatePlaneIntersections(){
+    flooding.clear();
+    for(int i=0; i<vertices.size(); i++) flooding.push_back(-1);
+
     for(int i=0; i<planes.size(); i++) planeIntersection(i);
 }
 
 void Mesh::updatePlaneIntersections(Plane *p){
     for(int i=0; i<planes.size(); i++)
-        if(p == planes[i])
+        if(p == planes[i]){
+            for(int j=0; j<vertices.size(); j++){
+                if(flooding[j] == i || flooding[j] == i + vertices.size()) flooding[j] = -1;
+            }
             planeIntersection(i);
+        }
 }
 
+// Finds all the intersections for plane nb index
 void Mesh::planeIntersection(int index){
     intersectionTriangles[index].clear();
 
@@ -131,6 +143,12 @@ void Mesh::planeIntersection(int index){
         unsigned int t2 = triangles[i].getVertex(2);
         if(planes[index]->isIntersection(Vec(vertices[t0]), Vec(vertices[t1]), Vec(vertices[t2]) )){
             intersectionTriangles[index].push_back(i);
+
+            for(int j=0; j<3; j++){
+                int sign = planes[index]->getSign(Vec(vertices[triangles[i].getVertex(j)]));
+                if(sign == 1) flooding[triangles[i].getVertex(j)] = vertices.size() + index;
+                else if(sign == -1) flooding[triangles[i].getVertex(j)] = index;
+            }
         }
     }
 

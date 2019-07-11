@@ -133,3 +133,10 @@ bool Plane::isIntersection(Vec v0, Vec v1, Vec v2){
 
     return false;   // if we haven't found a line that meets the criteria
 }
+
+
+int Plane::getSign(Vec v){
+    Vec tr0 = mf->localCoordinatesOf(v);
+
+    return static_cast<int>( tr0.z/(abs(tr0.z)) );
+}

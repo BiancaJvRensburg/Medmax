@@ -23,11 +23,15 @@ void Viewer::draw() {
     glColor3f(1.,1.,1.);
     mesh.draw();
 
+    glPolygonMode (GL_FRONT_AND_BACK, GL_FILL);
+
     glColor3f(1.0, 0, 0);
     leftPlane->draw();
 
     glColor3f(0, 1.0, 0);
     rightPlane->draw();
+
+    glPolygonMode (GL_FRONT_AND_BACK, GL_LINE);
 
     curve->draw();
 
@@ -51,7 +55,8 @@ void Viewer::init() {
   // Set up gl settings
   glEnable(GL_LIGHTING);
 
-  glPolygonMode (GL_FRONT_AND_BACK, GL_FILL);
+  //glPolygonMode (GL_FRONT_AND_BACK, GL_FILL);
+  glPolygonMode (GL_FRONT_AND_BACK, GL_LINE);
 
   glLineWidth (1.0f);
 
