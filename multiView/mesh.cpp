@@ -141,7 +141,7 @@ void Mesh::updatePlaneIntersections(){
         i+=2;
     }*/
 
-    //mergeFlood();
+    mergeFlood();
 }
 
 void Mesh::updatePlaneIntersections(Plane *p){
@@ -236,7 +236,10 @@ void Mesh::floodNeighbour(int index, int id){
 
 void Mesh::mergeFlood(){
     for(int i=0; i<flooding.size(); i++){
-        if(planeNeighbours[flooding[i]] < flooding[i]) flooding[i] = planeNeighbours[flooding[i]];
+        if(planeNeighbours[flooding[i]] !=-1 && planeNeighbours[flooding[i]] < flooding[i]){
+            //std::cout << flooding[i] << " becomes " << planeNeighbours[flooding[i]] << std::endl;
+            flooding[i] = planeNeighbours[flooding[i]];
+        }
     }
 }
 

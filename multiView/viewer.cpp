@@ -31,7 +31,7 @@ void Viewer::draw() {
     glColor3f(0, 1.0, 0);
     rightPlane->draw();
 
-    glPolygonMode (GL_FRONT_AND_BACK, GL_LINE);
+    //glPolygonMode (GL_FRONT_AND_BACK, GL_LINE);
 
     curve->draw();
 
