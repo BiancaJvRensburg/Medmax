@@ -138,6 +138,41 @@ void Mesh::updatePlaneIntersections(){
     }*/
 
     mergeFlood();
+    cutMesh();
+}
+
+// Can maybe optimise somewhere
+void Mesh::cutMesh(){
+    isCut = true;
+    trianglesCut.clear();
+
+    // for each vertex NOT between two planes
+    for(int i=0; i<flooding.size(); i++){
+        //std::cout << "Uhh" << std::endl;
+        if(planeNeighbours[flooding[i]]==-1){
+            //std::cout << "Exterior index" << std::endl;
+            // Get the triangles they belong to
+            for(int j=0; j<vertexTriangles[i].size(); j++){
+                // If it's not already in the list
+                bool found = false;
+                for(int k=0; k<trianglesCut.size(); k++){
+                    if(trianglesCut[k] == vertexTriangles[i][j]){
+                        found = true;
+                        //std::cout << "found" << std::endl;
+                        break;     // stop if its already in there
+                    }
+                }
+                if(!found){
+                    //std::cout << "adding triangle" << std::endl;
+                    trianglesCut.push_back(vertexTriangles[i][j]);
+                }
+            }
+        }
+    }
+}
+
+void Mesh::uncutMesh(){
+    isCut = false;
 }
 
 void Mesh::updatePlaneIntersections(Plane *p){
@@ -153,7 +188,6 @@ void Mesh::updatePlaneIntersections(Plane *p){
         }
     }
 
-    // Brute method
     for(int i=0; i<flooding.size(); i++){
         if(flooding[i] != -1){
             for(int j=0; j<vertexNeighbours[i].size(); j++)
@@ -231,9 +265,20 @@ void Mesh::draw()
 
     glBegin (GL_TRIANGLES);
     for(unsigned int i = 0 ; i < interIndex.size(); i++) interIndex[i] = 0;
-    for(unsigned int i = 0 ; i < triangles.size(); i++){
-        glTriangle(i);
+
+    if(!isCut){
+        for(unsigned int i = 0 ; i < triangles.size(); i++){
+            glTriangle(i);
+        }
     }
+    else{
+        //std::cout << trianglesCut.size() << std::endl;
+        for(int i = 0 ; i < trianglesCut.size(); i++){
+            //std::cout << "cutting " << std::endl;
+            glTriangle(trianglesCut[i]);
+        }
+    }
+
     glEnd();
 
     glDisable(GL_DEPTH_TEST);

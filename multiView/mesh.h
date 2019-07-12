@@ -25,6 +25,9 @@ public:
     std::vector< std::vector<int>> &getVertexNeighbours(){return vertexNeighbours;}
     const std::vector< std::vector<int>> &getVertexNeighbours()const {return vertexNeighbours;}
 
+    std::vector< std::vector<int>> &getVertexTriangles(){return vertexTriangles;}
+    const std::vector< std::vector<int>> &getVertexTriangles()const {return vertexTriangles;}
+
     void draw();
 
     void recomputeNormals();
@@ -54,6 +57,9 @@ protected:
     void floodNeighbour(int index, int id);     // flood the neighbours of the vertex index with the value id
     void mergeFlood();      // to be called after flooding; merges the regions between the planes
 
+    void cutMesh();
+    void uncutMesh();
+
     std::vector <Vec3Df> vertices;
     std::vector <Triangle> triangles;
 
@@ -63,7 +69,10 @@ protected:
 
     std::vector <int> flooding;
     std::vector< std::vector<int>> vertexNeighbours;
+    std::vector< std::vector<int>> vertexTriangles;
     std::vector<int> planeNeighbours;
+    bool isCut = false;
+    std::vector<int> trianglesCut;
 
     std::vector<Vec3Df> normals;
     std::vector<Vec3Df> verticesNormals;
