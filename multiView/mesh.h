@@ -53,14 +53,14 @@ protected:
     void computeBB();
 
     void computeTriangleNormals();
-    Vec3Df computeTriangleNormal(int t);
+    Vec3Df computeTriangleNormal(unsigned int t);
     void computeVerticesNormals();
     void glTriangle(unsigned int i);
     void glTriangleSmooth(unsigned int i);
 
-    void planeIntersection(int index);
+    void planeIntersection(unsigned int index);
 
-    void floodNeighbour(int index, int id);     // flood the neighbours of the vertex index with the value id
+    void floodNeighbour(unsigned int index, unsigned int id);     // flood the neighbours of the vertex index with the value id
     void mergeFlood();      // to be called after flooding; merges the regions between the planes
 
     void createSmoothedTriangles();
@@ -74,12 +74,12 @@ protected:
     std::vector <std::vector <unsigned int>> intersectionTriangles;    // Contains the index of the triangle instead of the actual triangle
     std::vector <unsigned int> interIndex;    // the current index of intersectionTriangles
 
-    std::vector <int> flooding;
+    std::vector <unsigned int> flooding;
     std::vector< std::vector<unsigned int>> vertexNeighbours;
     std::vector< std::vector<unsigned int>> vertexTriangles;
     std::vector<unsigned int> planeNeighbours;
     bool isCut = false;
-    std::vector<int> trianglesCut;
+    std::vector<unsigned int> trianglesCut;
 
     std::vector<Vec3Df> smoothedVerticies;
 

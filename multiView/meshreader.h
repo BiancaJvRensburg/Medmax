@@ -60,7 +60,7 @@ namespace FileIO{
         vertexNeighbours.clear();
         vertexTriangles.clear();
 
-        for(int i=0; i<vertices.size(); i++){
+        for(unsigned int i=0; i<vertices.size(); i++){
             std::vector<unsigned int> init;
             vertexNeighbours.push_back(init);
             vertexTriangles.push_back(init);
@@ -73,18 +73,18 @@ namespace FileIO{
             myfile >> n_vertices_on_face;
             if( n_vertices_on_face == 3 )
             {
-                int triIndex = triangles.size();
-                int _v1 , _v2 , _v3;
+                unsigned int triIndex = triangles.size();
+                unsigned int _v1 , _v2 , _v3;
                 myfile >> _v1 >> _v2 >> _v3;
                 triangles.push_back( Face(_v1, _v2, _v3) );
 
-                int vert[3] = {_v1, _v2, _v3};
+                unsigned int vert[3] = {_v1, _v2, _v3};
 
                 // Add to neighbours
                 for(int k=0; k<3; k++){
                     bool found = false;
 
-                    for(int i=0; i<vertexNeighbours[vert[k]].size(); i++){
+                    for(unsigned int i=0; i<vertexNeighbours[vert[k]].size(); i++){
                         if(vertexNeighbours[vert[k]][i] == vert[(k+1)%3]){
                             found = true;
                             break;
@@ -101,7 +101,7 @@ namespace FileIO{
                 for(int k=0; k<3; k++){
                     bool found = false;
 
-                    for(int i=0; i<vertexTriangles[vert[k]].size(); i++){
+                    for(unsigned int i=0; i<vertexTriangles[vert[k]].size(); i++){
                         if(vertexTriangles[vert[k]][i] == triIndex){
                             found = true;
                             break;
@@ -116,21 +116,21 @@ namespace FileIO{
             }
             else if( n_vertices_on_face == 4 )
             {
-                int _v1 , _v2 , _v3 , _v4;
+                unsigned int _v1 , _v2 , _v3 , _v4;
 
-                int triIndex = triangles.size();
+                unsigned int triIndex = triangles.size();
 
                 myfile >> _v1 >> _v2 >> _v3 >> _v4;
                 triangles.push_back( Face(_v1, _v2, _v3) );
                 triangles.push_back( Face(_v1, _v3, _v4) );
 
-                int vert[3] = {_v1, _v2, _v3};
+                unsigned int vert[3] = {_v1, _v2, _v3};
 
                 // First triangle
                 for(int k=0; k<3; k++){
                     bool found = false;
 
-                    for(int i=0; i<vertexNeighbours[vert[k]].size(); i++){
+                    for(unsigned int i=0; i<vertexNeighbours[vert[k]].size(); i++){
                         if(vertexNeighbours[vert[k]][i] == triIndex){
                             found = true;
                             break;
@@ -146,7 +146,7 @@ namespace FileIO{
                 for(int k=0; k<3; k++){
                     bool found = false;
 
-                    for(int i=0; i<vertexTriangles[vert[k]].size(); i++){
+                    for(unsigned int i=0; i<vertexTriangles[vert[k]].size(); i++){
                         if(vertexTriangles[vert[k]][i] == triIndex){
                             found = true;
                             break;
@@ -168,7 +168,7 @@ namespace FileIO{
                 for(int k=0; k<3; k++){
                     bool found = false;
 
-                    for(int i=0; i<vertexNeighbours[vert[k]].size(); i++){
+                    for(unsigned int i=0; i<vertexNeighbours[vert[k]].size(); i++){
                         if(vertexNeighbours[vert[k]][i] == vert[(k+1)%3]){
                             found = true;
                             break;
@@ -184,7 +184,7 @@ namespace FileIO{
                 for(int k=0; k<3; k++){
                     bool found = false;
 
-                    for(int i=0; i<vertexTriangles[vert[k]].size(); i++){
+                    for(unsigned int i=0; i<vertexTriangles[vert[k]].size(); i++){
                         if(vertexTriangles[vert[k]][i] == triIndex){
                             found = true;
                             break;
@@ -216,8 +216,8 @@ namespace MeshTools{
         radius = 0.0;
         for (unsigned int i = 0; i < points.size (); i++) {
             float vDistance = (points[i] - center).norm();
-            if (vDistance > radius)
-                radius = vDistance;
+            if (static_cast<double>(vDistance) > radius)
+                radius = static_cast<double>(vDistance);
         }
     }
 
@@ -237,7 +237,7 @@ namespace MeshTools{
         for(int v = 0 ; v < 3; v ++)
             dotProduct += clippingNormal[v]*pos[v];
 
-        if( dotProduct < 0.) return false;
+        if( static_cast<double>(dotProduct) < 0.) return false;
 
         return true;
     }

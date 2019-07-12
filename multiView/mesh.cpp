@@ -53,7 +53,7 @@ void Mesh::computeTriangleNormals(){
 
 }
 
-Vec3Df Mesh::computeTriangleNormal( int id ){
+Vec3Df Mesh::computeTriangleNormal(unsigned int id ){
 
     const Triangle & t = triangles[id];
     Vec3Df normal = Vec3Df::crossProduct(vertices[t.getVertex (1)] - vertices[t.getVertex (0)], vertices[t.getVertex (2)]- vertices[t.getVertex (0)]);
@@ -92,7 +92,7 @@ void Mesh::computeVerticesNormals(){
 void Mesh::glTriangle(unsigned int i){
     const Triangle & t = triangles[i];
 
-    for( int j = 0 ; j < 3 ; j++ ){
+    for(unsigned int j = 0 ; j < 3 ; j++ ){
         glNormal(verticesNormals[t.getVertex(j)]*normalDirection);
         glVertex(vertices[t.getVertex(j)]);
     }
@@ -103,7 +103,7 @@ void Mesh::glTriangle(unsigned int i){
 void Mesh::glTriangleSmooth(unsigned int i){
     const Triangle & t = triangles[i];
 
-    for( int j = 0 ; j < 3 ; j++ ){
+    for(unsigned int j = 0 ; j < 3 ; j++ ){
         glNormal(verticesNormals[t.getVertex(j)]*normalDirection);
         glVertex(smoothedVerticies[t.getVertex(j)]);
     }
@@ -113,8 +113,8 @@ void Mesh::glTriangleSmooth(unsigned int i){
 
 void Mesh::addPlane(Plane *p){
     planes.push_back(p);
-    planeNeighbours.push_back(-1);  // This is done once for the neg and once for the pos
-    planeNeighbours.push_back(-1);
+    planeNeighbours.push_back(static_cast<unsigned int>(-1));  // This is done once for the neg and once for the pos
+    planeNeighbours.push_back(static_cast<unsigned int>(-1));
     std::vector<unsigned int> init;
     intersectionTriangles.push_back(init);
     updatePlaneIntersections(p);
@@ -123,14 +123,14 @@ void Mesh::addPlane(Plane *p){
 
 void Mesh::updatePlaneIntersections(){
     flooding.clear();
-    for(int i=0; i<vertices.size(); i++) flooding.push_back(-1);
-    for(int i=0; i<planeNeighbours.size(); i++) planeNeighbours[i] = -1;
+    for(unsigned int i=0; i<vertices.size(); i++) flooding.push_back(static_cast<unsigned int>(-1));
+    for(unsigned int i=0; i<planeNeighbours.size(); i++) planeNeighbours[i] = static_cast<unsigned int>(-1);
 
-    for(int i=0; i<planes.size(); i++) planeIntersection(i);
+    for(unsigned int i=0; i<planes.size(); i++) planeIntersection(i);
 
-    for(int i=0; i<flooding.size(); i++){
-        if(flooding[i] != -1){
-            for(int j=0; j<vertexNeighbours[i].size(); j++)
+    for(unsigned int i=0; i<flooding.size(); i++){
+        if(flooding[i] != static_cast<unsigned int>(-1)){
+            for(unsigned int j=0; j<vertexNeighbours[i].size(); j++)
             floodNeighbour(vertexNeighbours[i][j], flooding[i]);
         }
     }
@@ -144,14 +144,14 @@ void Mesh::cutMesh(){
     trianglesCut.clear();
 
     bool truthTriangles[triangles.size()];  // keeps a record of the triangles who are already added
-    for(int i=0; i<triangles.size(); i++) truthTriangles[i] = false;
+    for(unsigned int i=0; i<triangles.size(); i++) truthTriangles[i] = false;
 
     switch (cuttingSide) {
         case Side::INTERIOR:
-            for(int i=0; i<flooding.size(); i++){
-                if(planeNeighbours[flooding[i]]==-1){
+            for(unsigned int i=0; i<flooding.size(); i++){
+                if(planeNeighbours[flooding[i]]==static_cast<unsigned int>(-1)){
                     // Get the triangles they belong to
-                    for(int j=0; j<vertexTriangles[i].size(); j++){
+                    for(unsigned int j=0; j<vertexTriangles[i].size(); j++){
                         // If it's not already in the list
                         if(!truthTriangles[vertexTriangles[i][j]]){
                             trianglesCut.push_back(vertexTriangles[i][j]);
@@ -163,10 +163,10 @@ void Mesh::cutMesh(){
         break;
 
         case Side::EXTERIOR:
-            for(int i=0; i<flooding.size(); i++){
-                if(planeNeighbours[flooding[i]]!=-1){
+            for(unsigned int i=0; i<flooding.size(); i++){
+                if(planeNeighbours[flooding[i]]!= static_cast<unsigned int>(-1)){
                     // Get the triangles they belong to
-                    for(int j=0; j<vertexTriangles[i].size(); j++){
+                    for(unsigned int j=0; j<vertexTriangles[i].size(); j++){
                         // If it's not already in the list
                         if(!truthTriangles[vertexTriangles[i][j]]){
                             trianglesCut.push_back(vertexTriangles[i][j]);
@@ -185,22 +185,21 @@ void Mesh::cutMesh(){
 void Mesh::createSmoothedTriangles(){
     smoothedVerticies.clear();
 
-    for(int i=0; i<vertices.size(); i++){
+    for(unsigned int i=0; i<vertices.size(); i++){
         smoothedVerticies.push_back(vertices[i]);
     }
 
     switch (cuttingSide) {
         case Side::INTERIOR:
-        for(int i=0; i<planes.size(); i++){
+        for(unsigned long long i=0; i<planes.size(); i++){
             // for each triangle cut
-            for(int j=0; j<intersectionTriangles[i].size(); j++){
-                int newVerticies[3] = {-1, -1, -1};
+            for(unsigned long long j=0; j<intersectionTriangles[static_cast<unsigned long long>(i)].size(); j++){
                  // find which verticies to keep
-                for(int k=0; k<3; k++){
-                    int vertexIndex = triangles[intersectionTriangles[i][j]].getVertex(k);
-                    if(planeNeighbours[flooding[vertexIndex]] != -1){   // if we need to change it
-                        Vec newVertex = planes[i]->getProjection(Vec(vertices[vertexIndex][0], vertices[vertexIndex][1], vertices[vertexIndex][2]) );
-                        smoothedVerticies[vertexIndex] = Vec3Df(newVertex.x, newVertex.y, newVertex.z); // get the projection
+                for(unsigned int k=0; k<3; k++){
+                    unsigned int vertexIndex = triangles[intersectionTriangles[i][j]].getVertex(k);
+                    if(planeNeighbours[flooding[vertexIndex]] != static_cast<unsigned int>( -1)){   // if we need to change it
+                        Vec newVertex = planes[i]->getProjection(Vec(static_cast<double>(vertices[vertexIndex][0]), static_cast<double>(vertices[vertexIndex][1]), static_cast<double>(vertices[vertexIndex][2])) );
+                        smoothedVerticies[vertexIndex] = Vec3Df(static_cast<float>(newVertex.x), static_cast<float>(newVertex.y), static_cast<float>(newVertex.z)); // get the projection
                     }
                     // else don't change the original
                 }
@@ -210,16 +209,15 @@ void Mesh::createSmoothedTriangles(){
         break;
 
         case Side::EXTERIOR:
-        for(int i=0; i<planes.size(); i++){
+        for(unsigned int i=0; i<planes.size(); i++){
             // for each triangle cut
-            for(int j=0; j<intersectionTriangles[i].size(); j++){
-                int newVerticies[3] = {-1, -1, -1};
+            for(unsigned long long j=0; j<intersectionTriangles[static_cast<unsigned long long>(i)].size(); j++){
                  // find which verticies to keep
-                for(int k=0; k<3; k++){
-                    int vertexIndex = triangles[intersectionTriangles[i][j]].getVertex(k);
-                    if(planeNeighbours[flooding[vertexIndex]] == -1){   // if we need to change it
-                        Vec newVertex = planes[i]->getProjection(Vec(vertices[vertexIndex][0], vertices[vertexIndex][1], vertices[vertexIndex][2]) );
-                        smoothedVerticies[vertexIndex] = Vec3Df(newVertex.x, newVertex.y, newVertex.z); // get the projection
+                for(unsigned int k=0; k<3; k++){
+                    unsigned int vertexIndex = triangles[intersectionTriangles[i][j]].getVertex(k);
+                    if(planeNeighbours[flooding[vertexIndex]] == static_cast<unsigned int>( -1)){   // if we need to change it
+                        Vec newVertex = planes[i]->getProjection(Vec(static_cast<double>(vertices[vertexIndex][0]), static_cast<double>(vertices[vertexIndex][1]), static_cast<double>(vertices[vertexIndex][2])) );
+                        smoothedVerticies[vertexIndex] = Vec3Df(static_cast<float>(newVertex.x), static_cast<float>(newVertex.y), static_cast<float>(newVertex.z)); // get the projection
                     }
                     // else don't change the original
                 }
@@ -237,12 +235,12 @@ void Mesh::updatePlaneIntersections(Plane *p){
     updatePlaneIntersections();
 }
 
-void Mesh::floodNeighbour(int index, int id){
+void Mesh::floodNeighbour(unsigned int index, unsigned int id){
     // Flood it
-    if(flooding[index] == -1){
+    if(flooding[index] == static_cast<unsigned int>(-1)){
         flooding[index] = id;
 
-        for(int i=0; i<vertexNeighbours[index].size(); i++){
+        for(unsigned int i=0; i<vertexNeighbours[index].size(); i++){
             floodNeighbour(vertexNeighbours[index][i], id);
         }
     }
@@ -255,7 +253,7 @@ void Mesh::floodNeighbour(int index, int id){
     // else it already belongs to a different plane
     else{
         // They're not already neighbours
-        if(planeNeighbours[id]==-1){
+        if(planeNeighbours[id]== static_cast<unsigned int>(-1)){
             planeNeighbours[id] = flooding[index];     // equal to the old value
             planeNeighbours[flooding[index]] = id;
         }
@@ -267,15 +265,15 @@ void Mesh::floodNeighbour(int index, int id){
 
 // Non permanent colour leak when they get too close, but they should never be allowed to be that close
 void Mesh::mergeFlood(){
-    for(int i=0; i<flooding.size(); i++){
-        if(planeNeighbours[flooding[i]] != -1 && planeNeighbours[flooding[i]] < flooding[i]){
+    for(unsigned int i=0; i<flooding.size(); i++){
+        if(planeNeighbours[flooding[i]] != static_cast<unsigned int>(-1) && planeNeighbours[flooding[i]] < flooding[i]){
             flooding[i] = planeNeighbours[flooding[i]];
         }
     }
 }
 
 // Finds all the intersections for plane nb index
-void Mesh::planeIntersection(int index){
+void Mesh::planeIntersection(unsigned int index){
     intersectionTriangles[index].clear();
 
     for(unsigned int i = 0 ; i < triangles.size(); i++){
@@ -285,9 +283,9 @@ void Mesh::planeIntersection(int index){
         if(planes[index]->isIntersection(Vec(vertices[t0]), Vec(vertices[t1]), Vec(vertices[t2]) )){
             intersectionTriangles[index].push_back(i);
 
-            for(int j=0; j<3; j++){
+            for(unsigned int j=0; j<3; j++){
                 int sign = planes[index]->getSign(Vec(vertices[triangles[i].getVertex(j)]));
-                if(sign == 1) flooding[triangles[i].getVertex(j)] = planes.size() + index;
+                if(sign == 1) flooding[triangles[i].getVertex(j)] = static_cast<unsigned int>(planes.size()) + index;
                 else if(sign == -1) flooding[triangles[i].getVertex(j)] = index;
             }
         }
@@ -309,7 +307,7 @@ void Mesh::draw()
         }
     }
     else{
-        for(int i = 0 ; i < trianglesCut.size(); i++){
+        for(unsigned int i = 0 ; i < trianglesCut.size(); i++){
             glTriangleSmooth(trianglesCut[i]);
         }
     }
