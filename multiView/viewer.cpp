@@ -69,6 +69,16 @@ QString Viewer::helpString() const {
   return text;
 }
 
+void Viewer::cutMesh(){
+    mesh.setIsCut(Side::INTERIOR, true);
+    update();
+}
+
+void Viewer::uncutMesh(){
+    mesh.setIsCut(Side::INTERIOR, false);
+    update();
+}
+
 void Viewer::moveLeftPlane(int position){
 
     double percentage = static_cast<double>(position) / static_cast<double>(sliderMax);

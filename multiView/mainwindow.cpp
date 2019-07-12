@@ -135,8 +135,20 @@ void MainWindow::initFileActions(){
     QAction *openFileFibulaAction = new QAction("Open fibula mesh", this);
     connect(openFileFibulaAction, &QAction::triggered, this, &MainWindow::openFibulaMesh);
 
+    QAction *cutMeshAction = new QAction("Cut", this);
+    connect(cutMeshAction, &QAction::triggered, skullViewer, &Viewer::cutMesh);
+    connect(cutMeshAction, &QAction::triggered, fibulaViewer, &ViewerFibula::cutMesh);
+
+    QAction *unCutMeshAction = new QAction("Undo cut", this);
+    connect(unCutMeshAction, &QAction::triggered, skullViewer, &Viewer::uncutMesh);
+    connect(unCutMeshAction, &QAction::triggered, fibulaViewer, &ViewerFibula::uncutMesh);
+
+
     fileActionGroup->addAction(openFileSkullAction);
     fileActionGroup->addAction(openFileFibulaAction);
+    fileActionGroup->addAction(unCutMeshAction);
+    fileActionGroup->addAction(cutMeshAction);
+
 }
 
 void MainWindow::initFileMenu(){

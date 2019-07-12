@@ -62,6 +62,12 @@ Vec3Df Mesh::computeTriangleNormal( int id ){
 
 }
 
+void Mesh::setIsCut(Side s, bool isCut){
+    this->isCut = isCut;
+    this->cuttingSide = s;
+    if(isCut) cutMesh();
+}
+
 void Mesh::computeVerticesNormals(){
 
     verticesNormals.clear();
@@ -138,17 +144,18 @@ void Mesh::updatePlaneIntersections(){
     }*/
 
     mergeFlood();
+    if(isCut) cutMesh();
     //cutMesh(Side::INTERIOR);
 }
 
-void Mesh::cutMesh(Side s){
-    isCut = true;
+void Mesh::cutMesh(){
+    //isCut = true;
     trianglesCut.clear();
 
     bool truthTriangles[triangles.size()];  // keeps a record of the triangles who are already added
     for(int i=0; i<triangles.size(); i++) truthTriangles[i] = false;
 
-    switch (s) {
+    switch (cuttingSide) {
         case Side::INTERIOR:
             for(int i=0; i<flooding.size(); i++){
                 if(planeNeighbours[flooding[i]]==-1){
@@ -182,9 +189,9 @@ void Mesh::cutMesh(Side s){
 
 }
 
-void Mesh::uncutMesh(){
+/*void Mesh::uncutMesh(){
     isCut = false;
-}
+}*/
 
 void Mesh::updatePlaneIntersections(Plane *p){
     /*flooding.clear();

@@ -16,6 +16,9 @@ public Q_SLOTS:
 
     void initCurve();
 
+    void cutMesh();
+    void uncutMesh();
+
 private:
     int indexOffset;
     int maxOffset;

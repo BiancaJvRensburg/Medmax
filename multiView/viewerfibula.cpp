@@ -54,3 +54,13 @@ void ViewerFibula::initCurve(){
 
     initPlanes(Movable::STATIC);
 }
+
+void ViewerFibula::cutMesh(){
+    mesh.setIsCut(Side::EXTERIOR, true);
+    update();
+}
+
+void ViewerFibula::uncutMesh(){
+    mesh.setIsCut(Side::EXTERIOR, false);
+    update();
+}
