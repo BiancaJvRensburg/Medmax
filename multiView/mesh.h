@@ -24,11 +24,11 @@ public:
     std::vector<Triangle> &getTriangles(){return triangles;}
     const std::vector<Triangle> &getTriangles()const {return triangles;}
 
-    std::vector< std::vector<int>> &getVertexNeighbours(){return vertexNeighbours;}
-    const std::vector< std::vector<int>> &getVertexNeighbours()const {return vertexNeighbours;}
+    std::vector< std::vector<unsigned int>> &getVertexNeighbours(){return vertexNeighbours;}
+    const std::vector< std::vector<unsigned int>> &getVertexNeighbours()const {return vertexNeighbours;}
 
-    std::vector< std::vector<int>> &getVertexTriangles(){return vertexTriangles;}
-    const std::vector< std::vector<int>> &getVertexTriangles()const {return vertexTriangles;}
+    std::vector< std::vector<unsigned int>> &getVertexTriangles(){return vertexTriangles;}
+    const std::vector< std::vector<unsigned int>> &getVertexTriangles()const {return vertexTriangles;}
 
     void draw();
 
@@ -66,7 +66,6 @@ protected:
     void createSmoothedTriangles();
 
     void cutMesh();
-    //void uncutMesh();
 
     std::vector <Vec3Df> vertices;
     std::vector <Triangle> triangles;
@@ -76,14 +75,13 @@ protected:
     std::vector <unsigned int> interIndex;    // the current index of intersectionTriangles
 
     std::vector <int> flooding;
-    std::vector< std::vector<int>> vertexNeighbours;
-    std::vector< std::vector<int>> vertexTriangles;
-    std::vector<int> planeNeighbours;
+    std::vector< std::vector<unsigned int>> vertexNeighbours;
+    std::vector< std::vector<unsigned int>> vertexTriangles;
+    std::vector<unsigned int> planeNeighbours;
     bool isCut = false;
     std::vector<int> trianglesCut;
 
     std::vector<Vec3Df> smoothedVerticies;
-    //std::vector<Triangle> smoothedTriangles;
 
     std::vector<Vec3Df> normals;
     std::vector<Vec3Df> verticesNormals;

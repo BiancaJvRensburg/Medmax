@@ -153,8 +153,8 @@ void Viewer::moveRightPlane(int position){
 void Viewer::openOFF(QString filename) {
     std::vector<Vec3Df> &vertices = mesh.getVertices();
     std::vector<Triangle> &triangles = mesh.getTriangles();
-    std::vector< std::vector<int>> &neighbours = mesh.getVertexNeighbours();
-    std::vector< std::vector<int>> &vertexTriangles = mesh.getVertexTriangles();
+    std::vector< std::vector<unsigned int>> &neighbours = mesh.getVertexNeighbours();
+    std::vector< std::vector<unsigned int>> &vertexTriangles = mesh.getVertexTriangles();
 
     FileIO::openOFF(filename.toStdString(), vertices, triangles, neighbours, vertexTriangles);
 
@@ -259,15 +259,5 @@ Quaternion Viewer::getNewOrientation(int index){
 
     return s.normalized();
 }
-
-/*double Viewer::angle(Vec a, Vec b){
-
-    double na = a.normalize();
-    double nb = b.normalize();
-
-    double ab = a*b;
-
-    return acos(ab / (na*nb));
-}*/
 
 

@@ -93,12 +93,6 @@ void Mesh::glTriangle(unsigned int i){
     const Triangle & t = triangles[i];
 
     for( int j = 0 ; j < 3 ; j++ ){
-        /* Visualisation testing */
-        if(flooding[t.getVertex(j)] == 0) glColor3f(0, 0, 1);
-        if(flooding[t.getVertex(j)] == 1) glColor3f(0, 0.5, 0.5);
-        if(flooding[t.getVertex(j)] == planes.size()) glColor3f(1, 0, 0);
-        if(flooding[t.getVertex(j)] == planes.size()+1) glColor3f(1, 1, 0);
-        /* End of visualisation testing */
         glNormal(verticesNormals[t.getVertex(j)]*normalDirection);
         glVertex(vertices[t.getVertex(j)]);
     }
@@ -110,12 +104,6 @@ void Mesh::glTriangleSmooth(unsigned int i){
     const Triangle & t = triangles[i];
 
     for( int j = 0 ; j < 3 ; j++ ){
-        /* Visualisation testing */
-        if(flooding[t.getVertex(j)] == 0) glColor3f(0, 0, 1);
-        if(flooding[t.getVertex(j)] == 1) glColor3f(0, 0.5, 0.5);
-        if(flooding[t.getVertex(j)] == planes.size()) glColor3f(1, 0, 0);
-        if(flooding[t.getVertex(j)] == planes.size()+1) glColor3f(1, 1, 0);
-        /* End of visualisation testing */
         glNormal(verticesNormals[t.getVertex(j)]*normalDirection);
         glVertex(smoothedVerticies[t.getVertex(j)]);
     }
@@ -147,22 +135,8 @@ void Mesh::updatePlaneIntersections(){
         }
     }
 
-    // for each neighbour, of each vertex, of each triangle intersected, on each plane
-    /*for(int k=0; k<planes.size(); k++){
-        for(int i=0; i<intersectionTriangles[k].size(); i++){
-            for(int j=0; j<3; j++){
-                int index = triangles[intersectionTriangles[k][i]].getVertex(j);
-                if(flooding[index] != -1){
-                    for(int l=0; l<vertexNeighbours[index].size(); l++)
-                    floodNeighbour(vertexNeighbours[index][l], flooding[index]);
-                }
-            }
-        }
-    }*/
-
     mergeFlood();
     if(isCut) cutMesh();
-    //cutMesh(Side::INTERIOR);
 }
 
 void Mesh::cutMesh(){
@@ -209,78 +183,56 @@ void Mesh::cutMesh(){
 }
 
 void Mesh::createSmoothedTriangles(){
-    //smoothedTriangles.clear();
     smoothedVerticies.clear();
-
-    // for each plane
-    /*for(int i=0; i<planes.size(); i++){
-        // for each triangle cut
-        for(int j=0; j<intersectionTriangles[i].size(); j++){
-            int newVerticies[3] = {-1, -1, -1};
-            int originalCount = 0;
-
-             // find which verticies to keep
-            for(int k=0; k<3; k++){
-                int vertexIndex = triangles[intersectionTriangles[i][j]].getVertex(k);
-                if(planeNeighbours[flooding[vertexIndex]] == -1){
-                    originalCount++;
-                    newVerticies[k] = vertexIndex;  // keep the index of the original vertex
-                }
-            }
-
-            // Find the intersections
-            if(originalCount==1)
-
-        }
-    }*/
 
     for(int i=0; i<vertices.size(); i++){
         smoothedVerticies.push_back(vertices[i]);
     }
 
-    for(int i=0; i<planes.size(); i++){
-        // for each triangle cut
-        for(int j=0; j<intersectionTriangles[i].size(); j++){
-            int newVerticies[3] = {-1, -1, -1};
-             // find which verticies to keep
-            for(int k=0; k<3; k++){
-                int vertexIndex = triangles[intersectionTriangles[i][j]].getVertex(k);
-                if(planeNeighbours[flooding[vertexIndex]] != -1){   // if we need to change it
-                    Vec newVertex = planes[i]->getProjection(Vec(vertices[vertexIndex][0], vertices[vertexIndex][1], vertices[vertexIndex][2]) );
-                    smoothedVerticies[vertexIndex] = Vec3Df(newVertex.x, newVertex.y, newVertex.z); // get the projection
+    switch (cuttingSide) {
+        case Side::INTERIOR:
+        for(int i=0; i<planes.size(); i++){
+            // for each triangle cut
+            for(int j=0; j<intersectionTriangles[i].size(); j++){
+                int newVerticies[3] = {-1, -1, -1};
+                 // find which verticies to keep
+                for(int k=0; k<3; k++){
+                    int vertexIndex = triangles[intersectionTriangles[i][j]].getVertex(k);
+                    if(planeNeighbours[flooding[vertexIndex]] != -1){   // if we need to change it
+                        Vec newVertex = planes[i]->getProjection(Vec(vertices[vertexIndex][0], vertices[vertexIndex][1], vertices[vertexIndex][2]) );
+                        smoothedVerticies[vertexIndex] = Vec3Df(newVertex.x, newVertex.y, newVertex.z); // get the projection
+                    }
+                    // else don't change the original
                 }
-                // else don't change the original
-            }
 
+            }
         }
+        break;
+
+        case Side::EXTERIOR:
+        for(int i=0; i<planes.size(); i++){
+            // for each triangle cut
+            for(int j=0; j<intersectionTriangles[i].size(); j++){
+                int newVerticies[3] = {-1, -1, -1};
+                 // find which verticies to keep
+                for(int k=0; k<3; k++){
+                    int vertexIndex = triangles[intersectionTriangles[i][j]].getVertex(k);
+                    if(planeNeighbours[flooding[vertexIndex]] == -1){   // if we need to change it
+                        Vec newVertex = planes[i]->getProjection(Vec(vertices[vertexIndex][0], vertices[vertexIndex][1], vertices[vertexIndex][2]) );
+                        smoothedVerticies[vertexIndex] = Vec3Df(newVertex.x, newVertex.y, newVertex.z); // get the projection
+                    }
+                    // else don't change the original
+                }
+
+            }
+        }
+        break;
+
     }
 }
 
-/*void Mesh::uncutMesh(){
-    isCut = false;
-}*/
-
 void Mesh::updatePlaneIntersections(Plane *p){
-    /*flooding.clear();
-    for(int i=0; i<vertices.size(); i++) flooding.push_back(-1);*/
-
-    /*for(int i=0; i<planes.size(); i++){
-        if(p == planes[i]){
-            for(int j=0; j<vertices.size(); j++){
-                if(flooding[j] == i || flooding[j] == i + planes.size()) flooding[j] = -1;      // Reinitialise the plane
-            }
-            planeIntersection(i);
-        }
-    }
-
-    for(int i=0; i<flooding.size(); i++){
-        if(flooding[i] != -1){
-            for(int j=0; j<vertexNeighbours[i].size(); j++)
-            floodNeighbour(vertexNeighbours[i][j], flooding[i]);
-        }
-    }*/
-
-    // mergeFlood
+    // Possible optimisation?
 
     updatePlaneIntersections();
 }
@@ -357,9 +309,7 @@ void Mesh::draw()
         }
     }
     else{
-        //std::cout << trianglesCut.size() << std::endl;
         for(int i = 0 ; i < trianglesCut.size(); i++){
-            //std::cout << "cutting " << std::endl;
             glTriangleSmooth(trianglesCut[i]);
         }
     }

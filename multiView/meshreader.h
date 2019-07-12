@@ -16,7 +16,7 @@
 namespace FileIO{
 
     template <typename Point, typename Face>
-    void openOFF( std::string const &filename, std::vector<Point> &vertices, std::vector<Face> &triangles, std::vector< std::vector<int>> &vertexNeighbours, std::vector< std::vector<int>> &vertexTriangles)
+    void openOFF( std::string const &filename, std::vector<Point> &vertices, std::vector<Face> &triangles, std::vector< std::vector<unsigned int>> &vertexNeighbours, std::vector< std::vector<unsigned int>> &vertexTriangles)
     {
         std::cout << "Opening " << filename << std::endl;
 
@@ -61,7 +61,7 @@ namespace FileIO{
         vertexTriangles.clear();
 
         for(int i=0; i<vertices.size(); i++){
-            std::vector<int> init;
+            std::vector<unsigned int> init;
             vertexNeighbours.push_back(init);
             vertexTriangles.push_back(init);
         }
