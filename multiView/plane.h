@@ -33,6 +33,8 @@ public:
     bool isIntersection(Vec v0, Vec v1, Vec v2);
     int getSign(Vec v);
 
+    Vec getProjection(Vec p);
+
     Movable status;
     CurvePoint* cp;
 
@@ -45,6 +47,7 @@ private:
     void initBasePlane();
     void rotate(Quaternion q) { mf->rotate(q); }
     double* t; // parametre
+    Vec normal;
 };
 
 #endif // PLANE_H

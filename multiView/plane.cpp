@@ -5,6 +5,7 @@ Plane::Plane(double s, Movable status)
     position = new Vec(0, 0, 0);
     size = s;
     rotationPercentage = 0;
+    normal = Vec(0, 0, 1);
 
     this->status = status;
 
@@ -12,7 +13,7 @@ Plane::Plane(double s, Movable status)
 
     if(status==Movable::DYNAMIC){
         mf = new ManipulatedFrame();
-        *t = 0; // TODO: This is only temporary
+        *t = 0;
         cp = new CurvePoint(position, (ManipulatedFrame*)mf, t);
     }
     else{
@@ -106,10 +107,10 @@ bool Plane::isIntersection(Vec v0, Vec v1, Vec v2){
     else{
         for(int i=0; i<3; i++){
             Vec l = tr[(i+1)%3] - tr[i];
-            Vec n = Vec(0,0,1);   // the z axis
+            //Vec n = Vec(0,0,1);   // the z axis
 
-            if(l*n == 0.0){
-                if( tr[i]*n == 0.0 ){
+            if(l*normal == 0.0){
+                if( tr[i]*normal == 0.0 ){
                     if( (tr[i].x < size && tr[i].y < size) || (tr[(i+1)%3].x < size && tr[(i+1)%3].y < size)){
                         return true;  // the plan contains the line
                     }
@@ -119,7 +120,7 @@ bool Plane::isIntersection(Vec v0, Vec v1, Vec v2){
 
             double baseD = l.norm();    // the actual length of the segment
 
-            double d = (-tr[i]*n) / (l*n);
+            double d = (-tr[i]*normal) / (l*normal);
 
             if(d > baseD) continue;     // it won't intersect without being extended
 
@@ -139,4 +140,14 @@ int Plane::getSign(Vec v){
     Vec tr0 = mf->localCoordinatesOf(v);
 
     return static_cast<int>( tr0.z/(abs(tr0.z)) );
+}
+
+Vec Plane::getProjection(Vec p){
+    Vec localP = mf->localCoordinatesOf(p);
+
+    double alpha = (localP * normal);
+
+    Vec newP = localP - normal *alpha;
+
+    return mf->localInverseCoordinatesOf(newP);
 }

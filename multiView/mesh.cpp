@@ -106,6 +106,23 @@ void Mesh::glTriangle(unsigned int i){
     glColor3f(1.0, 1.0, 1.0);
 }
 
+void Mesh::glTriangleSmooth(unsigned int i){
+    const Triangle & t = triangles[i];
+
+    for( int j = 0 ; j < 3 ; j++ ){
+        /* Visualisation testing */
+        if(flooding[t.getVertex(j)] == 0) glColor3f(0, 0, 1);
+        if(flooding[t.getVertex(j)] == 1) glColor3f(0, 0.5, 0.5);
+        if(flooding[t.getVertex(j)] == planes.size()) glColor3f(1, 0, 0);
+        if(flooding[t.getVertex(j)] == planes.size()+1) glColor3f(1, 1, 0);
+        /* End of visualisation testing */
+        glNormal(verticesNormals[t.getVertex(j)]*normalDirection);
+        glVertex(smoothedVerticies[t.getVertex(j)]);
+    }
+
+    glColor3f(1.0, 1.0, 1.0);
+}
+
 void Mesh::addPlane(Plane *p){
     planes.push_back(p);
     planeNeighbours.push_back(-1);  // This is done once for the neg and once for the pos
@@ -187,6 +204,56 @@ void Mesh::cutMesh(){
         break;
     }
 
+    createSmoothedTriangles();
+
+}
+
+void Mesh::createSmoothedTriangles(){
+    //smoothedTriangles.clear();
+    smoothedVerticies.clear();
+
+    // for each plane
+    /*for(int i=0; i<planes.size(); i++){
+        // for each triangle cut
+        for(int j=0; j<intersectionTriangles[i].size(); j++){
+            int newVerticies[3] = {-1, -1, -1};
+            int originalCount = 0;
+
+             // find which verticies to keep
+            for(int k=0; k<3; k++){
+                int vertexIndex = triangles[intersectionTriangles[i][j]].getVertex(k);
+                if(planeNeighbours[flooding[vertexIndex]] == -1){
+                    originalCount++;
+                    newVerticies[k] = vertexIndex;  // keep the index of the original vertex
+                }
+            }
+
+            // Find the intersections
+            if(originalCount==1)
+
+        }
+    }*/
+
+    for(int i=0; i<vertices.size(); i++){
+        smoothedVerticies.push_back(vertices[i]);
+    }
+
+    for(int i=0; i<planes.size(); i++){
+        // for each triangle cut
+        for(int j=0; j<intersectionTriangles[i].size(); j++){
+            int newVerticies[3] = {-1, -1, -1};
+             // find which verticies to keep
+            for(int k=0; k<3; k++){
+                int vertexIndex = triangles[intersectionTriangles[i][j]].getVertex(k);
+                if(planeNeighbours[flooding[vertexIndex]] != -1){   // if we need to change it
+                    Vec newVertex = planes[i]->getProjection(Vec(vertices[vertexIndex][0], vertices[vertexIndex][1], vertices[vertexIndex][2]) );
+                    smoothedVerticies[vertexIndex] = Vec3Df(newVertex.x, newVertex.y, newVertex.z); // get the projection
+                }
+                // else don't change the original
+            }
+
+        }
+    }
 }
 
 /*void Mesh::uncutMesh(){
@@ -293,7 +360,7 @@ void Mesh::draw()
         //std::cout << trianglesCut.size() << std::endl;
         for(int i = 0 ; i < trianglesCut.size(); i++){
             //std::cout << "cutting " << std::endl;
-            glTriangle(trianglesCut[i]);
+            glTriangleSmooth(trianglesCut[i]);
         }
     }
 
