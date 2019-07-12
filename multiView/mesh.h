@@ -6,6 +6,8 @@
 #include "plane.h"
 #include <queue>
 
+enum Side {INTERIOR, EXTERIOR};
+
 class Mesh
 {
 public:
@@ -40,6 +42,9 @@ public:
     void updatePlaneIntersections(Plane *p);
     void addPlane(Plane *p);
 
+    void cutMesh(Side s);
+    void uncutMesh();
+
     typedef std::priority_queue< std::pair< float , int > , std::deque< std::pair< float , int > > , std::greater< std::pair< float , int > > > FacesQueue;
 
     void invertNormal(){normalDirection *= -1;}
@@ -56,9 +61,6 @@ protected:
 
     void floodNeighbour(int index, int id);     // flood the neighbours of the vertex index with the value id
     void mergeFlood();      // to be called after flooding; merges the regions between the planes
-
-    void cutMesh();
-    void uncutMesh();
 
     std::vector <Vec3Df> vertices;
     std::vector <Triangle> triangles;

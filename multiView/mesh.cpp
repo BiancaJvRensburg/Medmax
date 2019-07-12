@@ -138,30 +138,48 @@ void Mesh::updatePlaneIntersections(){
     }*/
 
     mergeFlood();
-    cutMesh();
+    //cutMesh(Side::INTERIOR);
 }
 
-// Can maybe optimise somewhere
-void Mesh::cutMesh(){
+void Mesh::cutMesh(Side s){
     isCut = true;
     trianglesCut.clear();
 
     bool truthTriangles[triangles.size()];  // keeps a record of the triangles who are already added
     for(int i=0; i<triangles.size(); i++) truthTriangles[i] = false;
 
-    // for each vertex NOT between two planes
-    for(int i=0; i<flooding.size(); i++){
-        if(planeNeighbours[flooding[i]]==-1){
-            // Get the triangles they belong to
-            for(int j=0; j<vertexTriangles[i].size(); j++){
-                // If it's not already in the list
-                if(!truthTriangles[vertexTriangles[i][j]]){
-                    trianglesCut.push_back(vertexTriangles[i][j]);
-                    truthTriangles[vertexTriangles[i][j]] = true;
+    switch (s) {
+        case Side::INTERIOR:
+            for(int i=0; i<flooding.size(); i++){
+                if(planeNeighbours[flooding[i]]==-1){
+                    // Get the triangles they belong to
+                    for(int j=0; j<vertexTriangles[i].size(); j++){
+                        // If it's not already in the list
+                        if(!truthTriangles[vertexTriangles[i][j]]){
+                            trianglesCut.push_back(vertexTriangles[i][j]);
+                            truthTriangles[vertexTriangles[i][j]] = true;
+                        }
+                    }
+                }
+        }
+        break;
+
+        case Side::EXTERIOR:
+            for(int i=0; i<flooding.size(); i++){
+                if(planeNeighbours[flooding[i]]!=-1){
+                    // Get the triangles they belong to
+                    for(int j=0; j<vertexTriangles[i].size(); j++){
+                        // If it's not already in the list
+                        if(!truthTriangles[vertexTriangles[i][j]]){
+                            trianglesCut.push_back(vertexTriangles[i][j]);
+                            truthTriangles[vertexTriangles[i][j]] = true;
+                        }
+                    }
                 }
             }
-        }
+        break;
     }
+
 }
 
 void Mesh::uncutMesh(){
