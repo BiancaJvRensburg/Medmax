@@ -146,25 +146,18 @@ void Mesh::cutMesh(){
     isCut = true;
     trianglesCut.clear();
 
+    bool truthTriangles[triangles.size()];  // keeps a record of the triangles who are already added
+    for(int i=0; i<triangles.size(); i++) truthTriangles[i] = false;
+
     // for each vertex NOT between two planes
     for(int i=0; i<flooding.size(); i++){
-        //std::cout << "Uhh" << std::endl;
         if(planeNeighbours[flooding[i]]==-1){
-            //std::cout << "Exterior index" << std::endl;
             // Get the triangles they belong to
             for(int j=0; j<vertexTriangles[i].size(); j++){
                 // If it's not already in the list
-                bool found = false;
-                for(int k=0; k<trianglesCut.size(); k++){
-                    if(trianglesCut[k] == vertexTriangles[i][j]){
-                        found = true;
-                        //std::cout << "found" << std::endl;
-                        break;     // stop if its already in there
-                    }
-                }
-                if(!found){
-                    //std::cout << "adding triangle" << std::endl;
+                if(!truthTriangles[vertexTriangles[i][j]]){
                     trianglesCut.push_back(vertexTriangles[i][j]);
+                    truthTriangles[vertexTriangles[i][j]] = true;
                 }
             }
         }
