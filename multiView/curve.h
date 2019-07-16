@@ -61,7 +61,8 @@ private:
 
     // Catmull rom
     Vec* calculatePoint(double t);
-    Vec** catmullrom();
+    Vec** catmullrom(int k);
+    Vec* calculateDerivativePoint(double t);
 
     double* generateCatmullKnotVector(double alpha);
 
