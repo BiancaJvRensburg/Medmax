@@ -60,10 +60,8 @@ private:
     Vec deBoorDerivative(double u, int i, int r, int k);
 
     // Catmull rom
-    double* blendingFunction(double taux, double uVec[4]);
-    Vec* calculatePoint(double coeffs[4], ControlPoint* controls[4]);
     Vec* calculatePoint(double t);
-    Vec** catmullrom(int k);    // returns the k-th derivative of a catmull-rom spline
+    Vec** catmullrom();
 
     double* generateCatmullKnotVector(double alpha);
 

@@ -49,10 +49,6 @@ void Curve::generateBSpline(long nbU, int degree){
 }
 
 void Curve::generateCatmull(long nbU){
-    /*this->nbU = nbU;
-    this->degree = 3;
-    this->knotIndex = 0;*/
-
     int nbSeg = nbControlPoint-3;
 
     this->nbU = nbU - nbU%nbSeg;
@@ -61,7 +57,7 @@ void Curve::generateCatmull(long nbU){
     this->degree = 3;
 
     this->knotVector = generateCatmullKnotVector(0.5);
-    curve = catmullrom(0);
+    curve = catmullrom();
     this->knotVector = generateUniformKnotVector(0);
     dt =  splineDerivative(1);
     d2t = splineDerivative(2);
@@ -186,7 +182,7 @@ void Curve::reintialiseCurve(){
     }
 
     this->knotVector = generateCatmullKnotVector(0.5);
-    curve = catmullrom(0);
+    curve = catmullrom();
     this->knotVector = generateUniformKnotVector(0);
     dt =  splineDerivative(1);
     d2t = splineDerivative(2);
@@ -226,48 +222,16 @@ double* Curve::generateCatmullKnotVector(double alpha){
     for(int i=1; i<nbControlPoint; i++){
         Vec p = *(TabControlPoint[i]->getPoint()) - *(TabControlPoint[i-1]->getPoint());
         kv[i] =  pow(p.norm(),alpha) + kv[i-1];
-        //std::cout << i << " : " << kv[i] << std::endl;
     }
-
-    //std::cout << "ok for the knot vector" << std::endl;
 
     return kv;
 }
 
 // Catmull rom
-double* Curve::blendingFunction(double taux, double uVec[4]){
-    double* result = new double[4];
-
-    result[0] = -taux*uVec[1] + 2.0*taux*uVec[2] - taux*uVec[3];
-    result[1] = uVec[0] + (taux-3.0)*uVec[2] + (2.0-taux)*uVec[3];
-    result[2] = taux*uVec[2] + (3.0-2.0*taux)*uVec[2] + (taux-2.0)*uVec[3];
-    result[3] = -taux*uVec[2] + taux*uVec[3];
-
-    /*std::cout << "u : " << uVec[1];
-    //for(int i=0; i<3; i++)
-    std::cout << " with last coeff " << result[3] << " ";
-
-    std::cout<< "\n" << std::endl;*/
-
-    return result;
-}
-
-Vec* Curve::calculatePoint(double coeffs[4], ControlPoint* controls[4]){
-    Vec* result = new Vec(0,0,0);
-
-    for(int i=0; i<4; i++) *result += *controls[i]->getPoint()*coeffs[i];
-
-    return result;
-}
-
 Vec* Curve::calculatePoint(double t){
     Vec* result = new Vec(0,0,0);
 
     Vec p[4] = {*TabControlPoint[knotIndex-1]->getPoint(), *TabControlPoint[knotIndex]->getPoint(), *TabControlPoint[knotIndex+1]->getPoint(), *TabControlPoint[knotIndex+2]->getPoint()};
-   // Vec l0[3];
-
-    //for(int i=0; i<4; i++)
-    //std::cout << "p" << " : " << p[1].x <<" , " << p[1].y << " , " << p[1].z << std::endl;
 
     double t0 = knotVector[knotIndex-1];
     double t1 = knotVector[knotIndex];
@@ -283,82 +247,25 @@ Vec* Curve::calculatePoint(double t){
 
     *result = (t2-t)/(t2-t1)*b1 + (t-t1)/(t2-t1)*b2;
 
-    /*for(int i=knotIndex-1; i<knotIndex+2; i++){
-        double alpha = (knotVector[i+1] - t) / (knotVector[i+1] - knotVector[i]);
-        double beta = (t - knotVector[i]) / (knotVector[i+1] - knotVector[i]);
-        l0[i - knotIndex -1] = alpha*p[i] + beta*p[i+1];
-    }
-
-    Vec l1[2];
-    for(int i=knotIndex-1; i<knotIndex+1; i++){
-        double alpha = (knotVector[i+2] - t) / (knotVector[i+2] - knotVector[i]);
-        double beta = (t - knotVector[i]) / (knotVector[i+2] - knotVector[i]);
-        l0[i - knotIndex -1] = alpha*p[i] + beta*p[i+1];
-    }
-
-    double alpha = (knotVector[knotIndex+1] - t) / (knotVector[knotIndex+1] - knotVector[knotIndex]);
-    double beta = (t - knotVector[knotIndex]) / (knotVector[knotIndex+1] - knotVector[knotIndex]);*/
-
-    //*result = alpha*l1[0] + beta*l1[1];
-
-    //std::cout << " t : " << t << " point : " << result->x << " " << result->y << " " << result->z << std::endl;
-
     return result;
 }
 
-Vec** Curve::catmullrom(int k){
+Vec** Curve::catmullrom(){
     int nbSeg = nbControlPoint-3;
     int uPerSeg = nbU/nbSeg;
-    //nbU -= nbU%nbSeg;
 
-    // std::cout << nbU << std::endl;
-    //nbU = nbSeg/uPerSeg;
-
-    //Vec** c = new Vec*[static_cast<unsigned long long>(nbU*nbSeg+1)];
     Vec** c = new Vec*[static_cast<unsigned long long>(nbU)];
 
-    /*std::cout << "Nb segments : " << nbSeg << std::endl;
-    std::cout << "Nb control : " << nbControlPoint << std::endl;
-
-    // For each segment
     for(int j=1; j<=nbSeg; j++){
-        std::cout << "and now?" << std::endl;
-        // Find each u from 0 to 1
-        for(int i=0; i<uPerSeg; i++){
-            double u = (1.0 / static_cast<double>(uPerSeg-1)) * static_cast<double>(i);
-            double uVec[4] = {1, u, u*u, u*u*u};
-            if(k!=0){
-                uVec[0] = 0;
-                uVec[1] = 1;
-                uVec[2] = 2.0*u;
-                uVec[3] = 3.0*u*u;
-            }
-            ControlPoint* cps[4] = {TabControlPoint[j-1], TabControlPoint[j], TabControlPoint[j+1], TabControlPoint[j+2]};
-            c[(j-1)*uPerSeg+i] = calculatePoint(blendingFunction(0.5, uVec), cps);
-
-            std::cout<< "j : " << j << " and on curve " << (j-1)*uPerSeg+i <<  std::endl;
-        }
-    }*/
-
-    knotIndex = 1;
-
-    //std::cout << "Capacity : " << nbU*nbSeg+1 << std::endl;
-
-    for(int j=1; j<=nbSeg; j++){
-        // Find each u from 0 to 1
         int it=0;
         knotIndex = j;
-        //std::cout << "\n\n knotIndex: " << knotIndex << std::endl;
         for(double i=knotVector[j]; i<knotVector[j+1]; i+=((knotVector[j+1]-knotVector[j])/static_cast<double>(uPerSeg))){
-            //double u = (1.0 / static_cast<double>(nbU-1)) * static_cast<double>(i);
             c[(j-1)*uPerSeg+it] = new Vec();
 
             c[(j-1)*uPerSeg+it] = calculatePoint(i);
-            //std::cout << "point " << (j-1)*nbU+it <<" recieved : " << c[(j-1)*nbU+it]->x << " , " << c[(j-1)*nbU+it]->y << " , " << c[(j-1)*nbU+it]->z << " , " << std::endl;
             it++;
         }
     }
-
     return c;
 }
 
