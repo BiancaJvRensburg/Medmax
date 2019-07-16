@@ -19,6 +19,8 @@ public:
     Vec** getCurve(){ return curve; }
     Vec* getPoint(int index){ return curve[index]; }
 
+    void generateCatmull(long nbU);
+
     Vec tangent(int index);
     Vec binormal(int index);
     Vec normal(int index);
@@ -56,6 +58,14 @@ private:
     Vec deBoor(double u, int i, int r);
     Vec** splineDerivative(int k);
     Vec deBoorDerivative(double u, int i, int r, int k);
+
+    // Catmull rom
+    double* blendingFunction(double taux, double uVec[4]);
+    Vec* calculatePoint(double coeffs[4], ControlPoint* controls[4]);
+    Vec* calculatePoint(double t);
+    Vec** catmullrom(int k);    // returns the k-th derivative of a catmull-rom spline
+
+    double* generateCatmullKnotVector(double alpha);
 
     void initConnections();
     void updateConnections(ControlPoint*);

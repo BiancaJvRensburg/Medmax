@@ -21,15 +21,15 @@ void Viewer::draw() {
     //drawAxis(20.0);
 
     glColor3f(1.,1.,1.);
-    mesh.draw();
+    //mesh.draw();
 
     glPolygonMode (GL_FRONT_AND_BACK, GL_FILL);
 
-    glColor3f(1.0, 0, 0);
+    /*glColor3f(1.0, 0, 0);
     leftPlane->draw();
 
     glColor3f(0, 1.0, 0);
-    rightPlane->draw();
+    rightPlane->draw();*/
 
     //glPolygonMode (GL_FRONT_AND_BACK, GL_LINE);
 
@@ -170,13 +170,20 @@ void Viewer::openOFF(QString filename) {
 }
 
 void Viewer::initCurve(){
-    /*const long nbCP = 4;
+    /*const long nbCP = 6;
     ControlPoint *control[nbCP];
 
     control[0] = new ControlPoint(-45.7, -28.2, -36);
     control[1] = new ControlPoint(-20, -98.3, -90.1);
     control[2] = new ControlPoint(17, -104.4, -98.3);
-    control[3] = new ControlPoint(37.2, -39, -41.5);
+    control[3] = new ControlPoint(37.2, -39, -41.5);*/
+
+    /*control[0] = new ControlPoint(37.2, -39, -41.5);
+    control[1] = new ControlPoint(-45.7, -28.2, -36);
+    control[2] = new ControlPoint(-20, -98.3, -90.1);
+    control[3] = new ControlPoint(17, -104.4, -98.3);
+    control[4] = new ControlPoint(37.2, -39, -41.5);
+    control[5] = new ControlPoint(-45.7, -28.2, -36);
 
     int degree = 3;*/
 
@@ -197,8 +204,10 @@ void Viewer::initCurve(){
 
     connect(curve, &Curve::curveReinitialised, this, &Viewer::updatePlanes);
 
-    nbU = 1000;
-    curve->generateBSpline(nbU, degree);
+    nbU = 96;
+    //curve->generateBSpline(nbU, degree);
+    curve->generateCatmull(nbU);
+    curve->drawTangent(curveIndexL);
 
     //curve->addControlPoint(control[1]);
 
