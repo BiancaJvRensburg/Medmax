@@ -52,15 +52,11 @@ void Curve::generateCatmull(long nbU){
     int nbSeg = nbControlPoint-3;
 
     this->nbU = nbU - nbU%nbSeg;
-    //std::cout << "nbu :" << nbU << std::endl;
     this->knotIndex = 0;
     this->degree = 3;
 
     this->knotVector = generateCatmullKnotVector(0.5);
-    curve = catmullrom(0);
-    dt =  catmullrom(1);
-    //this->knotVector = generateUniformKnotVector(0);
-    d2t = catmullrom(2);
+    catmullrom();
 }
 
 
@@ -175,17 +171,7 @@ void Curve::getModVec(int j, int r, double t, int kI, double offset, double* off
 }
 
 void Curve::reintialiseCurve(){
-    /*for(int i=0; i<nbU; i++){
-        delete curve[i];
-        delete dt[i];
-        delete d2t[i];
-    }*/
-
-    this->knotVector = generateCatmullKnotVector(0.5);
-    curve = catmullrom(0);
-    dt =  catmullrom(1);
-    //this->knotVector = generateUniformKnotVector(0);
-    d2t = catmullrom(2);
+   catmullrom();
 
     Q_EMIT curveReinitialised();
 }
@@ -228,7 +214,7 @@ double* Curve::generateCatmullKnotVector(double alpha){
 }
 
 // Catmull rom
-Vec* Curve::calculatePoint(double t){
+/*Vec* Curve::calculatePoint(double t){
     Vec* result = new Vec(0,0,0);
 
     Vec p[4] = {*TabControlPoint[knotIndex-1]->getPoint(), *TabControlPoint[knotIndex]->getPoint(), *TabControlPoint[knotIndex+1]->getPoint(), *TabControlPoint[knotIndex+2]->getPoint()};
@@ -277,11 +263,9 @@ Vec* Curve::calculateDerivativePoint(double t){
     *result = 1.0/(t2-t1)*(b2-b1) + (t2-t)/(t2-t1)*b1p + (t-t1)/(t2-t1)*b2p;
 
     return result;
-}
+}*/
 
-Vec* Curve::calculateSecondDerivativePoint(double t){
-    Vec* result = new Vec(0,0,0);
-
+void Curve::calculateSecondDerivativePoint(Vec* c, Vec* cp, Vec* cpp, double t){
     Vec p[4] = {*TabControlPoint[knotIndex-1]->getPoint(), *TabControlPoint[knotIndex]->getPoint(), *TabControlPoint[knotIndex+1]->getPoint(), *TabControlPoint[knotIndex+2]->getPoint()};
 
     double t0 = knotVector[knotIndex-1];
@@ -306,30 +290,35 @@ Vec* Curve::calculateSecondDerivativePoint(double t){
     Vec b1pp = 1.0/(t2-t0)*(a2p-a1p);
     Vec b2pp = 1.0/(t3-t1)*(a3p-a2p);
 
-    *result = 1.0/(t2-t1)*(b2p-b1p) + (t2-t)/(t2-t1)*b1pp + (t-t1)/(t2-t1)*b2pp;
-
-    return result;
+    *c = (t2-t)/(t2-t1)*b1 + (t-t1)/(t2-t1)*b2;
+    *cp = 1.0/(t2-t1)*(b2-b1) + (t2-t)/(t2-t1)*b1p + (t-t1)/(t2-t1)*b2p;
+    *cpp = 1.0/(t2-t1)*(b2p-b1p) + (t2-t)/(t2-t1)*b1pp + (t-t1)/(t2-t1)*b2pp;
 }
 
-Vec** Curve::catmullrom(int k){
+void Curve::catmullrom(){
     int nbSeg = nbControlPoint-3;
     int uPerSeg = nbU/nbSeg;
 
-    Vec** c = new Vec*[static_cast<unsigned long long>(nbU)];
+    curve = new Vec*[static_cast<unsigned long long>(nbU)];
+    dt = new Vec*[static_cast<unsigned long long>(nbU)];
+    d2t = new Vec*[static_cast<unsigned long long>(nbU)];
 
     for(int j=1; j<=nbSeg; j++){
         int it=0;
         knotIndex = j;
         for(double i=knotVector[j]; i<knotVector[j+1]; i+=((knotVector[j+1]-knotVector[j])/static_cast<double>(uPerSeg))){
-            c[(j-1)*uPerSeg+it] = new Vec();
+            curve[(j-1)*uPerSeg+it] = new Vec();
+            dt[(j-1)*uPerSeg+it] = new Vec();
+            d2t[(j-1)*uPerSeg+it] = new Vec();
 
-            if(k==0) c[(j-1)*uPerSeg+it] = calculatePoint(i);
+            calculateSecondDerivativePoint(curve[(j-1)*uPerSeg+it], dt[(j-1)*uPerSeg+it], d2t[(j-1)*uPerSeg+it], i);
+
+            /*if(k==0) c[(j-1)*uPerSeg+it] = calculatePoint(i);
             else if(k==1) c[(j-1)*uPerSeg+it] = calculateDerivativePoint(i);
-            else c[(j-1)*uPerSeg+it] = calculateSecondDerivativePoint(i);
-                it++;
+            else c[(j-1)*uPerSeg+it] = calculateSecondDerivativePoint(i);*/
+            it++;
         }
     }
-    return c;
 }
 
 double Curve::discreteLength(int indexS, int indexE){
