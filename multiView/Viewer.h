@@ -48,7 +48,7 @@ protected:
 
     int curveIndexL;
     int curveIndexR;
-    int nbU;
+    long* nbU;
     int sliderMax;
 
     // double angle(Vec a, Vec b);

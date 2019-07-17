@@ -8,12 +8,12 @@ ViewerFibula::ViewerFibula(QWidget *parent, StandardCamera *camera, int sliderMa
 
 void ViewerFibula::movePlanes(int position){
 
-    int offset = static_cast<int>(static_cast<double>(position)/ static_cast<double>(maxOffset) * static_cast<double>(nbU));
+    int offset = static_cast<int>(static_cast<double>(position)/ static_cast<double>(maxOffset) * static_cast<double>(*nbU));
 
-    if(curveIndexL + offset < nbU && curveIndexL + offset > 0 && curveIndexR + offset < nbU && curveIndexR + offset > 0){
+    if(curveIndexL + offset < *nbU && curveIndexL + offset > 0 && curveIndexR + offset < *nbU && curveIndexR + offset > 0){
         indexOffset = offset;
-        double percentageL = static_cast<double>(curveIndexL + offset) / static_cast<double>(nbU);
-        double percentageR = static_cast<double>(curveIndexR + offset) / static_cast<double>(nbU);
+        double percentageL = static_cast<double>(curveIndexL + offset) / static_cast<double>(*nbU);
+        double percentageR = static_cast<double>(curveIndexR + offset) / static_cast<double>(*nbU);
 
         leftPlane->setPosition(curve->getPoint(curveIndexL + indexOffset), percentageL);
         rightPlane->setPosition(curve->getPoint(curveIndexR + indexOffset), percentageR);
@@ -29,7 +29,7 @@ void ViewerFibula::movePlanes(int position){
 
 void ViewerFibula::movePlaneDistance(double distance){
     curveIndexR = curve->indexForLength(curveIndexL, distance);
-    double percentage = static_cast<double>(curveIndexR + indexOffset) / static_cast<double>(nbU);
+    double percentage = static_cast<double>(curveIndexR + indexOffset) / static_cast<double>(*nbU);
     rightPlane->setPosition(curve->getCurve()[curveIndexR + indexOffset], percentage);
     rightPlane->setOrientation(getNewOrientation(curveIndexR + indexOffset));
     mesh.updatePlaneIntersections(rightPlane);
@@ -47,10 +47,10 @@ void ViewerFibula::initCurve(){
 
     curve = new Curve(nbCP, control);
 
-    nbU = 100;
+    *nbU = 100;
 
     int nbSeg = nbCP-3;
-    nbU -= nbU%nbSeg;
+    nbU -= *nbU%nbSeg;
 
     curve->generateCatmull(nbU);
     //curve->generateBSpline(nbU, 3);

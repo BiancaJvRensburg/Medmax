@@ -19,7 +19,7 @@ public:
     Vec** getCurve(){ return curve; }
     Vec* getPoint(int index){ return curve[index]; }
 
-    void generateCatmull(long nbU);
+    void generateCatmull(long* nbU);
 
     Vec tangent(int index);
     Vec binormal(int index);
@@ -46,7 +46,8 @@ private:
     ControlPoint **TabControlPoint;
     long nbControlPoint;
     Vec **curve;
-    long nbU;
+    long* nbU;
+    bool *controlPointIndicies;
 
     // BSpline
     int degree;
@@ -62,6 +63,8 @@ private:
     // Catmull rom
     void catmullrom();  // calculate the spline, first and second derivative
     void calculateCatmullPoints(Vec* c, Vec* cp, Vec* cpp, double t);
+
+    bool isControlPoint(int index);
 
     double* generateCatmullKnotVector(double alpha);
 

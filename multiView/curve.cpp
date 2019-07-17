@@ -4,6 +4,7 @@
 
 Curve::Curve(long nbCP)
 {
+    this->nbU = new long();
     TabControlPoint = new ControlPoint*[static_cast<unsigned long long>(MAX_CNTRL_POINTS)];
     if(nbCP <= MAX_CNTRL_POINTS) nbControlPoint = nbCP;
     else nbControlPoint = MAX_CNTRL_POINTS;
@@ -15,7 +16,8 @@ Curve::Curve(long nbCP)
     initConnections();
 }
 
-Curve::Curve(long nbCP, ControlPoint *cntrlPoints[]){  
+Curve::Curve(long nbCP, ControlPoint *cntrlPoints[]){
+    this->nbU = new long();
     TabControlPoint = new ControlPoint*[static_cast<unsigned long long>(MAX_CNTRL_POINTS)];
     if(nbCP <= MAX_CNTRL_POINTS) nbControlPoint = nbCP;
     else nbControlPoint = MAX_CNTRL_POINTS;
@@ -38,7 +40,7 @@ void Curve::updateConnections(ControlPoint* p){
 }
 
 void Curve::generateBSpline(long nbU, int degree){
-    this->nbU = nbU;
+    *this->nbU = nbU;
     this->degree = degree;
     this->knotIndex = 0;
 
@@ -48,10 +50,11 @@ void Curve::generateBSpline(long nbU, int degree){
     d2t = splineDerivative(2);
 }
 
-void Curve::generateCatmull(long n){
+void Curve::generateCatmull(long* n){
     int nbSeg = nbControlPoint-3;
 
-    this->nbU = n - n%nbSeg;
+    this->nbU = n;
+    *this->nbU -= *n%nbSeg;
     //std::cout << "Nbu : " << this->nbU << std::endl;
     this->knotIndex = 0;
     this->degree = 3;
@@ -76,10 +79,10 @@ Vec** Curve::splineDerivative(int k){
 
     this->knotIndex = 0;
 
-    Vec** c = new Vec*[static_cast<unsigned long long>(nbU)];
+    Vec** c = new Vec*[static_cast<unsigned long long>(*nbU)];
 
-    for(int i=0; i<nbU; i++){
-        double u = (1.0 / static_cast<double>(nbU-1)) * static_cast<double>(i);
+    for(int i=0; i<*nbU; i++){
+        double u = (1.0 / static_cast<double>(*nbU-1)) * static_cast<double>(i);
         c[i] = new Vec();
 
         while(u >= knotVector[knotIndex+1] && knotVector[knotIndex+1] != 1.0) knotIndex++;
@@ -188,7 +191,7 @@ void Curve::addControlPoint(ControlPoint* p){
     ControlPoint* nextP;
 
     while(TabControlPoint[i]->getPoint() != p->getPoint()) i++;
-    if(i < nbU-1) nextP = TabControlPoint[i+1];
+    if(i < *nbU-1) nextP = TabControlPoint[i+1];
     else return;    // don't do anything for the end point
 
     ControlPoint* halfway = new ControlPoint( (nextP->getX() + p->getX())/2.0, (nextP->getY() + p->getY())/2.0, (nextP->getZ() + p->getZ())/2.0);
@@ -251,26 +254,28 @@ void Curve::calculateCatmullPoints(Vec* c, Vec* cp, Vec* cpp, double t){
 
 void Curve::catmullrom(){
     int nbSeg = nbControlPoint-3;
-    int uPerSeg = nbU/nbSeg;
+    int uPerSeg = *nbU/nbSeg;
 
    //std::cout << "nb per seg : " << uPerSeg << std::endl;
 
-    curve = new Vec*[static_cast<unsigned long long>(nbU)];
-    dt = new Vec*[static_cast<unsigned long long>(nbU)];
-    d2t = new Vec*[static_cast<unsigned long long>(nbU)];
+    curve = new Vec*[static_cast<unsigned long long>(*nbU)];
+    dt = new Vec*[static_cast<unsigned long long>(*nbU)];
+    d2t = new Vec*[static_cast<unsigned long long>(*nbU)];
+    controlPointIndicies = new bool[static_cast<unsigned long long>(*nbU)];
+
+    for(int i=0; i<*nbU; i++) controlPointIndicies[i] = false;
 
     for(int j=1; j<=nbSeg; j++){
         int it=0;
         knotIndex = j;
-       // std::cout << "incrementation : " << (knotVector[j+1]-knotVector[j])/static_cast<double>(uPerSeg) << std::endl;
+        controlPointIndicies[(j-1)*uPerSeg] = true;
         for(double i=knotVector[j]; i<knotVector[j+1]; i+=((knotVector[j+1]-knotVector[j])/static_cast<double>(uPerSeg))){
-            if((j-1)*uPerSeg+it >= nbU) return;
+            if((j-1)*uPerSeg+it >= *nbU) return;
             curve[(j-1)*uPerSeg+it] = new Vec();
             dt[(j-1)*uPerSeg+it] = new Vec();
             d2t[(j-1)*uPerSeg+it] = new Vec();
 
             calculateCatmullPoints(curve[(j-1)*uPerSeg+it], dt[(j-1)*uPerSeg+it], d2t[(j-1)*uPerSeg+it], i);
-            //std::cout << "case " << (j-1)*uPerSeg+it << std::endl;
             it++;
         }
     }
@@ -285,7 +290,7 @@ int Curve::indexForLength(int indexS, double length){
     int i=0;
 
     // First condition should never happen, just extra protection to prevent crashes
-    while(indexS+i < nbU-1 && discreteLength(indexS, indexS+i) < length) i++;
+    while(indexS+i < *nbU-1 && discreteLength(indexS, indexS+i) < length) i++;
 
     return indexS+i;
 }
@@ -297,7 +302,7 @@ void Curve::draw(){
       glBegin(GL_LINE_STRIP);
       glColor3f(0.0, 1.0, 0.0);
 
-      for(int i=0; i<nbU; i++){
+      for(int i=0; i<*nbU; i++){
         Vec *p = curve[i];
         glVertex3f(static_cast<float>(p->x), static_cast<float>(p->y), static_cast<float>(p->z));
       }
@@ -325,6 +330,10 @@ void Curve::drawControl(){
 }
 
 // Frenet frame
+bool Curve::isControlPoint(int index){
+    if(controlPointIndicies[index]) return true;
+    return false;
+}
 
 Vec Curve::tangent(int index){
     Vec t = Vec(dt[index]->x, dt[index]->y, dt[index]->z);
@@ -338,6 +347,8 @@ Vec Curve::normal(int index){
 }
 
 Vec Curve::binormal(int index){
+    if(index!=0 && index!=*nbU-1 && isControlPoint(index)) return (binormal(index-1) + binormal(index+1))/2.0;
+
     Vec b = cross(Vec(dt[index]->x, dt[index]->y, dt[index]->z), Vec(d2t[index]->x, d2t[index]->y, d2t[index]->z));
     b.normalize();
 
