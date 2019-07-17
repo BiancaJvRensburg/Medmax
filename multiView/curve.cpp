@@ -277,13 +277,15 @@ void Curve::catmullrom(){
 }
 
 double Curve::discreteLength(int indexS, int indexE){
+    //std::cout << "start : " << indexS << " , end : " << indexE << std::endl;
     return sqrt( pow((curve[indexE]->x - curve[indexS]->x), 2) + pow((curve[indexE]->y - curve[indexS]->y), 2) + pow((curve[indexE]->z - curve[indexS]->z), 2));
 }
 
 int Curve::indexForLength(int indexS, double length){
     int i=0;
 
-    while(discreteLength(indexS, indexS+i) < length) i++;
+    // First condition should never happen, just extra protection to prevent crashes
+    while(discreteLength(indexS+i < nbU-1 && indexS, indexS+i) < length) i++;
 
     return indexS+i;
 }
