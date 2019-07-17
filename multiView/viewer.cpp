@@ -20,12 +20,12 @@ void Viewer::draw() {
     glMultMatrixd(manipulatedFrame()->matrix());
     //drawAxis(20.0);
 
-    glColor3f(1.,1.,1.);
-    //mesh.draw();
+    /*glColor3f(1.,1.,1.);
+    mesh.draw();
 
     glPolygonMode (GL_FRONT_AND_BACK, GL_FILL);
 
-    /*glColor3f(1.0, 0, 0);
+    glColor3f(1.0, 0, 0);
     leftPlane->draw();
 
     glColor3f(0, 1.0, 0);
@@ -197,21 +197,24 @@ void Viewer::initCurve(){
     control[4] = new ControlPoint(46.3957, -23.0805, -54.17);
     control[5] = new ControlPoint(44.4578, -24.7785, -19.9623);
 
-    int degree = 3;
+    //int degree = 3;
 
 
     curve = new Curve(nbCP, control);
 
     connect(curve, &Curve::curveReinitialised, this, &Viewer::updatePlanes);
 
-    nbU = 96;
+    nbU = 100;
+
+    int nbSeg = nbCP-3;
+    nbU -= nbU%nbSeg; // Adjust it so it divides perfectly
     //curve->generateBSpline(nbU, degree);
     curve->generateCatmull(nbU);
-    curve->drawTangent(curveIndexL);
+    //curve->drawTangent(curveIndexL);
 
     //curve->addControlPoint(control[1]);
 
-   initPlanes(Movable::DYNAMIC);
+   initPlanes(Movable::STATIC);
 }
 
 void Viewer::initPlanes(Movable status){

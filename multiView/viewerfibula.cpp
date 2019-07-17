@@ -47,9 +47,13 @@ void ViewerFibula::initCurve(){
 
     curve = new Curve(nbCP, control);
 
-    nbU = 1000;
+    nbU = 100;
 
-    curve->generateBSpline(nbU, 3);
+    int nbSeg = nbCP-3;
+    nbU -= nbU%nbSeg;
+
+    curve->generateCatmull(nbU);
+    //curve->generateBSpline(nbU, 3);
     connect(curve, &Curve::curveReinitialised, this, &Viewer::updatePlanes);
 
     initPlanes(Movable::STATIC);

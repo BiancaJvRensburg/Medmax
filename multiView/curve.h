@@ -60,10 +60,8 @@ private:
     Vec deBoorDerivative(double u, int i, int r, int k);
 
     // Catmull rom
-    //Vec* calculatePoint(double t);
     void catmullrom();  // calculate the spline, first and second derivative
-    //void calculateDerivativePoint(double t);
-    void calculateSecondDerivativePoint(Vec* c, Vec* cp, Vec* cpp, double t);
+    void calculateCatmullPoints(Vec* c, Vec* cp, Vec* cpp, double t);
 
     double* generateCatmullKnotVector(double alpha);
 

@@ -135,8 +135,8 @@ void Mesh::updatePlaneIntersections(){
         }
     }
 
-    mergeFlood();
-    if(isCut) cutMesh();
+    //mergeFlood();
+    //if(isCut) cutMesh();
 }
 
 void Mesh::cutMesh(){
