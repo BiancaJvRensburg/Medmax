@@ -285,7 +285,7 @@ int Curve::indexForLength(int indexS, double length){
     int i=0;
 
     // First condition should never happen, just extra protection to prevent crashes
-    while(discreteLength(indexS+i < nbU-1 && indexS, indexS+i) < length) i++;
+    while(indexS+i < nbU-1 && discreteLength(indexS, indexS+i) < length) i++;
 
     return indexS+i;
 }
