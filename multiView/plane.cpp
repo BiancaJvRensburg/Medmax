@@ -49,8 +49,8 @@ void Plane::draw(){
     glDisable(GL_DEPTH);
     glDisable(GL_DEPTH_TEST);
 
-    /*glColor3f(1,1,1);
-    QGLViewer::drawAxis(15.0);*/
+    glColor3f(1,1,1);
+    QGLViewer::drawAxis(15.0);
 
     if(status==Movable::DYNAMIC) cp->draw();
 
@@ -111,7 +111,8 @@ bool Plane::isIntersection(Vec v0, Vec v1, Vec v2){
 
             if(l*normal == 0.0){
                 if( tr[i]*normal == 0.0 ){
-                    if( (tr[i].x < size && tr[i].y < size) || (tr[(i+1)%3].x < size && tr[(i+1)%3].y < size)){
+                    if( (abs(tr[i].x) < size && abs(tr[i].y) < size) || ( abs(tr[(i+1)%3].x) < size && abs(tr[(i+1)%3].y) < size)){
+                        //std::cout << "returning" << std::endl;
                         return true;  // the plan contains the line
                     }
                 }
@@ -120,13 +121,16 @@ bool Plane::isIntersection(Vec v0, Vec v1, Vec v2){
 
             double baseD = l.norm();    // the actual length of the segment
 
-            double d = (-tr[i]*normal) / (l*normal);
+            double d = normal*(-tr[i]) / (normal*l);
 
-            if(d > baseD) continue;     // it won't intersect without being extended
+            if(abs(d) > abs(baseD)){
+                continue;     // it won't intersect without being extended
+            }
 
             Vec intersection = d*l + tr[i];
 
             if(abs(intersection.x) < size && abs(intersection.y) < size){
+                //if(intersection.x > size/2.0 || intersection.x < -size/2.0 || intersection.y > size/2.0 || intersection.y < -size/2.0) std::cout << d << std::endl; // std::cout << intersection.x << " " << intersection.y << " " << intersection.z << std::endl;
                 return true;
             }
         }

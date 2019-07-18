@@ -24,7 +24,7 @@ void Viewer::draw() {
     glColor3f(1.,1.,1.);
     mesh.draw();
 
-    glPolygonMode (GL_FRONT_AND_BACK, GL_FILL);
+    //glPolygonMode (GL_FRONT_AND_BACK, GL_FILL);
 
     glColor3f(1.0, 0, 0);
     leftPlane->draw();
@@ -32,7 +32,7 @@ void Viewer::draw() {
     glColor3f(0, 1.0, 0);
     rightPlane->draw();
 
-    glPolygonMode (GL_FRONT_AND_BACK, GL_LINE);
+    //glPolygonMode (GL_FRONT_AND_BACK, GL_LINE);
 
     curve->draw();
 
@@ -215,10 +215,6 @@ void Viewer::initCurve(){
     connect(curve, &Curve::curveReinitialised, this, &Viewer::updatePlanes);
 
     *nbU = 200;
-
-    int nbSeg = nbCP-3;
-    //*nbU -= *nbU%nbSeg; // Adjust it so it divides perfectly
-    //curve->generateBSpline(nbU, degree);
     curve->generateCatmull(nbU);
 
    initPlanes(Movable::STATIC);
@@ -228,8 +224,8 @@ void Viewer::initPlanes(Movable status){
     curveIndexR = *nbU - 1;
     curveIndexL = 0;
 
-    leftPlane = new Plane(25.0, status);
-    rightPlane = new Plane(25.0, status);
+    leftPlane = new Plane(40.0, status);
+    rightPlane = new Plane(40.0, status);
 
 
     leftPlane->setPosition(curve->getPoint(curveIndexL), 0);

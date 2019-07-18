@@ -40,6 +40,7 @@ public:
 
     void updatePlaneIntersections();    // need one for a single plane
     void updatePlaneIntersections(Plane *p);
+
     void addPlane(Plane *p);
 
     void setIsCut(Side s, bool isCut);
@@ -74,12 +75,12 @@ protected:
     std::vector <std::vector <unsigned int>> intersectionTriangles;    // Contains the index of the triangle instead of the actual triangle
     std::vector <unsigned int> interIndex;    // the current index of intersectionTriangles
 
-    std::vector <unsigned int> flooding;
+    std::vector <int> flooding;
     std::vector< std::vector<unsigned int>> vertexNeighbours;
     std::vector< std::vector<unsigned int>> vertexTriangles;
-    std::vector<unsigned int> planeNeighbours;
+    std::vector<int> planeNeighbours;
     bool isCut = false;
-    std::vector<unsigned int> trianglesCut;
+    std::vector<unsigned int> trianglesCut;     // The list of triangles after the cutting
 
     std::vector<Vec3Df> smoothedVerticies;
 
@@ -92,6 +93,9 @@ protected:
     Vec3Df BBMax;
     Vec3Df BBCentre;
     float radius;
+
+    //temporary
+    int neighCount;
 
     int normalDirection;
 };

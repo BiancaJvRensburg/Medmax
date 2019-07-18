@@ -352,6 +352,8 @@ Vec Curve::binormal(int index){
     Vec b = cross(Vec(dt[index]->x, dt[index]->y, dt[index]->z), Vec(d2t[index]->x, d2t[index]->y, d2t[index]->z));
     b.normalize();
 
+    //std::cout << "binormal : " << b.x << " , " << b.y << " , " << b.z << std::endl;
+
     return b;
 }
 
