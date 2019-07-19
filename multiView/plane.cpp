@@ -49,8 +49,8 @@ void Plane::draw(){
     glDisable(GL_DEPTH);
     glDisable(GL_DEPTH_TEST);
 
-    glColor3f(1,1,1);
-    QGLViewer::drawAxis(15.0);
+    /*glColor3f(1,1,1);
+    QGLViewer::drawAxis(15.0);*/
 
     if(status==Movable::DYNAMIC) cp->draw();
 
@@ -96,18 +96,29 @@ Quaternion Plane::fromRotatedBasis(Vec x, Vec y, Vec z){
 * The mesh will then use this information
 * This is the only thing that the plane deals with
 */
-bool Plane::isIntersection(Vec v0, Vec v1, Vec v2){
+bool Plane::isIntersection(Vec v0, Vec v1, Vec v2, bool print){
     Vec tr0 = mf->localCoordinatesOf(v0);
     Vec tr1 = mf->localCoordinatesOf(v1);
     Vec tr2 = mf->localCoordinatesOf(v2);
 
     Vec tr[3] = {tr0, tr1, tr2};
 
+    //for(int i=0; i<3; i++) if(abs(tr[i].z) < 0.0001) std::cout << "on the plane" << std::endl;
+
     if( (tr0.z < 0 && tr1.z < 0 && tr2.z < 0) || (tr0.z > 0 && tr1.z > 0 && tr2.z > 0) ) return false;
     else{
+        if(print){
+            std::cout << "coordinates : " << std::endl;
+            for(int i=0; i<3; i++) std::cout << i << " : " << tr[i].x << " , " << tr[i].y << " " << tr[i].z << std::endl;
+        }
         for(int i=0; i<3; i++){
+
+            //if( (tr[(i+1)%3].z < 0 && tr[i].z < 0) || (tr[(i+1)%3].z > 0 && tr[i].z > 0) ) continue; // if they're both on the same side, no intersection
+
             Vec l = tr[(i+1)%3] - tr[i];
             //Vec n = Vec(0,0,1);   // the z axis
+
+            if(print) std::cout << "l : " << l.x << " , " << l.y << " , " << l.z << std::endl;
 
             if(l*normal == 0.0){
                 if( tr[i]*normal == 0.0 ){
@@ -123,14 +134,19 @@ bool Plane::isIntersection(Vec v0, Vec v1, Vec v2){
 
             double d = normal*(-tr[i]) / (normal*l);
 
-            if(abs(d) > abs(baseD)){
-                continue;     // it won't intersect without being extended
-            }
+            if(print) std::cout << i << "  d : " << d << " base d :" << baseD << std::endl;
+            if(print) std::cout <<  normal*(-tr[i]) << "   " << (normal*l) << std::endl;
+
+            //if(abs(d) > abs(baseD)){
+                //continue;     // it won't intersect without being extended
+            //}
+
+            if(abs(d) > 1.0) continue;
 
             Vec intersection = d*l + tr[i];
 
             if(abs(intersection.x) < size && abs(intersection.y) < size){
-                //if(intersection.x > size/2.0 || intersection.x < -size/2.0 || intersection.y > size/2.0 || intersection.y < -size/2.0) std::cout << d << std::endl; // std::cout << intersection.x << " " << intersection.y << " " << intersection.z << std::endl;
+                if(print) std::cout << "Intersection point : " << intersection.x << " " << intersection.y << " " << intersection.z << std::endl;
                 return true;
             }
         }
@@ -140,10 +156,12 @@ bool Plane::isIntersection(Vec v0, Vec v1, Vec v2){
 }
 
 
-int Plane::getSign(Vec v){
+double Plane::getSign(Vec v){
     Vec tr0 = mf->localCoordinatesOf(v);
 
-    return static_cast<int>( tr0.z/(abs(tr0.z)) );
+    //if(tr0.z == 0.0) std::cout << "on the plane" << std::endl;
+
+    return tr0.z/(abs(tr0.z));
 }
 
 Vec Plane::getProjection(Vec p){

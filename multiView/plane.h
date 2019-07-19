@@ -30,8 +30,8 @@ public:
     double getT(){ return *t; }
     void draw();
 
-    bool isIntersection(Vec v0, Vec v1, Vec v2);
-    int getSign(Vec v);
+    bool isIntersection(Vec v0, Vec v1, Vec v2, bool print);
+    double getSign(Vec v);
 
     Vec getProjection(Vec p);
 
