@@ -94,9 +94,6 @@ protected:
     Vec3Df BBCentre;
     float radius;
 
-    //temporary
-    int neighCount;
-
     int normalDirection;
 };
 

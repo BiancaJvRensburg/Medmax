@@ -64,34 +64,6 @@ Vec3Df Mesh::computeTriangleNormal(unsigned int id ){
 }
 
 void Mesh::setIsCut(Side s, bool isCut){
-    if(vertexNeighbours.size() > 0){
-        std::cout << "12960 : " << vertexNeighbours[12960].size() << std::endl;
-        std::cout << "12698 : " << vertexNeighbours[12698].size() << std::endl;
-
-        int count=0;
-        for(int i=0; i<triangles.size(); i++){
-            for(int j=0; j<3; j++){
-                if(triangles[i][j]==12960) count++;
-            }
-        }
-        std::cout << "12960 triangles : " << count << std::endl;
-
-        count=0;
-            for(int i=0; i<triangles.size(); i++){
-                for(int j=0; j<3; j++){
-                    if(triangles[i][j]==12698) count++;
-                }
-            }
-            std::cout << "12698 triangles : " << count << std::endl;
-
-            std::cout << "12960 vertex triangles : " << vertexTriangles[12960].size() << std::endl;
-            std::cout << "12698 vertex triangles : " << vertexTriangles[12698].size() << std::endl;
-
-
-    }
-
-
-
     this->isCut = isCut;
     this->cuttingSide = s;
     if(isCut) updatePlaneIntersections();
@@ -122,13 +94,6 @@ void Mesh::glTriangle(unsigned int i){
     const Triangle & t = triangles[i];
 
     for(unsigned int j = 0 ; j < 3 ; j++ ){
-        /* Visualisation testing */
-               if(flooding[t.getVertex(j)] == 0) glColor3f(0, 0, 1);
-               if(flooding[t.getVertex(j)] == 1) glColor3f(0, 0.5, 0.5);
-               if(flooding[t.getVertex(j)] == planes.size()) glColor3f(1, 0, 0);
-               if(flooding[t.getVertex(j)] == planes.size()+1) glColor3f(1, 1, 0);
-               //if(t.getVertex(j) == 12960 || t.getVertex(j) ==  12698) glColor3f(1.0, 1.0, 1.0);
-               /* End of visualisation testing */
         glNormal(verticesNormals[t.getVertex(j)]*normalDirection);
         glVertex(vertices[t.getVertex(j)]);
     }
@@ -140,12 +105,6 @@ void Mesh::glTriangleSmooth(unsigned int i){
     const Triangle & t = triangles[i];
 
     for(unsigned int j = 0 ; j < 3 ; j++ ){
-        /* Visualisation testing */
-               if(flooding[t.getVertex(j)] == 0) glColor3f(0, 0, 1);
-               if(flooding[t.getVertex(j)] == 1) glColor3f(0, 0.5, 0.5);
-               if(flooding[t.getVertex(j)] == planes.size()) glColor3f(1, 0, 0);
-               if(flooding[t.getVertex(j)] == planes.size()+1) glColor3f(1, 1, 0);
-               /* End of visualisation testing */
         glNormal(verticesNormals[t.getVertex(j)]*normalDirection);
         glVertex(smoothedVerticies[t.getVertex(j)]);
     }
@@ -164,70 +123,37 @@ void Mesh::addPlane(Plane *p){
 }
 
 void Mesh::updatePlaneIntersections(){
-    //if(isCut){
+    if(isCut){
         flooding.clear();
         for(int i=0; i<vertices.size(); i++) flooding.push_back(-1);
         for(int i=0; i<planeNeighbours.size(); i++) planeNeighbours[i] = -1;
 
         for(unsigned int i=0; i<planes.size(); i++) planeIntersection(i);
 
-        /*if(flooding.size()!=0){
-            std::cout << "Before flooding 12960 flood : " << flooding[12960] << std::endl;
-            std::cout << "Before flooding 12698 flood : " << flooding[12698] << std::endl;
-        }*/
-
-        // std::cout << " \n " << std::endl;
-
-        //neighCount=0;
-        //int count=0;
-        if(!isCut){
         for(unsigned int i=0; i<flooding.size(); i++){
             if(flooding[i] != -1){
-                //count++;
                 for(unsigned int j=0; j<vertexNeighbours[i].size(); j++){
-                    //if(vertexNeighbours[i][j]==12960) count++;
                 floodNeighbour(vertexNeighbours[i][j], flooding[i]);
                 }
             }
         }
 
-        //std::cout << "12960 explored : " << count << std::endl;
-
-        /*if(flooding.size()!=0){
-            std::cout << "After flooding 12960 flood : " << flooding[12960] << std::endl;
-            std::cout << "After flooding 12698 flood : " << flooding[12698] << std::endl;
-        }*/
-
-
         mergeFlood();
-        //std::cout << "\n" << std::endl;
-        }
-
-
-        /*for(unsigned int i=0; i<planeNeighbours.size(); i+=2){
-            std::cout << i << " : " << planeNeighbours[i] << " , " << planeNeighbours[i+1] << std::endl;
-        }*/
-
-        //mergeFlood();
-
-        if(isCut)cutMesh();
-    //}
+        cutMesh();
+    }
 }
 
 void Mesh::cutMesh(){
-    //isCut = true;
     trianglesCut.clear();
 
     bool truthTriangles[triangles.size()];  // keeps a record of the triangles who are already added
     for(unsigned int i=0; i<triangles.size(); i++) truthTriangles[i] = false;
 
-    //int count = 0;
     switch (cuttingSide) {
         case Side::INTERIOR:
             for(unsigned int i=0; i<flooding.size(); i++){
                 if(planeNeighbours[flooding[i]]==-1){
                     // Get the triangles they belong to
-                    //count++;
                     for(unsigned int j=0; j<vertexTriangles[i].size(); j++){
                         // If it's not already in the list
                         if(!truthTriangles[vertexTriangles[i][j]]){
@@ -254,8 +180,6 @@ void Mesh::cutMesh(){
             }
         break;
     }
-
-    //std::cout << trianglesCut.size() << "   " << count << std::endl;
 
     createSmoothedTriangles();
 
@@ -333,18 +257,9 @@ void Mesh::floodNeighbour(unsigned int index, unsigned int id){
     else{
         // They're not already neighbours
         if(planeNeighbours[id]== -1){
-            if( (flooding[index]==3 && id==2) || (flooding[index]==2 && id==3) ) std::cout << "Found wrong neighbour : " << index << std::endl;
             planeNeighbours[id] = flooding[index];     // equal to the old value
             planeNeighbours[flooding[index]] = id;
         }
-
-
-        /*else if(planeNeighbours[id] != flooding[index]){
-            std::cout << id << " Current : " << planeNeighbours[id] << " , new " << flooding[index] <<  std::endl;
-            planeNeighbours[planeNeighbours[id]] = -1; // reset the other
-            planeNeighbours[id] = flooding[index];
-            planeNeighbours[flooding[index]] = id;
-        }*/
 
         // They're already neighbours
         return;
@@ -365,25 +280,12 @@ void Mesh::planeIntersection(unsigned int index){
     intersectionTriangles[index].clear();
 
     for(unsigned int i = 0 ; i < triangles.size(); i++){
-        //if(i == 12960 || i == 12698) std::cout << "checking";
         unsigned int t0 = triangles[i].getVertex(0);
         unsigned int t1 = triangles[i].getVertex(1);
         unsigned int t2 = triangles[i].getVertex(2);
 
-        bool print=false;
 
-        if(t0 == 12960 || t0 == 12698) print = true;
-        if(t1 == 12960 || t1 == 12698) print = true;
-        if(t2 == 12960 || t2 == 12698) print = true;
-        /*if(t0 == 12960 || t0 == 12698) std::cout << "t0" << std::endl;
-        if(t1 == 12960 || t1 == 12698) std::cout << "t1" << std::endl;
-        if(t2 == 12960 || t2 == 12698) std::cout << "t2" << std::endl;*/
-
-        if(planes[index]->isIntersection(Vec(vertices[t0]), Vec(vertices[t1]), Vec(vertices[t2]), print )){
-            //std::cout << i << std::endl;
-            if(t0 == 12960 || t0 == 12698) std::cout << "found" << std::endl;
-            if(t1 == 12960 || t1 == 12698) std::cout << "found" << std::endl;
-            if(t2 == 12960 || t2 == 12698) std::cout << "found" << std::endl;
+        if(planes[index]->isIntersection(Vec(vertices[t0]), Vec(vertices[t1]), Vec(vertices[t2]) )){
 
             intersectionTriangles[index].push_back(i);
 
@@ -391,11 +293,9 @@ void Mesh::planeIntersection(unsigned int index){
             for(unsigned int j=0; j<3; j++){
                 double sign = planes[index]->getSign(Vec(vertices[triangles[i].getVertex(j)]));
                 if(sign >= 0 ){
-                    if(triangles[i].getVertex(j) == 12960 || triangles[i].getVertex(j) ==  12698) std::cout << "positive" << std::endl;
                     flooding[triangles[i].getVertex(j)] = planes.size() + index;
                 }
                 else if(sign < 0){
-                    if(triangles[i].getVertex(j) == 12960 || triangles[i].getVertex(j) ==  12698) std::cout << "negative" << std::endl;
                     flooding[triangles[i].getVertex(j)] = index;
                 }
             }
