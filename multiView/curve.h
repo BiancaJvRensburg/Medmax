@@ -75,6 +75,8 @@ private:
     Vec** dt;
     Vec** d2t;
 
+    Vec interpolateBinormal(int index);
+
     void getModVec(int j, int r, double t, int kI, double offset, double* newPoints);
 
     int isSpace();  // Is there space for another control point?

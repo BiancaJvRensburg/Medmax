@@ -27,6 +27,7 @@ public Q_SLOTS:
     virtual void updatePlanes();
     virtual void cutMesh();
     virtual void uncutMesh();
+    void drawMesh();
 
 Q_SIGNALS:
     void leftPosChanged(double);
@@ -41,6 +42,7 @@ protected:
     virtual void initCurve();
     void initPlanes(Movable status);
     Quaternion getNewOrientation(int index);
+    Quaternion updateOrientation(int index);
 
     Plane *leftPlane;
     Plane *rightPlane;
@@ -50,6 +52,7 @@ protected:
     int curveIndexR;
     long* nbU;
     int sliderMax;
+    bool isDrawMesh;
 
     // double angle(Vec a, Vec b);
 

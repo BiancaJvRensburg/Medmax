@@ -59,7 +59,7 @@ void Curve::generateCatmull(long* n){
     this->knotIndex = 0;
     this->degree = 3;
 
-    this->knotVector = generateCatmullKnotVector(0.5);
+    this->knotVector = generateCatmullKnotVector(0.3);
     catmullrom();
 }
 
@@ -282,7 +282,6 @@ void Curve::catmullrom(){
 }
 
 double Curve::discreteLength(int indexS, int indexE){
-    //std::cout << "start : " << indexS << " , end : " << indexE << std::endl;
     return sqrt( pow((curve[indexE]->x - curve[indexS]->x), 2) + pow((curve[indexE]->y - curve[indexS]->y), 2) + pow((curve[indexE]->z - curve[indexS]->z), 2));
 }
 
@@ -346,15 +345,26 @@ Vec Curve::normal(int index){
     return cross(binormal(index), tangent(index));
 }
 
-Vec Curve::binormal(int index){
-    if(index!=0 && index!=*nbU-1 && isControlPoint(index)) return (binormal(index-1) + binormal(index+1))/2.0;
+Vec Curve::interpolateBinormal(int index){
+    if(index!=0 && index!=*nbU-1 && isControlPoint(index)) return (interpolateBinormal(index-1) + interpolateBinormal(index+1))/2.0;
 
     Vec b = cross(Vec(dt[index]->x, dt[index]->y, dt[index]->z), Vec(d2t[index]->x, d2t[index]->y, d2t[index]->z));
     b.normalize();
 
-    //std::cout << "binormal : " << b.x << " , " << b.y << " , " << b.z << std::endl;
-
     return b;
+}
+
+Vec Curve::binormal(int index){
+    // take 5 to start with
+    Vec b = interpolateBinormal(index);
+
+    for(int i=1; i<20; i++){
+        if(index-i>=0) b += interpolateBinormal(index-i) / pow(2, i);
+        else if(index+i<*nbU) b += interpolateBinormal(index+i) / pow(2, i);
+        else b += b / (pow(2,i));
+    }
+
+    return (b/3.0);
 }
 
 Vec Curve::orientation(int index){

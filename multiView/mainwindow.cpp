@@ -143,11 +143,15 @@ void MainWindow::initFileActions(){
     connect(unCutMeshAction, &QAction::triggered, skullViewer, &Viewer::uncutMesh);
     connect(unCutMeshAction, &QAction::triggered, fibulaViewer, &ViewerFibula::uncutMesh);
 
+    QAction *drawMeshAction = new QAction("Draw Mesh", this);
+    connect(drawMeshAction, &QAction::triggered, skullViewer, &Viewer::drawMesh);
+    connect(drawMeshAction, &QAction::triggered, fibulaViewer, &ViewerFibula::drawMesh);
 
     fileActionGroup->addAction(openFileSkullAction);
     fileActionGroup->addAction(openFileFibulaAction);
     fileActionGroup->addAction(unCutMeshAction);
     fileActionGroup->addAction(cutMeshAction);
+    fileActionGroup->addAction(drawMeshAction);
 
 }
 

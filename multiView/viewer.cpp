@@ -12,6 +12,7 @@ Viewer::Viewer(QWidget *parent, StandardCamera *cam, int sliderMax) : QGLViewer(
 
     this->nbU = new long();
     this->sliderMax = sliderMax;
+    this->isDrawMesh = true;
 }
 
 void Viewer::draw() {
@@ -22,7 +23,7 @@ void Viewer::draw() {
     //drawAxis(20.0);
 
     glColor3f(1.,1.,1.);
-    mesh.draw();
+    if(isDrawMesh) mesh.draw();
 
     //glPolygonMode (GL_FRONT_AND_BACK, GL_FILL);
 
@@ -37,7 +38,7 @@ void Viewer::draw() {
     curve->draw();
 
     curve->drawControl(); // We want to visualise this at all times
-    //curve->drawTangent(curveIndexL);
+    // curve->drawTangent(curveIndexL);
 
     glPopMatrix();
 }
@@ -70,6 +71,12 @@ QString Viewer::helpString() const {
   return text;
 }
 
+void Viewer::drawMesh(){
+    if(isDrawMesh) isDrawMesh = false;
+    else isDrawMesh = true;
+    update();
+}
+
 void Viewer::cutMesh(){
     mesh.setIsCut(Side::INTERIOR, true);
     update();
@@ -95,7 +102,9 @@ void Viewer::moveLeftPlane(int position){
     else curveIndexL = curveIndexR - 1;
 
         leftPlane->setPosition(curve->getPoint(curveIndexL), percentage);
-        leftPlane->setOrientation(getNewOrientation(curveIndexL));
+        //leftPlane->setOrientation(getNewOrientation(curveIndexL));
+
+        leftPlane->setOrientation(updateOrientation(curveIndexL));
 
        // mesh.planeIntersection(leftPlane);
         mesh.updatePlaneIntersections(leftPlane);
@@ -141,7 +150,9 @@ void Viewer::moveRightPlane(int position){
     double percentageR = static_cast<double>(curveIndexR) / static_cast<double>(*nbU);
 
         rightPlane->setPosition(curve->getPoint(curveIndexR), percentageR);
-        rightPlane->setOrientation(getNewOrientation(curveIndexR));
+        //rightPlane->setOrientation(getNewOrientation(curveIndexR));
+
+        rightPlane->setOrientation(updateOrientation(curveIndexR));
 
         mesh.updatePlaneIntersections(rightPlane);
 
@@ -191,7 +202,7 @@ void Viewer::initCurve(){
     control[4] = new ControlPoint(46.3957, -23.0805, -54.17);
     control[5] = new ControlPoint(44.4578, -24.7785, -19.9623);*/
 
-    const long nbCP = 9;
+    /*const long nbCP = 9;
     ControlPoint *control[nbCP];
 
     control[0] = new ControlPoint(-51.946, -19.1294, -18.4682);
@@ -205,7 +216,23 @@ void Viewer::initCurve(){
     control[6] = new ControlPoint(38, -40, -60);
     control[7] = new ControlPoint(47.56, -22.74, -35.3152);
 
-    control[8] = new ControlPoint(51.946, -19.1294, -18.4682);
+    control[8] = new ControlPoint(51.946, -19.1294, -18.4682);*/
+
+    const long nbCP = 9;
+        ControlPoint *control[nbCP];
+
+        control[0] = new ControlPoint(-53.3782, 6.81694, -5.29601);
+        control[1] = new ControlPoint(-55.1869, -9.35275, -22.6458);
+        control[2] = new ControlPoint(-45.0097, -35.0681, -50.9899);
+        control[3] = new ControlPoint(-27.6007, -69.2743, -67.6769);
+
+        control[4] = new ControlPoint(0, -91.5282, -74.3305);
+
+        control[5] = new ControlPoint(27.6007, -69.2743, -67.6769);
+        control[6] = new ControlPoint(45.0097, -35.0681, -50.9899);
+        control[7] = new ControlPoint(55.1869, -9.35275, -22.6458);
+
+        control[8] = new ControlPoint(53.3782, 6.81694, -5.29601);
 
     //int degree = 3;
 
@@ -234,6 +261,7 @@ void Viewer::initPlanes(Movable status){
     leftPlane->setOrientation(getNewOrientation(curveIndexL));
     rightPlane->setOrientation(getNewOrientation(curveIndexR));
 
+
     if(status == Movable::DYNAMIC){
         connect(leftPlane->cp, &CurvePoint::curvePointTranslated, curve, &Curve::moveToPoint);
         connect(rightPlane->cp, &CurvePoint::curvePointTranslated, curve, &Curve::moveToPoint);
@@ -256,8 +284,11 @@ void Viewer::updatePlanes(){
     leftPlane->setPosition(curve->getPoint(curveIndexL), percentageL);
     rightPlane->setPosition(curve->getPoint(curveIndexR), percentageR);
 
-    leftPlane->setOrientation(getNewOrientation(curveIndexL));
-    rightPlane->setOrientation(getNewOrientation(curveIndexR));
+    /*leftPlane->setOrientation(getNewOrientation(curveIndexL));
+    rightPlane->setOrientation(getNewOrientation(curveIndexR));*/
+
+    leftPlane->setOrientation(updateOrientation(curveIndexL));
+    rightPlane->setOrientation(updateOrientation(curveIndexR));
 
     //mesh.planeIntersection(leftPlane);
 
@@ -272,6 +303,11 @@ Quaternion Viewer::getNewOrientation(int index){
     // Both planes need the same coordinate system
     s = leftPlane->fromRotatedBasis(curve->normal(index), curve->binormal(index), curve->tangent(index));
 
+    return s.normalized();
+}
+
+Quaternion Viewer::updateOrientation(int index){
+    Quaternion s = Quaternion(Vec(0,0,1.0), curve->tangent(index));
     return s.normalized();
 }
 
