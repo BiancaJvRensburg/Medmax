@@ -109,8 +109,10 @@ void MainWindow::initDisplayDockWidgets(){
     connect(fibulaSlider, static_cast<void (QSlider::*)(int)>(&QSlider::sliderMoved), fibulaViewer, &ViewerFibula::movePlanes);
 
     // Connect the two views
-    connect(skullViewer, &Viewer::leftPosChanged, fibulaViewer, &ViewerFibula::movePlaneDistance);
+    connect(skullViewer, &Viewer::leftPosChanged, fibulaViewer, &ViewerFibula::moveGhostPlaneDistance);
     connect(skullViewer, &Viewer::rightPosChanged, fibulaViewer, &ViewerFibula::movePlaneDistance);
+
+    connect(skullViewer, &Viewer::ghostPlanesAdded, fibulaViewer, &ViewerFibula::ghostPlanesRecieved);
 
     contentsMand->setLayout(contentLayoutMand);
     contentsFibula->setLayout(contentLayoutFibula);

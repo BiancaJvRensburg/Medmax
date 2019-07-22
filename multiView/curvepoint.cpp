@@ -1,10 +1,10 @@
 #include "curvepoint.h"
 
-CurvePoint::CurvePoint(Vec* p, ManipulatedFrame* mf, double* t)
+CurvePoint::CurvePoint(Vec* p, ManipulatedFrame* mf)
 {
     this->p = p;
     this->mf = mf;
-    this->t = t;
+    //this->curveIndex = curveIndex;
     connect(mf, &ManipulatedFrame::manipulated, this, &ControlPoint::cntrlMoved);
 }
 
@@ -34,5 +34,5 @@ void CurvePoint::cntrlMoved(){
     p->y = y;
     p->z = z;
 
-    Q_EMIT CurvePoint::curvePointTranslated(offset, *this->t);
+    Q_EMIT CurvePoint::curvePointTranslated(offset);
 }

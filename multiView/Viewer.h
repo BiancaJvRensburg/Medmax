@@ -27,11 +27,12 @@ public Q_SLOTS:
     virtual void updatePlanes();
     virtual void cutMesh();
     virtual void uncutMesh();
-    void drawMesh();
+    virtual void drawMesh();
 
 Q_SIGNALS:
     void leftPosChanged(double);
     void rightPosChanged(double);
+    void ghostPlanesAdded(int, double[]);
 
 protected:
     void draw();
@@ -41,20 +42,21 @@ protected:
 
     virtual void initCurve();
     void initPlanes(Movable status);
+    virtual void addGhostPlanes(int nb);
     Quaternion getNewOrientation(int index);
     Quaternion updateOrientation(int index);
 
     Plane *leftPlane;
     Plane *rightPlane;
     Curve *curve;
+    std::vector<Plane*> ghostPlanes;
 
     int curveIndexL;
     int curveIndexR;
     long* nbU;
     int sliderMax;
     bool isDrawMesh;
-
-    // double angle(Vec a, Vec b);
+    int* ghostLocation;
 
 };
 

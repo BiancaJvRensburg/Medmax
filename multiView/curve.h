@@ -22,10 +22,6 @@ public:
     void generateCatmull(long* nbU);
 
     Vec tangent(int index);
-    /*Vec binormal(int index);
-    Vec normal(int index);
-
-    Vec orientation(int index);*/
 
     void draw();
     void drawControl();
@@ -37,7 +33,7 @@ public:
 public Q_SLOTS:
     void reintialiseCurve();
     void addControlPoint(ControlPoint*);
-    void moveToPoint(Vec, double);
+    void moveToPoint(Vec);
 
 Q_SIGNALS:
     void curveReinitialised();
@@ -61,8 +57,7 @@ private:
     Vec deBoorDerivative(double u, int i, int r, int k);
 
     // Catmull rom
-    void catmullrom();  // calculate the spline, first and second derivative
-    //void calculateCatmullPoints(Vec* c, Vec* cp, Vec* cpp, double t);
+    void catmullrom();  // calculate the spline and the first derivative
     void calculateCatmullPoints(Vec* c, Vec* cp, double t);
 
     bool isControlPoint(int index);
@@ -74,9 +69,6 @@ private:
 
     // Frenet frame
     Vec** dt;
-    //Vec** d2t;
-
-    // Vec interpolateBinormal(int index);
 
     void getModVec(int j, int r, double t, int kI, double offset, double* newPoints);
 

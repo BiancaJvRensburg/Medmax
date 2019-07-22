@@ -12,13 +12,18 @@ void ViewerFibula::movePlanes(int position){
 
     if(curveIndexL + offset < *nbU && curveIndexL + offset > 0 && curveIndexR + offset < *nbU && curveIndexR + offset > 0){
         indexOffset = offset;
-        double percentageL = static_cast<double>(curveIndexL + offset) / static_cast<double>(*nbU);
-        double percentageR = static_cast<double>(curveIndexR + offset) / static_cast<double>(*nbU);
+        /*double percentageL = static_cast<double>(curveIndexL + offset) / static_cast<double>(*nbU);
+        double percentageR = static_cast<double>(curveIndexR + offset) / static_cast<double>(*nbU);*/
 
-        leftPlane->setPosition(curve->getPoint(curveIndexL + indexOffset), percentageL);
-        rightPlane->setPosition(curve->getPoint(curveIndexR + indexOffset), percentageR);
+        leftPlane->setPosition(curve->getPoint(curveIndexL + indexOffset));
+        rightPlane->setPosition(curve->getPoint(curveIndexR + indexOffset));
         leftPlane->setOrientation(getNewOrientation(curveIndexL + indexOffset));
         rightPlane->setOrientation(getNewOrientation(curveIndexR + indexOffset));
+
+        for(unsigned int i=0; i<ghostPlanes.size(); i++){
+            ghostPlanes[i]->setPosition(curve->getPoint(ghostLocation[i] + indexOffset));
+            ghostPlanes[i]->setOrientation(getNewOrientation(ghostLocation[i] + indexOffset));
+        }
     }
 
     mesh.updatePlaneIntersections();
@@ -27,11 +32,64 @@ void ViewerFibula::movePlanes(int position){
 
 }
 
+void ViewerFibula::drawMesh(){
+
+}
+
+void ViewerFibula::addGhostPlanes(int nb){
+    ghostPlanes.clear();
+
+    for(unsigned int i=0; i<static_cast<unsigned int>(nb); i++){
+        ghostPlanes.push_back(new Plane(40.0, Movable::STATIC));
+
+        ghostPlanes[i]->setPosition(curve->getCurve()[ghostLocation[i] + indexOffset]);
+        ghostPlanes[i]->setOrientation(getNewOrientation(ghostLocation[i] + indexOffset));
+    }
+
+    update();
+}
+
+void ViewerFibula::ghostPlanesRecieved(int nb, double distance[]){
+    ghostLocation = new int[nb];
+
+    ghostLocation[0] = curve->indexForLength(curveIndexL, distance[0]);
+    for(int i=1; i<nb; i++) ghostLocation[i] = curve->indexForLength(ghostLocation[i-1], distance[i]);
+    curveIndexR = curve->indexForLength(ghostLocation[nb-1], distance[nb]);
+
+    // doesn't work if its done before the curve is initialised
+    addGhostPlanes(nb);
+}
+
+void ViewerFibula::getGhostLocations(){
+
+}
+
 void ViewerFibula::movePlaneDistance(double distance){
-    curveIndexR = curve->indexForLength(curveIndexL, distance);
-    double percentage = static_cast<double>(curveIndexR + indexOffset) / static_cast<double>(*nbU);
-    rightPlane->setPosition(curve->getCurve()[curveIndexR + indexOffset], percentage);
+    if(ghostPlanes.size()==0) curveIndexR = curve->indexForLength(curveIndexL, distance);
+    else curveIndexR = curve->indexForLength(ghostLocation[ghostPlanes.size()-1], distance);
+
+    rightPlane->setPosition(curve->getCurve()[curveIndexR + indexOffset]);
     rightPlane->setOrientation(getNewOrientation(curveIndexR + indexOffset));
+    mesh.updatePlaneIntersections(rightPlane);
+    update();
+}
+
+void ViewerFibula::moveGhostPlaneDistance(double distance){
+    int offset = 0;
+    if(ghostPlanes.size()==0) movePlaneDistance(distance);
+    else offset = curve->indexForLength(curveIndexL, distance) - ghostLocation[0];
+
+    // move all planes by the offset
+    for(unsigned int i=0; i<ghostPlanes.size(); i++){
+        ghostLocation[i] += offset;
+        ghostPlanes[i]->setPosition(curve->getCurve()[ghostLocation[i] + indexOffset]);
+        ghostPlanes[i]->setOrientation(getNewOrientation(ghostLocation[i] + indexOffset));
+    }
+
+    curveIndexR += offset;
+    rightPlane->setPosition(curve->getCurve()[curveIndexR + indexOffset]);
+    rightPlane->setOrientation(getNewOrientation(curveIndexR + indexOffset));
+
     mesh.updatePlaneIntersections(rightPlane);
     update();
 }
@@ -47,7 +105,7 @@ void ViewerFibula::initCurve(){
 
     curve = new Curve(nbCP, control);
 
-    *nbU = 100;
+    *nbU = 300;
 
     int nbSeg = nbCP-3;
     nbU -= *nbU%nbSeg;
@@ -57,6 +115,8 @@ void ViewerFibula::initCurve(){
     connect(curve, &Curve::curveReinitialised, this, &Viewer::updatePlanes);
 
     initPlanes(Movable::STATIC);
+
+    //addGhostPlanes(2);
 }
 
 void ViewerFibula::cutMesh(){

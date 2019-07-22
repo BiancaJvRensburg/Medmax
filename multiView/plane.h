@@ -17,7 +17,7 @@ public:
     Plane(double s, Movable status);
     void setSize(double s){ size = s; }
 
-    void setPosition(Vec *pos, double t);
+    void setPosition(Vec *pos);
     void setOrientation(Quaternion q){ mf->setOrientation(q); }
     Quaternion fromRotatedBasis(Vec x, Vec y, Vec z);
 
@@ -27,7 +27,7 @@ public:
     void rotatePlaneYZ(double percentage);   // rotate around the z axis
     void rotatePlane(Vec axis, double angle);
 
-    double getT(){ return *t; }
+    //double getCurveIndex(){ return *curveIndex; }
     void draw();
 
     bool isIntersection(Vec v0, Vec v1, Vec v2);
@@ -46,7 +46,7 @@ private:
     double rotationPercentage;
     void initBasePlane();
     void rotate(Quaternion q) { mf->rotate(q); }
-    double* t; // parametre
+    //double* curveIndex; // parametre
     Vec normal;
 };
 

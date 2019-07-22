@@ -8,7 +8,7 @@ class CurvePoint : public ControlPoint
     Q_OBJECT
 
 public:
-    CurvePoint(Vec* p, ManipulatedFrame* mf, double* t);
+    CurvePoint(Vec* p, ManipulatedFrame* mf);
 
     void setPosition(Vec* p){ this->p->x = p->x;
                                 this->p->y = p->y;
@@ -20,10 +20,10 @@ public Q_SLOTS:
     void cntrlMoved();
 
 Q_SIGNALS:
-    void curvePointTranslated(Vec offset, double t);
+    void curvePointTranslated(Vec offset);
 
 private:
-    double* t;
+    //double* curveIndex;
 };
 
 #endif // CURVEPOINT_H

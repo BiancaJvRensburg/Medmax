@@ -9,16 +9,16 @@ Plane::Plane(double s, Movable status)
 
     this->status = status;
 
-    t = new double();
+    //curveIndex = new double();
 
     if(status==Movable::DYNAMIC){
         mf = new ManipulatedFrame();
-        *t = 0;
-        cp = new CurvePoint(position, (ManipulatedFrame*)mf, t);
+        //*curveIndex = 0;
+        cp = new CurvePoint(position, (ManipulatedFrame*)mf);
     }
     else{
         mf = new Frame();
-        *t = 0;
+        //*curveIndex = 0;
         cp = NULL;
     }
 
@@ -71,13 +71,12 @@ void Plane::rotatePlaneYZ(double percentage){
     rotatePlane(axis, theta);
 }
 
-void Plane::setPosition(Vec* pos, double t){
+void Plane::setPosition(Vec* pos){
     position = pos;
     mf->setPosition(position->x, position->y, position->z);
 
     if(status==Movable::DYNAMIC){
         cp->setPosition(pos);
-        *this->t = t;
     }
 }
 

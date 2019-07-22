@@ -33,6 +33,9 @@ void Viewer::draw() {
     glColor3f(0, 1.0, 0);
     rightPlane->draw();
 
+    glColor3f(0,0,0);
+    for(unsigned int i=0; i<ghostPlanes.size(); i++) ghostPlanes[i]->draw();
+
     //glPolygonMode (GL_FRONT_AND_BACK, GL_LINE);
 
     curve->draw();
@@ -72,9 +75,15 @@ QString Viewer::helpString() const {
 }
 
 void Viewer::drawMesh(){
-    if(isDrawMesh) isDrawMesh = false;
+    /*if(isDrawMesh) isDrawMesh = false;
     else isDrawMesh = true;
-    update();
+    update();*/
+    ghostLocation = new int[2];
+
+    ghostLocation[0] = 20;
+    ghostLocation[1] = 50;
+
+    addGhostPlanes(2);
 }
 
 void Viewer::cutMesh(){
@@ -101,12 +110,15 @@ void Viewer::moveLeftPlane(int position){
     else if(curveIndexL == curveIndexR - 1) return;
     else curveIndexL = curveIndexR - 1;
 
-    leftPlane->setPosition(curve->getPoint(curveIndexL), percentage);
+    leftPlane->setPosition(curve->getPoint(curveIndexL));
     leftPlane->setOrientation(getNewOrientation(curveIndexL));
 
     mesh.updatePlaneIntersections(leftPlane);
 
-    double distance = curve->discreteLength(curveIndexL, curveIndexR);
+    double distance;
+
+    if(ghostPlanes.size()==0) distance = curve->discreteLength(curveIndexL, curveIndexR);
+    else distance = curve->discreteLength(curveIndexL, ghostLocation[0]);
 
     update();
     Q_EMIT leftPosChanged(distance);
@@ -143,14 +155,17 @@ void Viewer::moveRightPlane(int position){
     else if(curveIndexR == curveIndexL + 1) return;
     else curveIndexR = curveIndexL + 1;
 
-    double percentageR = static_cast<double>(curveIndexR) / static_cast<double>(*nbU);
+    //double percentageR = static_cast<double>(curveIndexR) / static_cast<double>(*nbU);
 
-    rightPlane->setPosition(curve->getPoint(curveIndexR), percentageR);
+    rightPlane->setPosition(curve->getPoint(curveIndexR));
     rightPlane->setOrientation(getNewOrientation(curveIndexR));
 
     mesh.updatePlaneIntersections(rightPlane);
 
-    double distance = curve->discreteLength(curveIndexL, curveIndexR);
+    double distance;
+
+    if(ghostPlanes.size()==0) distance = curve->discreteLength(curveIndexL, curveIndexR);
+    else distance = curve->discreteLength(ghostLocation[ghostPlanes.size()-1], curveIndexR);
 
     update();
     Q_EMIT rightPosChanged(distance);
@@ -217,6 +232,7 @@ void Viewer::initCurve(){
     curve->generateCatmull(nbU);
 
    initPlanes(Movable::STATIC);
+
 }
 
 void Viewer::initPlanes(Movable status){
@@ -227,8 +243,8 @@ void Viewer::initPlanes(Movable status){
     rightPlane = new Plane(40.0, status);
 
 
-    leftPlane->setPosition(curve->getPoint(curveIndexL), 0);
-    rightPlane->setPosition(curve->getPoint(curveIndexR), 1);
+    leftPlane->setPosition(curve->getPoint(curveIndexL));
+    rightPlane->setPosition(curve->getPoint(curveIndexR));
 
     leftPlane->setOrientation(getNewOrientation(curveIndexL));
     rightPlane->setOrientation(getNewOrientation(curveIndexR));
@@ -243,6 +259,23 @@ void Viewer::initPlanes(Movable status){
     mesh.addPlane(rightPlane);
 }
 
+void Viewer::addGhostPlanes(int nb){
+    double distances[nb+1];     // +1 for the last plane
+
+    for(unsigned int i=0; i<static_cast<unsigned int>(nb); i++){
+        ghostPlanes.push_back(new Plane(40.0, Movable::STATIC));
+        ghostPlanes[i]->setOrientation(getNewOrientation(ghostLocation[i]));
+        ghostPlanes[i]->setPosition(curve->getPoint(ghostLocation[i]));
+        if(i==0) distances[i] = curve->discreteLength(curveIndexL, ghostLocation[i]);
+        else distances[i] = curve->discreteLength(ghostLocation[i-1], ghostLocation[i]);
+    }
+
+    distances[nb] = curve->discreteLength(ghostLocation[nb-1], curveIndexR);
+
+    Q_EMIT ghostPlanesAdded(nb, distances);
+    update();
+}
+
 void Viewer::updateCamera(const Vec3Df & center, float radius){
     camera()->setSceneCenter(Vec(static_cast<double>(center[0]), static_cast<double>(center[1]), static_cast<double>(center[2])));
     camera()->setSceneRadius(static_cast<double>(radius*1.05f));
@@ -253,8 +286,8 @@ void Viewer::updatePlanes(){
     double percentageL = static_cast<double>(curveIndexL) / static_cast<double>(*nbU);
     double percentageR = static_cast<double>(curveIndexR) / static_cast<double>(*nbU);
 
-    leftPlane->setPosition(curve->getPoint(curveIndexL), percentageL);
-    rightPlane->setPosition(curve->getPoint(curveIndexR), percentageR);
+    leftPlane->setPosition(curve->getPoint(curveIndexL));
+    rightPlane->setPosition(curve->getPoint(curveIndexR));
 
     leftPlane->setOrientation(getNewOrientation(curveIndexL));
     rightPlane->setOrientation(getNewOrientation(curveIndexR));
@@ -265,13 +298,6 @@ void Viewer::updatePlanes(){
 }
 
 Quaternion Viewer::getNewOrientation(int index){
-    /*Quaternion s;
-
-    // Both planes need the same coordinate system
-    s = leftPlane->fromRotatedBasis(curve->normal(index), curve->binormal(index), curve->tangent(index));
-
-    return s.normalized();*/
-
     Quaternion s = Quaternion(Vec(0,0,1.0), curve->tangent(index));
     return s.normalized();
 }
