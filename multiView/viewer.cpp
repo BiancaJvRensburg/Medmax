@@ -101,14 +101,15 @@ void Viewer::moveLeftPlane(int position){
     double percentage = static_cast<double>(position) / static_cast<double>(sliderMax);
     int index = static_cast<int>(percentage * static_cast<double>(*nbU) );
 
-    if(curveIndexR > index){   // Only move if we're going backwards or we haven't met the other plane
+    if( (ghostPlanes.size()==0 && curveIndexR > index) || (ghostPlanes.size()!=0 && ghostLocation[0] > index) ){   // Only move if we're going backwards or we haven't met the other plane
         curveIndexL = index;
 
         if(curveIndexL >= *nbU) curveIndexL = *nbU-1;
         else if(curveIndexL < 0) curveIndexL = 0;   // shouldn't ever happen
     }
-    else if(curveIndexL == curveIndexR - 1) return;
-    else curveIndexL = curveIndexR - 1;
+    else if( (ghostPlanes.size()==0 && curveIndexL == curveIndexR - 1) || (ghostPlanes.size()!=0 && curveIndexL == ghostLocation[0] - 1)) return;
+    else if(ghostPlanes.size()==0) curveIndexL = curveIndexR - 1;
+    else curveIndexL = ghostLocation[0] - 1;
 
     leftPlane->setPosition(curve->getPoint(curveIndexL));
     leftPlane->setOrientation(getNewOrientation(curveIndexL));
@@ -146,14 +147,15 @@ void Viewer::moveRightPlane(int position){
     double percentage = static_cast<double>(position) / static_cast<double>(sliderMax);
     int index = *nbU - 1 - static_cast<int>(percentage * static_cast<double>(*nbU) );
 
-    if(index > curveIndexL){
+    if( (ghostPlanes.size()==0 && index > curveIndexL) || (ghostPlanes.size()>0 && index > ghostLocation[ghostPlanes.size()-1]) ){
         curveIndexR = index;
 
-        if(curveIndexR >= *nbU) curveIndexR = *nbU-1;
+        if(curveIndexR >= *nbU) curveIndexR = *nbU-1; // shouldn't ever happen either, outside of testing
         else if(curveIndexR < 0) curveIndexR = 0;   // shouldn't ever happen
     }
-    else if(curveIndexR == curveIndexL + 1) return;
-    else curveIndexR = curveIndexL + 1;
+    else if( (ghostPlanes.size()==0 && curveIndexR == curveIndexL + 1) || (ghostPlanes.size()!=0 && curveIndexR == ghostLocation[ghostPlanes.size()-1] + 1)) return;
+    else if(ghostPlanes.size()==0) curveIndexR = curveIndexL + 1;
+    else curveIndexR = ghostLocation[ghostPlanes.size()-1] + 1;
 
     //double percentageR = static_cast<double>(curveIndexR) / static_cast<double>(*nbU);
 
@@ -283,8 +285,8 @@ void Viewer::updateCamera(const Vec3Df & center, float radius){
 }
 
 void Viewer::updatePlanes(){
-    double percentageL = static_cast<double>(curveIndexL) / static_cast<double>(*nbU);
-    double percentageR = static_cast<double>(curveIndexR) / static_cast<double>(*nbU);
+    /*double percentageL = static_cast<double>(curveIndexL) / static_cast<double>(*nbU);
+    double percentageR = static_cast<double>(curveIndexR) / static_cast<double>(*nbU);*/
 
     leftPlane->setPosition(curve->getPoint(curveIndexL));
     rightPlane->setPosition(curve->getPoint(curveIndexR));
