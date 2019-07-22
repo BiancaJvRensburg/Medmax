@@ -24,8 +24,6 @@ public Q_SLOTS:
     void drawMesh();
 
 private:
-    void getGhostLocations();
-
     int indexOffset;
     int maxOffset;
 };

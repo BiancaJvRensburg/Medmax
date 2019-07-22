@@ -60,10 +60,6 @@ void ViewerFibula::ghostPlanesRecieved(int nb, double distance[]){
     addGhostPlanes(nb);
 }
 
-void ViewerFibula::getGhostLocations(){
-
-}
-
 void ViewerFibula::movePlaneDistance(double distance){
     if(ghostPlanes.size()==0) curveIndexR = curve->indexForLength(curveIndexL, distance);
     else curveIndexR = curve->indexForLength(ghostLocation[ghostPlanes.size()-1], distance);
@@ -95,13 +91,17 @@ void ViewerFibula::moveGhostPlaneDistance(double distance){
 }
 
 void ViewerFibula::initCurve(){
-    const long nbCP = 4;
+    const long nbCP = 6;
     ControlPoint* control[nbCP];
 
-    control[0] = new ControlPoint(102.4, 82.5, -864);
-    control[1] = new ControlPoint(91.5, 95.1, -926.9);
-    control[2] = new ControlPoint(81.2, 94.4, -1071);
-    control[3] = new ControlPoint(80.9, 90.1, -1155);
+    control[0] = new ControlPoint(108.241, 69.6891, -804.132);
+
+    control[1] = new ControlPoint(97.122, 82.1788, -866.868);
+    control[2] = new ControlPoint(93.5364, 90.1045, -956.126);
+    control[3] = new ControlPoint(83.3966, 92.5807, -1069.7);
+    control[4] = new ControlPoint(80.9, 90.1, -1155);
+
+    control[5] = new ControlPoint(86.4811, 90.9929, -1199.7);
 
     curve = new Curve(nbCP, control);
 

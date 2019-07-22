@@ -46,6 +46,8 @@ protected:
     Quaternion getNewOrientation(int index);
     Quaternion updateOrientation(int index);
 
+    double angle(Vec a, Vec b);
+
     Plane *leftPlane;
     Plane *rightPlane;
     Curve *curve;

@@ -78,12 +78,41 @@ void Viewer::drawMesh(){
     /*if(isDrawMesh) isDrawMesh = false;
     else isDrawMesh = true;
     update();*/
-    ghostLocation = new int[2];
 
-    ghostLocation[0] = 20;
-    ghostLocation[1] = 50;
+    if(ghostPlanes.size()==0){  // only add them once
+        const int nb=2;
+        ghostLocation = new int[nb];
 
-    addGhostPlanes(2);
+        double tangentDif[nb];
+        int maxIndicies[nb];
+
+        maxIndicies[0] = curveIndexL;
+        maxIndicies[1] = curveIndexL;
+        tangentDif[0] = 0;
+        tangentDif[1] = 0;
+
+        // Find an ordered list of the greatest angles
+        for(int i=curveIndexL+1; i<curveIndexR; i++){
+            double tangentAngle = angle(curve->tangent(i-1), curve->tangent(i));
+            for(int j=0; j<nb; j++){
+                if(tangentAngle > tangentDif[j]){
+                    for(int k=j+1; k<nb; k++){
+                        tangentDif[k] = tangentDif[k-1];
+                        maxIndicies[k] = maxIndicies[k-1];
+                    }
+                    tangentDif[j] = tangentAngle;
+                    maxIndicies[j] = i;
+                    break;
+                }
+            }
+        }
+
+        for(int i=0; i<nb; i++){
+            ghostLocation[i] = maxIndicies[i];
+        }
+
+        addGhostPlanes(2);
+    }
 }
 
 void Viewer::cutMesh(){
@@ -212,18 +241,19 @@ void Viewer::initCurve(){
     const long nbCP = 9;
     ControlPoint *control[nbCP];
 
-    control[0] = new ControlPoint(-53.3782, 6.81694, -5.29601);
-    control[1] = new ControlPoint(-55.1869, -9.35275, -22.6458);
-    control[2] = new ControlPoint(-45.0097, -35.0681, -50.9899);
+    control[0] = new ControlPoint(-56.9335, -13.9973, 8.25454);
+
+    control[1] = new ControlPoint(-50.8191, -20.195, -19.53);
+    control[2] = new ControlPoint(-40.155, -34.5957, -50.7005);
     control[3] = new ControlPoint(-27.6007, -69.2743, -67.6769);
 
-    control[4] = new ControlPoint(0, -91.5282, -74.3305);
+    control[4] = new ControlPoint(0, -85.966, -68.3154);
 
-    control[5] = new ControlPoint(27.6007, -69.2743, -67.6769);
-    control[6] = new ControlPoint(45.0097, -35.0681, -50.9899);
-    control[7] = new ControlPoint(55.1869, -9.35275, -22.6458);
+    control[5] = new ControlPoint(26.7572, -69.0705, -65.6261);
+    control[6] = new ControlPoint(40.3576, -34.3609, -50.7634);
+    control[7] = new ControlPoint(46.2189, -21.3245, -17.9009);
 
-    control[8] = new ControlPoint(53.3782, 6.81694, -5.29601);
+    control[8] = new ControlPoint(52.3669, -15.4613, 8.70223);
 
 
     curve = new Curve(nbCP, control);
@@ -302,6 +332,16 @@ void Viewer::updatePlanes(){
 Quaternion Viewer::getNewOrientation(int index){
     Quaternion s = Quaternion(Vec(0,0,1.0), curve->tangent(index));
     return s.normalized();
+}
+
+double Viewer::angle(Vec a, Vec b){
+
+    double na = a.normalize();
+    double nb = b.normalize();
+
+    double ab = a*b;
+
+    return acos(ab / (na*nb));
 }
 
 
