@@ -101,18 +101,15 @@ void Viewer::moveLeftPlane(int position){
     else if(curveIndexL == curveIndexR - 1) return;
     else curveIndexL = curveIndexR - 1;
 
-        leftPlane->setPosition(curve->getPoint(curveIndexL), percentage);
-        //leftPlane->setOrientation(getNewOrientation(curveIndexL));
+    leftPlane->setPosition(curve->getPoint(curveIndexL), percentage);
+    leftPlane->setOrientation(getNewOrientation(curveIndexL));
 
-        leftPlane->setOrientation(updateOrientation(curveIndexL));
+    mesh.updatePlaneIntersections(leftPlane);
 
-       // mesh.planeIntersection(leftPlane);
-        mesh.updatePlaneIntersections(leftPlane);
+    double distance = curve->discreteLength(curveIndexL, curveIndexR);
 
-        double distance = curve->discreteLength(curveIndexL, curveIndexR);
-
-        update();
-        Q_EMIT leftPosChanged(distance);
+    update();
+    Q_EMIT leftPosChanged(distance);
 
 }
 
@@ -120,7 +117,6 @@ void Viewer::rotateLeftPlane(int position){
     double percentage = static_cast<double>(position) / static_cast<double>(sliderMax);
 
     leftPlane->rotatePlaneYZ(percentage);
-    //mesh.planeIntersection(leftPlane);
     mesh.updatePlaneIntersections(leftPlane);
     update();
 }
@@ -149,17 +145,15 @@ void Viewer::moveRightPlane(int position){
 
     double percentageR = static_cast<double>(curveIndexR) / static_cast<double>(*nbU);
 
-        rightPlane->setPosition(curve->getPoint(curveIndexR), percentageR);
-        //rightPlane->setOrientation(getNewOrientation(curveIndexR));
+    rightPlane->setPosition(curve->getPoint(curveIndexR), percentageR);
+    rightPlane->setOrientation(getNewOrientation(curveIndexR));
 
-        rightPlane->setOrientation(updateOrientation(curveIndexR));
+    mesh.updatePlaneIntersections(rightPlane);
 
-        mesh.updatePlaneIntersections(rightPlane);
+    double distance = curve->discreteLength(curveIndexL, curveIndexR);
 
-        double distance = curve->discreteLength(curveIndexL, curveIndexR);
-
-        update();
-        Q_EMIT rightPosChanged(distance);
+    update();
+    Q_EMIT rightPosChanged(distance);
 }
 
 void Viewer::openOFF(QString filename) {
@@ -182,26 +176,6 @@ void Viewer::openOFF(QString filename) {
 }
 
 void Viewer::initCurve(){
-    /*const long nbCP = 4;
-    ControlPoint *control[nbCP];
-
-    control[0] = new ControlPoint(-45.7, -28.2, -36);
-    control[1] = new ControlPoint(-20, -98.3, -90.1);
-    control[2] = new ControlPoint(17, -104.4, -98.3);
-    control[3] = new ControlPoint(37.2, -39, -41.5);
-
-    int degree = 3;*/
-
-    /*const long nbCP = 6;
-    ControlPoint *control[nbCP];
-
-    control[0] = new ControlPoint(-51.946, -19.1294, -18.4682);
-    control[1] = new ControlPoint(-35.7371, -14.8855, -63.1966);
-    control[2] = new ControlPoint(-27.1318, -96.5289, -62.9186);
-    control[3] = new ControlPoint(23.4442, -88.4731, -61.2257);
-    control[4] = new ControlPoint(46.3957, -23.0805, -54.17);
-    control[5] = new ControlPoint(44.4578, -24.7785, -19.9623);*/
-
     /*const long nbCP = 9;
     ControlPoint *control[nbCP];
 
@@ -219,22 +193,20 @@ void Viewer::initCurve(){
     control[8] = new ControlPoint(51.946, -19.1294, -18.4682);*/
 
     const long nbCP = 9;
-        ControlPoint *control[nbCP];
+    ControlPoint *control[nbCP];
 
-        control[0] = new ControlPoint(-53.3782, 6.81694, -5.29601);
-        control[1] = new ControlPoint(-55.1869, -9.35275, -22.6458);
-        control[2] = new ControlPoint(-45.0097, -35.0681, -50.9899);
-        control[3] = new ControlPoint(-27.6007, -69.2743, -67.6769);
+    control[0] = new ControlPoint(-53.3782, 6.81694, -5.29601);
+    control[1] = new ControlPoint(-55.1869, -9.35275, -22.6458);
+    control[2] = new ControlPoint(-45.0097, -35.0681, -50.9899);
+    control[3] = new ControlPoint(-27.6007, -69.2743, -67.6769);
 
-        control[4] = new ControlPoint(0, -91.5282, -74.3305);
+    control[4] = new ControlPoint(0, -91.5282, -74.3305);
 
-        control[5] = new ControlPoint(27.6007, -69.2743, -67.6769);
-        control[6] = new ControlPoint(45.0097, -35.0681, -50.9899);
-        control[7] = new ControlPoint(55.1869, -9.35275, -22.6458);
+    control[5] = new ControlPoint(27.6007, -69.2743, -67.6769);
+    control[6] = new ControlPoint(45.0097, -35.0681, -50.9899);
+    control[7] = new ControlPoint(55.1869, -9.35275, -22.6458);
 
-        control[8] = new ControlPoint(53.3782, 6.81694, -5.29601);
-
-    //int degree = 3;
+    control[8] = new ControlPoint(53.3782, 6.81694, -5.29601);
 
 
     curve = new Curve(nbCP, control);
@@ -284,13 +256,8 @@ void Viewer::updatePlanes(){
     leftPlane->setPosition(curve->getPoint(curveIndexL), percentageL);
     rightPlane->setPosition(curve->getPoint(curveIndexR), percentageR);
 
-    /*leftPlane->setOrientation(getNewOrientation(curveIndexL));
-    rightPlane->setOrientation(getNewOrientation(curveIndexR));*/
-
-    leftPlane->setOrientation(updateOrientation(curveIndexL));
-    rightPlane->setOrientation(updateOrientation(curveIndexR));
-
-    //mesh.planeIntersection(leftPlane);
+    leftPlane->setOrientation(getNewOrientation(curveIndexL));
+    rightPlane->setOrientation(getNewOrientation(curveIndexR));
 
     mesh.updatePlaneIntersections();
 
@@ -298,15 +265,13 @@ void Viewer::updatePlanes(){
 }
 
 Quaternion Viewer::getNewOrientation(int index){
-    Quaternion s;
+    /*Quaternion s;
 
     // Both planes need the same coordinate system
     s = leftPlane->fromRotatedBasis(curve->normal(index), curve->binormal(index), curve->tangent(index));
 
-    return s.normalized();
-}
+    return s.normalized();*/
 
-Quaternion Viewer::updateOrientation(int index){
     Quaternion s = Quaternion(Vec(0,0,1.0), curve->tangent(index));
     return s.normalized();
 }
