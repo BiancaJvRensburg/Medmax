@@ -86,13 +86,15 @@ void Viewer::drawMesh(){
         double tangentDif[nb];
         int maxIndicies[nb];
 
-        maxIndicies[0] = curveIndexL;
-        maxIndicies[1] = curveIndexL;
-        tangentDif[0] = 0;
-        tangentDif[1] = 0;
+        int startI = curve->indexForLength(curveIndexL, constraint);
+
+        for(int i=0; i<nb; i++){
+            maxIndicies[i] = startI;
+            tangentDif[i] = 0;
+        }
 
         // Find an ordered list of the greatest angles
-        for(int i=curveIndexL+1; i<curveIndexR; i++){
+        for(int i=startI; i<curveIndexR; i++){
             double tangentAngle = angle(curve->tangent(i-1), curve->tangent(i));
             for(int j=0; j<nb; j++){
                 if(tangentAngle > tangentDif[j]){
@@ -130,15 +132,15 @@ void Viewer::moveLeftPlane(int position){
     double percentage = static_cast<double>(position) / static_cast<double>(sliderMax);
     int index = static_cast<int>(percentage * static_cast<double>(*nbU) );
 
-    if( (ghostPlanes.size()==0 && curveIndexR > index) || (ghostPlanes.size()!=0 && ghostLocation[0] > index) ){   // Only move if we're going backwards or we haven't met the other plane
+    if( (ghostPlanes.size()==0 &&  curve->indexForLength(curveIndexR, -constraint) > index) || (ghostPlanes.size()!=0 && curve->indexForLength(ghostLocation[0], -constraint) > index) ){   // Only move if we're going backwards or we haven't met the other plane
         curveIndexL = index;
 
         if(curveIndexL >= *nbU) curveIndexL = *nbU-1;
         else if(curveIndexL < 0) curveIndexL = 0;   // shouldn't ever happen
     }
-    else if( (ghostPlanes.size()==0 && curveIndexL == curveIndexR - 1) || (ghostPlanes.size()!=0 && curveIndexL == ghostLocation[0] - 1)) return;
-    else if(ghostPlanes.size()==0) curveIndexL = curveIndexR - 1;
-    else curveIndexL = ghostLocation[0] - 1;
+    else if( (ghostPlanes.size()==0 && curveIndexL == curve->indexForLength(curveIndexR, -constraint)) || (ghostPlanes.size()!=0 && curveIndexL == curve->indexForLength(ghostLocation[0], -constraint))) return;
+    else if(ghostPlanes.size()==0) curveIndexL = curve->indexForLength(curveIndexR, -constraint);
+    else curveIndexL = curve->indexForLength(ghostLocation[0], -constraint);
 
     leftPlane->setPosition(curve->getPoint(curveIndexL));
     leftPlane->setOrientation(getNewOrientation(curveIndexL));
@@ -176,15 +178,15 @@ void Viewer::moveRightPlane(int position){
     double percentage = static_cast<double>(position) / static_cast<double>(sliderMax);
     int index = *nbU - 1 - static_cast<int>(percentage * static_cast<double>(*nbU) );
 
-    if( (ghostPlanes.size()==0 && index > curveIndexL) || (ghostPlanes.size()>0 && index > ghostLocation[ghostPlanes.size()-1]) ){
+    if( (ghostPlanes.size()==0 && index > curve->indexForLength(curveIndexL, constraint)) || (ghostPlanes.size()>0 && index > curve->indexForLength(ghostLocation[ghostPlanes.size()-1],constraint)) ){
         curveIndexR = index;
 
         if(curveIndexR >= *nbU) curveIndexR = *nbU-1; // shouldn't ever happen either, outside of testing
         else if(curveIndexR < 0) curveIndexR = 0;   // shouldn't ever happen
     }
-    else if( (ghostPlanes.size()==0 && curveIndexR == curveIndexL + 1) || (ghostPlanes.size()!=0 && curveIndexR == ghostLocation[ghostPlanes.size()-1] + 1)) return;
-    else if(ghostPlanes.size()==0) curveIndexR = curveIndexL + 1;
-    else curveIndexR = ghostLocation[ghostPlanes.size()-1] + 1;
+    else if( (ghostPlanes.size()==0 && curveIndexR == curve->indexForLength(curveIndexL, constraint)) || (ghostPlanes.size()!=0 && curveIndexR == curve->indexForLength(ghostLocation[ghostPlanes.size()-1],constraint))) return;
+    else if(ghostPlanes.size()==0) curveIndexR = curve->indexForLength(curveIndexL, constraint);
+    else curveIndexR = curve->indexForLength(ghostLocation[ghostPlanes.size()-1],constraint);
 
     //double percentageR = static_cast<double>(curveIndexR) / static_cast<double>(*nbU);
 

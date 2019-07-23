@@ -56,13 +56,17 @@ void ViewerFibula::ghostPlanesRecieved(int nb, double distance[]){
     for(int i=1; i<nb; i++) ghostLocation[i] = curve->indexForLength(ghostLocation[i-1], distance[i]);
     curveIndexR = curve->indexForLength(ghostLocation[nb-1], distance[nb]);
 
-    // doesn't work if its done before the curve is initialised
+    // doesn't work if its done before the curve is initialised (should never happen)
     addGhostPlanes(nb);
 }
 
 void ViewerFibula::movePlaneDistance(double distance){
-    if(ghostPlanes.size()==0) curveIndexR = curve->indexForLength(curveIndexL, distance);
-    else curveIndexR = curve->indexForLength(ghostLocation[ghostPlanes.size()-1], distance);
+    int newIndex;
+    if(ghostPlanes.size()==0) newIndex = curve->indexForLength(curveIndexL, distance);
+    else newIndex = curve->indexForLength(ghostLocation[ghostPlanes.size()-1], distance);
+
+    if(newIndex + indexOffset >= *nbU) return;      // This should never happen
+    else curveIndexR = newIndex;
 
     rightPlane->setPosition(curve->getCurve()[curveIndexR + indexOffset]);
     rightPlane->setOrientation(getNewOrientation(curveIndexR + indexOffset));

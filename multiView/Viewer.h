@@ -60,6 +60,8 @@ protected:
     bool isDrawMesh;
     int* ghostLocation;
 
+    const double constraint = 25;
+
 };
 
 #endif // VIEWER_H
