@@ -47,6 +47,9 @@ protected:
     Quaternion updateOrientation(int index);
 
     double angle(Vec a, Vec b);
+    //static int cmpfunc (const void * a, const void * b);
+    int partition(int sorted[], int start, int end);
+    void quicksort(int sorted[], int start, int end);
 
     Plane *leftPlane;
     Plane *rightPlane;

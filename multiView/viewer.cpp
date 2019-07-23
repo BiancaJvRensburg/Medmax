@@ -74,46 +74,114 @@ QString Viewer::helpString() const {
   return text;
 }
 
+/*int Viewer::cmpfunc(const void *a, const void *b){
+    int ia = *(int*)a;
+    int ib = *(int*)b;
+
+    double tangentAngleA = angle(curve->tangent(ia-1), curve->tangent(ia));
+    double tangentAngleB = angle(curve->tangent(ib-1), curve->tangent(ib));
+
+    return static_cast<int>(tangentAngleB - tangentAngleA);
+}*/
+
+void swap(int* a, int* b){
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+int Viewer::partition(int sorted[], int start, int end){
+    int p = sorted[end];
+    int index = start - 1;
+
+    for(int i=start; i<end; i++){
+        double tangentAngleA = angle(curve->tangent(sorted[i]-1), curve->tangent(sorted[i]));
+        double tangentAngleP = angle(curve->tangent(p-1), curve->tangent(p));
+
+        if(tangentAngleA >= tangentAngleP){
+            index++;
+            swap(&sorted[index], &sorted[i]);
+        }
+    }
+    swap(&sorted[index+1], &sorted[end]);
+    return index+1;
+}
+
+void Viewer::quicksort(int sorted[], int start, int end){
+    if(start < end){
+        int p = partition(sorted, start, end);
+        quicksort(sorted, start, p-1);
+        quicksort(sorted, p+1, end);
+    }
+}
+
 void Viewer::drawMesh(){
     /*if(isDrawMesh) isDrawMesh = false;
     else isDrawMesh = true;
     update();*/
 
     if(ghostPlanes.size()==0){  // only add them once
-        const int nb=2;
-        ghostLocation = new int[nb];
+        const int nb=3;
+        int finalNb = nb;
 
-        double tangentDif[nb];
         int maxIndicies[nb];
 
-        int startI = curve->indexForLength(curveIndexL, constraint);
+        const int startI = curve->indexForLength(curveIndexL, constraint);
+        const int endI = curve->indexForLength(curveIndexR, -constraint);
+        const int searchArea = endI - startI;
 
-        for(int i=0; i<nb; i++){
-            maxIndicies[i] = startI;
-            tangentDif[i] = 0;
+        int sorted[searchArea];
+
+        for(int i=0; i<searchArea; i++){
+            sorted[i] = startI+i;
         }
 
-        // Find an ordered list of the greatest angles
-        for(int i=startI; i<curveIndexR; i++){
-            double tangentAngle = angle(curve->tangent(i-1), curve->tangent(i));
-            for(int j=0; j<nb; j++){
-                if(tangentAngle > tangentDif[j]){
-                    for(int k=j+1; k<nb; k++){
-                        tangentDif[k] = tangentDif[k-1];
-                        maxIndicies[k] = maxIndicies[k-1];
+        quicksort(sorted, 0, searchArea-1);
+
+        maxIndicies[0] = sorted[0];
+        std::cout << maxIndicies[0] << std::endl;
+        int sortedIndex = 1;
+
+        for(int i=1; i<nb; i++){
+            // the constraint
+            bool tooClose;
+            do{
+                tooClose = false;
+                for(int j=i-1; j>=0; j--){
+                    if(sortedIndex < searchArea && curve->discreteLength(maxIndicies[j],sorted[sortedIndex])<constraint){
+                        tooClose = true;
+                        break;
                     }
-                    tangentDif[j] = tangentAngle;
-                    maxIndicies[j] = i;
-                    break;
                 }
+                if(tooClose) sortedIndex++;
+            }while(tooClose);
+
+            if(sortedIndex >= searchArea){
+                finalNb = i;
+                break;
+            }
+            maxIndicies[i] = sorted[sortedIndex];
+            sortedIndex++;  // move with i
+        }
+
+        // sort the planes
+        for(int i=0; i<finalNb; i++){
+            for(int j=i+1; j<finalNb; j++){
+                if(maxIndicies[i] > maxIndicies[j]) swap(&maxIndicies[i], &maxIndicies[j]);
             }
         }
 
-        for(int i=0; i<nb; i++){
+        if(finalNb==1 && (curve->discreteLength(maxIndicies[0], curveIndexL)>constraint || curve->discreteLength(maxIndicies[0], curveIndexR)>constraint) ) return; // don't add any planes
+
+        ghostLocation = new int[finalNb];
+
+        for(int i=0; i<finalNb; i++){
+
             ghostLocation[i] = maxIndicies[i];
+            std::cout << ghostLocation[i] << std::endl;
         }
 
-        addGhostPlanes(2);
+        addGhostPlanes(finalNb);
     }
 }
 
