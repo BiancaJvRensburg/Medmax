@@ -130,10 +130,13 @@ void ViewerFibula::initCurve(){
 
 void ViewerFibula::cutMesh(){
     mesh.setIsCut(Side::EXTERIOR, true);
+    isGhostPlanes = true;
     update();
 }
 
 void ViewerFibula::uncutMesh(){
     mesh.setIsCut(Side::EXTERIOR, false);
+    isGhostPlanes = false;
+    ghostPlanes.clear();
     update();
 }

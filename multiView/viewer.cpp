@@ -110,8 +110,6 @@ void Viewer::quicksort(int sorted[], int start, int end){
 void Viewer::drawMesh(){
     /*if(isDrawMesh) isDrawMesh = false;
     else isDrawMesh = true;*/
-    isGhostPlanes = true;
-    initGhostPlanes();
     update();
 }
 
@@ -188,11 +186,15 @@ void Viewer::initGhostPlanes(){
 
 void Viewer::cutMesh(){
     mesh.setIsCut(Side::INTERIOR, true);
+    isGhostPlanes = true;
+    initGhostPlanes();
     update();
 }
 
 void Viewer::uncutMesh(){
     mesh.setIsCut(Side::INTERIOR, false);
+    isGhostPlanes = false;
+    ghostPlanes.clear();
     update();
 }
 
