@@ -50,6 +50,11 @@ void ViewerFibula::addGhostPlanes(int nb){
 }
 
 void ViewerFibula::ghostPlanesRecieved(int nb, double distance[]){
+    if(nb==0){
+        ghostPlanes.clear();
+        return;
+    }
+
     ghostLocation = new int[nb];
 
     ghostLocation[0] = curve->indexForLength(curveIndexL, distance[0]);

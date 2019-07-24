@@ -13,6 +13,8 @@ Viewer::Viewer(QWidget *parent, StandardCamera *cam, int sliderMax) : QGLViewer(
     this->nbU = new long();
     this->sliderMax = sliderMax;
     this->isDrawMesh = true;
+    this->nbGhostPlanes = 3;
+    this->isGhostPlanes = false;
 }
 
 void Viewer::draw() {
@@ -74,16 +76,6 @@ QString Viewer::helpString() const {
   return text;
 }
 
-/*int Viewer::cmpfunc(const void *a, const void *b){
-    int ia = *(int*)a;
-    int ib = *(int*)b;
-
-    double tangentAngleA = angle(curve->tangent(ia-1), curve->tangent(ia));
-    double tangentAngleB = angle(curve->tangent(ib-1), curve->tangent(ib));
-
-    return static_cast<int>(tangentAngleB - tangentAngleA);
-}*/
-
 void swap(int* a, int* b){
     int temp = *a;
     *a = *b;
@@ -117,18 +109,24 @@ void Viewer::quicksort(int sorted[], int start, int end){
 
 void Viewer::drawMesh(){
     /*if(isDrawMesh) isDrawMesh = false;
-    else isDrawMesh = true;
-    update();*/
+    else isDrawMesh = true;*/
+    isGhostPlanes = true;
+    initGhostPlanes();
+    update();
+}
 
-    if(ghostPlanes.size()==0){  // only add them once
-        const int nb=3;
-        int finalNb = nb;
+void Viewer::initGhostPlanes(){
+    ghostPlanes.clear();
 
-        int maxIndicies[nb];
+    int finalNb = nbGhostPlanes;
 
-        const int startI = curve->indexForLength(curveIndexL, constraint);
-        const int endI = curve->indexForLength(curveIndexR, -constraint);
-        const int searchArea = endI - startI;
+    int maxIndicies[nbGhostPlanes];
+
+    const int startI = curve->indexForLength(curveIndexL, constraint);
+    const int endI = curve->indexForLength(curveIndexR, -constraint);
+    const int searchArea = endI - startI;
+
+    if(searchArea > 0){
 
         int sorted[searchArea];
 
@@ -139,10 +137,9 @@ void Viewer::drawMesh(){
         quicksort(sorted, 0, searchArea-1);
 
         maxIndicies[0] = sorted[0];
-        std::cout << maxIndicies[0] << std::endl;
         int sortedIndex = 1;
 
-        for(int i=1; i<nb; i++){
+        for(int i=1; i<nbGhostPlanes; i++){
             // the constraint
             bool tooClose;
             do{
@@ -171,18 +168,22 @@ void Viewer::drawMesh(){
             }
         }
 
-        if(finalNb==1 && (curve->discreteLength(maxIndicies[0], curveIndexL)>constraint || curve->discreteLength(maxIndicies[0], curveIndexR)>constraint) ) return; // don't add any planes
-
         ghostLocation = new int[finalNb];
 
-        for(int i=0; i<finalNb; i++){
+        for(int i=0; i<finalNb; i++) ghostLocation[i] = maxIndicies[i];
 
-            ghostLocation[i] = maxIndicies[i];
-            std::cout << ghostLocation[i] << std::endl;
-        }
+        currentNbGhostPlanes = finalNb;
 
         addGhostPlanes(finalNb);
+
+        // Update the fibula planes
+        double distance = curve->discreteLength(curveIndexL, ghostLocation[0]);
+        Q_EMIT leftPosChanged(distance);
+        distance = curve->discreteLength(curveIndexR, ghostLocation[finalNb-1]);
+        Q_EMIT rightPosChanged(distance);
+
     }
+    else Q_EMIT ghostPlanesAdded(0,0);
 }
 
 void Viewer::cutMesh(){
@@ -200,15 +201,18 @@ void Viewer::moveLeftPlane(int position){
     double percentage = static_cast<double>(position) / static_cast<double>(sliderMax);
     int index = static_cast<int>(percentage * static_cast<double>(*nbU) );
 
-    if( (ghostPlanes.size()==0 &&  curve->indexForLength(curveIndexR, -constraint) > index) || (ghostPlanes.size()!=0 && curve->indexForLength(ghostLocation[0], -constraint) > index) ){   // Only move if we're going backwards or we haven't met the other plane
+    if( (curve->indexForLength(curveIndexR, -constraint) > index)){// || ( ){   // Only move if we're going backwards or we haven't met the other plane
         curveIndexL = index;
 
         if(curveIndexL >= *nbU) curveIndexL = *nbU-1;
         else if(curveIndexL < 0) curveIndexL = 0;   // shouldn't ever happen
     }
-    else if( (ghostPlanes.size()==0 && curveIndexL == curve->indexForLength(curveIndexR, -constraint)) || (ghostPlanes.size()!=0 && curveIndexL == curve->indexForLength(ghostLocation[0], -constraint))) return;
-    else if(ghostPlanes.size()==0) curveIndexL = curve->indexForLength(curveIndexR, -constraint);
-    else curveIndexL = curve->indexForLength(ghostLocation[0], -constraint);
+    else if( (curveIndexL == curve->indexForLength(curveIndexR, -constraint)) ) return; //|| (ghostPlanes.size()!=0 && curveIndexL == curve->indexForLength(ghostLocation[0], -constraint))) return;
+    else curveIndexL = curve->indexForLength(curveIndexR, -constraint);
+    // else curveIndexL = curve->indexForLength(ghostLocation[0], -constraint);
+
+    //if( (ghostPlanes.size()!=0 && curve->indexForLength(ghostLocation[0], -constraint) < curveIndexL) || (isGhostPlanes && currentNbGhostPlanes!=nbGhostPlanes)) initGhostPlanes();
+    if(isGhostPlanes) initGhostPlanes();
 
     leftPlane->setPosition(curve->getPoint(curveIndexL));
     leftPlane->setOrientation(getNewOrientation(curveIndexL));
@@ -246,17 +250,18 @@ void Viewer::moveRightPlane(int position){
     double percentage = static_cast<double>(position) / static_cast<double>(sliderMax);
     int index = *nbU - 1 - static_cast<int>(percentage * static_cast<double>(*nbU) );
 
-    if( (ghostPlanes.size()==0 && index > curve->indexForLength(curveIndexL, constraint)) || (ghostPlanes.size()>0 && index > curve->indexForLength(ghostLocation[ghostPlanes.size()-1],constraint)) ){
+    if( index > curve->indexForLength(curveIndexL, constraint)){
         curveIndexR = index;
 
         if(curveIndexR >= *nbU) curveIndexR = *nbU-1; // shouldn't ever happen either, outside of testing
         else if(curveIndexR < 0) curveIndexR = 0;   // shouldn't ever happen
     }
-    else if( (ghostPlanes.size()==0 && curveIndexR == curve->indexForLength(curveIndexL, constraint)) || (ghostPlanes.size()!=0 && curveIndexR == curve->indexForLength(ghostLocation[ghostPlanes.size()-1],constraint))) return;
-    else if(ghostPlanes.size()==0) curveIndexR = curve->indexForLength(curveIndexL, constraint);
-    else curveIndexR = curve->indexForLength(ghostLocation[ghostPlanes.size()-1],constraint);
+    else if(curveIndexR == curve->indexForLength(curveIndexL, constraint)) return;
+    else curveIndexR = curve->indexForLength(curveIndexL, constraint);
 
-    //double percentageR = static_cast<double>(curveIndexR) / static_cast<double>(*nbU);
+    //if( (ghostPlanes.size()!=0 && curve->indexForLength(ghostLocation[ghostPlanes.size()-1], constraint) > curveIndexR) ||
+
+    if(isGhostPlanes) initGhostPlanes();
 
     rightPlane->setPosition(curve->getPoint(curveIndexR));
     rightPlane->setOrientation(getNewOrientation(curveIndexR));
@@ -375,7 +380,7 @@ void Viewer::addGhostPlanes(int nb){
     distances[nb] = curve->discreteLength(ghostLocation[nb-1], curveIndexR);
 
     Q_EMIT ghostPlanesAdded(nb, distances);
-    update();
+    //update();
 }
 
 void Viewer::updateCamera(const Vec3Df & center, float radius){

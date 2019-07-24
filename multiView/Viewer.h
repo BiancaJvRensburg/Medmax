@@ -43,6 +43,7 @@ protected:
     virtual void initCurve();
     void initPlanes(Movable status);
     virtual void addGhostPlanes(int nb);
+    virtual void initGhostPlanes();
     Quaternion getNewOrientation(int index);
     Quaternion updateOrientation(int index);
 
@@ -55,6 +56,9 @@ protected:
     Plane *rightPlane;
     Curve *curve;
     std::vector<Plane*> ghostPlanes;
+    int nbGhostPlanes;
+    int currentNbGhostPlanes;
+    bool isGhostPlanes;
 
     int curveIndexL;
     int curveIndexR;
