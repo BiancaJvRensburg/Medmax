@@ -27,7 +27,7 @@ public Q_SLOTS:
     virtual void updatePlanes();
     virtual void cutMesh();
     virtual void uncutMesh();
-    virtual void drawMesh();
+    void drawMesh();
 
 Q_SIGNALS:
     void leftPosChanged(double);

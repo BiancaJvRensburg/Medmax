@@ -21,7 +21,6 @@ public Q_SLOTS:
 
     void cutMesh();
     void uncutMesh();
-    void drawMesh();
 
 private:
     int indexOffset;

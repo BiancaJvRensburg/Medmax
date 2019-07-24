@@ -45,6 +45,7 @@ public:
 
     void setIsCut(Side s, bool isCut);
     // void switchIsCut(Side s);
+    void drawCut();
 
     typedef std::priority_queue< std::pair< float , int > , std::deque< std::pair< float , int > > , std::greater< std::pair< float , int > > > FacesQueue;
 
@@ -68,21 +69,22 @@ protected:
 
     void cutMesh();
 
-    std::vector <Vec3Df> vertices;
-    std::vector <Triangle> triangles;
+    std::vector <Vec3Df> vertices;      // starting verticies
+    std::vector <Triangle> triangles;       // starting triangles
 
     std::vector <Plane*> planes;
     std::vector <std::vector <unsigned int>> intersectionTriangles;    // Contains the index of the triangle instead of the actual triangle
     std::vector <unsigned int> interIndex;    // the current index of intersectionTriangles
 
     std::vector <int> flooding;
-    std::vector< std::vector<unsigned int>> vertexNeighbours;
-    std::vector< std::vector<unsigned int>> vertexTriangles;
-    std::vector<int> planeNeighbours;
+    std::vector< std::vector<unsigned int>> vertexNeighbours;       // each vertex's neighbours
+    std::vector< std::vector<unsigned int>> vertexTriangles;        // the triangles each vertex belongs to
+    std::vector<int> planeNeighbours;       // which planes are neighbours
     bool isCut = false;
     std::vector<unsigned int> trianglesCut;     // The list of triangles after the cutting
+    std::vector<unsigned int> trianglesExtracted;       // The list of triangles taken out (the complement of trianglesCut)
 
-    std::vector<Vec3Df> smoothedVerticies;
+    std::vector<Vec3Df> smoothedVerticies;      // New verticies which line up with the cutting plane
 
     std::vector<Vec3Df> normals;
     std::vector<Vec3Df> verticesNormals;

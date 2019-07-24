@@ -12,7 +12,7 @@ Viewer::Viewer(QWidget *parent, StandardCamera *cam, int sliderMax) : QGLViewer(
 
     this->nbU = new long();
     this->sliderMax = sliderMax;
-    this->isDrawMesh = true;
+    this->isDrawMesh = false;
     this->nbGhostPlanes = 3;
     this->isGhostPlanes = false;
 }
@@ -25,7 +25,8 @@ void Viewer::draw() {
     //drawAxis(20.0);
 
     glColor3f(1.,1.,1.);
-    if(isDrawMesh) mesh.draw();
+    mesh.draw();
+    if(isDrawMesh) mesh.drawCut();
 
     //glPolygonMode (GL_FRONT_AND_BACK, GL_FILL);
 
@@ -108,8 +109,8 @@ void Viewer::quicksort(int sorted[], int start, int end){
 }
 
 void Viewer::drawMesh(){
-    /*if(isDrawMesh) isDrawMesh = false;
-    else isDrawMesh = true;*/
+    if(isDrawMesh) isDrawMesh = false;
+    else isDrawMesh = true;
     update();
 }
 

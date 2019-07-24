@@ -181,6 +181,11 @@ void Mesh::cutMesh(){
         break;
     }
 
+    trianglesExtracted.clear();
+    for(int i=0; i<triangles.size(); i++){
+        if(!truthTriangles[i]) trianglesExtracted.push_back(i);
+    }
+
     createSmoothedTriangles();
 
 }
@@ -324,6 +329,25 @@ void Mesh::draw()
     }
 
     glEnd();
+
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_DEPTH);
+}
+
+void Mesh::drawCut(){
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_DEPTH);
+
+    glPolygonMode (GL_FRONT_AND_BACK, GL_LINE);
+
+    glBegin (GL_TRIANGLES);
+    for(unsigned int i = 0 ; i < trianglesExtracted.size(); i++){
+        glTriangleSmooth(trianglesExtracted[i]);
+    }
+
+    glEnd();
+
+    glPolygonMode (GL_FRONT_AND_BACK, GL_FILL);
 
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_DEPTH);

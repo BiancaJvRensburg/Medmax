@@ -32,10 +32,6 @@ void ViewerFibula::movePlanes(int position){
 
 }
 
-void ViewerFibula::drawMesh(){
-
-}
-
 void ViewerFibula::addGhostPlanes(int nb){
     ghostPlanes.clear();
 
