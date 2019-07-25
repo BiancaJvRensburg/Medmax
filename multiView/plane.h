@@ -34,6 +34,8 @@ public:
     double getSign(Vec v);
 
     Vec getProjection(Vec p);
+    Vec* getPosition(){ return position; }
+    CurvePoint* getCurvePoint(){ return cp; }
 
     Movable status;
     CurvePoint* cp;

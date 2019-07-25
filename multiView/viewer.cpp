@@ -28,6 +28,8 @@ void Viewer::draw() {
     mesh.draw();
     if(isDrawMesh) mesh.drawCut();
 
+    if(isGhostPlanes)drawPolyline();
+
     //glPolygonMode (GL_FRONT_AND_BACK, GL_FILL);
 
     glColor3f(1.0, 0, 0);
@@ -41,12 +43,38 @@ void Viewer::draw() {
 
     //glPolygonMode (GL_FRONT_AND_BACK, GL_LINE);
 
-    curve->draw();
+    //curve->draw();
 
-    curve->drawControl(); // We want to visualise this at all times
+    //curve->drawControl(); // We want to visualise this at all times
     // curve->drawTangent(curveIndexL);
 
     glPopMatrix();
+}
+
+void Viewer::drawPolyline(){
+    glEnable(GL_DEPTH);
+    glEnable(GL_DEPTH_TEST);
+    glColor3f(0.0, 1.0, 0.0);
+
+    glBegin(GL_LINE_STRIP);
+    glColor3f(0.0, 0.0, 1.0);
+
+        Vec *p = leftPlane->getPosition();
+        glVertex3f(static_cast<float>(p->x), static_cast<float>(p->y), static_cast<float>(p->z));
+
+        for(unsigned int i=0; i<ghostPlanes.size(); i++){
+            if(ghostPlanes[i]->getCurvePoint()==NULL) continue;
+            p = new Vec(ghostPlanes[i]->getCurvePoint()->getX(), ghostPlanes[i]->getCurvePoint()->getY(), ghostPlanes[i]->getCurvePoint()->getZ());
+            glVertex3f(static_cast<float>(p->x), static_cast<float>(p->y), static_cast<float>(p->z));
+        }
+
+        p = rightPlane->getPosition();
+        glVertex3f(static_cast<float>(p->x), static_cast<float>(p->y), static_cast<float>(p->z));
+
+    glEnd();
+
+    glDisable(GL_DEPTH);
+    glDisable(GL_DEPTH_TEST);
 }
 
 void Viewer::init() {
@@ -204,17 +232,15 @@ void Viewer::moveLeftPlane(int position){
     double percentage = static_cast<double>(position) / static_cast<double>(sliderMax);
     int index = static_cast<int>(percentage * static_cast<double>(*nbU) );
 
-    if( (curve->indexForLength(curveIndexR, -constraint) > index)){// || ( ){   // Only move if we're going backwards or we haven't met the other plane
+    if( (curve->indexForLength(curveIndexR, -constraint) > index)){  // Only move if we're going backwards or we haven't met the other plane
         curveIndexL = index;
 
         if(curveIndexL >= *nbU) curveIndexL = *nbU-1;
         else if(curveIndexL < 0) curveIndexL = 0;   // shouldn't ever happen
     }
-    else if( (curveIndexL == curve->indexForLength(curveIndexR, -constraint)) ) return; //|| (ghostPlanes.size()!=0 && curveIndexL == curve->indexForLength(ghostLocation[0], -constraint))) return;
+    else if( (curveIndexL == curve->indexForLength(curveIndexR, -constraint)) ) return;
     else curveIndexL = curve->indexForLength(curveIndexR, -constraint);
-    // else curveIndexL = curve->indexForLength(ghostLocation[0], -constraint);
 
-    //if( (ghostPlanes.size()!=0 && curve->indexForLength(ghostLocation[0], -constraint) < curveIndexL) || (isGhostPlanes && currentNbGhostPlanes!=nbGhostPlanes)) initGhostPlanes();
     if(isGhostPlanes) initGhostPlanes();
 
     leftPlane->setPosition(curve->getPoint(curveIndexL));
@@ -261,8 +287,6 @@ void Viewer::moveRightPlane(int position){
     }
     else if(curveIndexR == curve->indexForLength(curveIndexL, constraint)) return;
     else curveIndexR = curve->indexForLength(curveIndexL, constraint);
-
-    //if( (ghostPlanes.size()!=0 && curve->indexForLength(ghostLocation[ghostPlanes.size()-1], constraint) > curveIndexR) ||
 
     if(isGhostPlanes) initGhostPlanes();
 
@@ -373,7 +397,7 @@ void Viewer::addGhostPlanes(int nb){
     double distances[nb+1];     // +1 for the last plane
 
     for(unsigned int i=0; i<static_cast<unsigned int>(nb); i++){
-        ghostPlanes.push_back(new Plane(40.0, Movable::STATIC));
+        ghostPlanes.push_back(new Plane(40.0, Movable::DYNAMIC));
         ghostPlanes[i]->setOrientation(getNewOrientation(ghostLocation[i]));
         ghostPlanes[i]->setPosition(curve->getPoint(ghostLocation[i]));
         if(i==0) distances[i] = curve->discreteLength(curveIndexL, ghostLocation[i]);
@@ -383,7 +407,6 @@ void Viewer::addGhostPlanes(int nb){
     distances[nb] = curve->discreteLength(ghostLocation[nb-1], curveIndexR);
 
     Q_EMIT ghostPlanesAdded(nb, distances);
-    //update();
 }
 
 void Viewer::updateCamera(const Vec3Df & center, float radius){
@@ -393,9 +416,6 @@ void Viewer::updateCamera(const Vec3Df & center, float radius){
 }
 
 void Viewer::updatePlanes(){
-    /*double percentageL = static_cast<double>(curveIndexL) / static_cast<double>(*nbU);
-    double percentageR = static_cast<double>(curveIndexR) / static_cast<double>(*nbU);*/
-
     leftPlane->setPosition(curve->getPoint(curveIndexL));
     rightPlane->setPosition(curve->getPoint(curveIndexR));
 

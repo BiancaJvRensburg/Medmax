@@ -36,6 +36,7 @@ Q_SIGNALS:
 
 protected:
     void draw();
+    void drawPolyline();
     void init();
     QString helpString() const;
     void updateCamera(const Vec3Df & center, float radius);
