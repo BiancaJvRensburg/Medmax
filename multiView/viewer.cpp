@@ -28,7 +28,7 @@ void Viewer::draw() {
     mesh.draw();
     if(isDrawMesh) mesh.drawCut();
 
-    if(isGhostPlanes)drawPolyline();
+    if(isGhostPlanes) drawPolyline();
 
     //glPolygonMode (GL_FRONT_AND_BACK, GL_FILL);
 
@@ -39,7 +39,7 @@ void Viewer::draw() {
     rightPlane->draw();
 
     glColor3f(0,0,0);
-    for(unsigned int i=0; i<ghostPlanes.size(); i++) ghostPlanes[i]->draw();
+    for(unsigned int i=0; i<ghostPlanes.size(); i++) ghostPlanes[i].draw();
 
     //glPolygonMode (GL_FRONT_AND_BACK, GL_LINE);
 
@@ -63,8 +63,8 @@ void Viewer::drawPolyline(){
         glVertex3f(static_cast<float>(p->x), static_cast<float>(p->y), static_cast<float>(p->z));
 
         for(unsigned int i=0; i<ghostPlanes.size(); i++){
-            if(ghostPlanes[i]->getCurvePoint()==NULL) continue;
-            p = new Vec(ghostPlanes[i]->getCurvePoint()->getX(), ghostPlanes[i]->getCurvePoint()->getY(), ghostPlanes[i]->getCurvePoint()->getZ());
+            if(ghostPlanes[i].getCurvePoint()==NULL) continue;
+            p = new Vec(ghostPlanes[i].getCurvePoint()->getX(), ghostPlanes[i].getCurvePoint()->getY(), ghostPlanes[i].getCurvePoint()->getZ());
             glVertex3f(static_cast<float>(p->x), static_cast<float>(p->y), static_cast<float>(p->z));
         }
 
@@ -144,6 +144,7 @@ void Viewer::drawMesh(){
 
 void Viewer::initGhostPlanes(){
     ghostPlanes.clear();
+    //delete[] ghostLocation;
 
     int finalNb = nbGhostPlanes;
 
@@ -202,6 +203,8 @@ void Viewer::initGhostPlanes(){
         currentNbGhostPlanes = finalNb;
 
         addGhostPlanes(finalNb);
+
+        for(unsigned int i=0; i<ghostPlanes.size(); i++) connect(ghostPlanes[i].getCurvePoint(), &CurvePoint::curvePointTranslated, this, &Viewer::ghostPlaneMoved);
 
         // Update the fibula planes
         double distance = curve->discreteLength(curveIndexL, ghostLocation[0]);
@@ -383,12 +386,6 @@ void Viewer::initPlanes(Movable status){
     leftPlane->setOrientation(getNewOrientation(curveIndexL));
     rightPlane->setOrientation(getNewOrientation(curveIndexR));
 
-
-    if(status == Movable::DYNAMIC){
-        connect(leftPlane->cp, &CurvePoint::curvePointTranslated, curve, &Curve::moveToPoint);
-        connect(rightPlane->cp, &CurvePoint::curvePointTranslated, curve, &Curve::moveToPoint);
-    }
-
     mesh.addPlane(leftPlane);
     mesh.addPlane(rightPlane);
 }
@@ -397,14 +394,31 @@ void Viewer::addGhostPlanes(int nb){
     double distances[nb+1];     // +1 for the last plane
 
     for(unsigned int i=0; i<static_cast<unsigned int>(nb); i++){
-        ghostPlanes.push_back(new Plane(40.0, Movable::DYNAMIC));
-        ghostPlanes[i]->setOrientation(getNewOrientation(ghostLocation[i]));
-        ghostPlanes[i]->setPosition(curve->getPoint(ghostLocation[i]));
+        ghostPlanes.push_back(Plane(40.0, Movable::DYNAMIC));
+        ghostPlanes[i].setOrientation(getNewOrientation(ghostLocation[i]));
+        ghostPlanes[i].setPosition(curve->getPoint(ghostLocation[i]));
         if(i==0) distances[i] = curve->discreteLength(curveIndexL, ghostLocation[i]);
         else distances[i] = curve->discreteLength(ghostLocation[i-1], ghostLocation[i]);
     }
 
     distances[nb] = curve->discreteLength(ghostLocation[nb-1], curveIndexR);
+
+    Q_EMIT ghostPlanesAdded(nb, distances);
+}
+
+void Viewer::ghostPlaneMoved(){
+    // get the new distances
+    // Optimisation: just get the distances from the plane moved
+
+    unsigned int nb = ghostPlanes.size();
+    double distances[nb+1];     // +1 for the last plane
+
+    for(unsigned int i=0; i<static_cast<unsigned int>(nb); i++){
+        if(i==0) distances[i] = segmentLength(*(leftPlane->getPosition()), *(ghostPlanes[i].getCurvePoint()->getPoint()));
+        else distances[i] = segmentLength(*(ghostPlanes[i-1].getCurvePoint()->getPoint()), *(ghostPlanes[i].getCurvePoint()->getPoint()));
+    }
+
+    distances[nb] = segmentLength(*(rightPlane->getPosition()), *(ghostPlanes[nb-1].getCurvePoint()->getPoint()));
 
     Q_EMIT ghostPlanesAdded(nb, distances);
 }
@@ -440,6 +454,10 @@ double Viewer::angle(Vec a, Vec b){
     double ab = a*b;
 
     return acos(ab / (na*nb));
+}
+
+double Viewer::segmentLength(Vec a, Vec b){
+    return sqrt( pow((b.x - a.x), 2) + pow((b.y - a.y), 2) + pow((b.z - a.z), 2));
 }
 
 

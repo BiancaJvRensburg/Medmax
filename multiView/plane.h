@@ -15,6 +15,7 @@ class Plane
 {
 public:
     Plane(double s, Movable status);
+    //virtual ~Plane();
     void setSize(double s){ size = s; }
 
     void setPosition(Vec *pos);
@@ -38,11 +39,10 @@ public:
     CurvePoint* getCurvePoint(){ return cp; }
 
     Movable status;
-    CurvePoint* cp;
 
 private:
     Vec* position;
-    Vec* points[4];
+    Vec points[4];
     double size;
     Frame* mf;
     double rotationPercentage;
@@ -50,6 +50,7 @@ private:
     void rotate(Quaternion q) { mf->rotate(q); }
     //double* curveIndex; // parametre
     Vec normal;
+    CurvePoint* cp;
 };
 
 #endif // PLANE_H

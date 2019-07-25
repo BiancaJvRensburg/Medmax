@@ -21,8 +21,8 @@ void ViewerFibula::movePlanes(int position){
         rightPlane->setOrientation(getNewOrientation(curveIndexR + indexOffset));
 
         for(unsigned int i=0; i<ghostPlanes.size(); i++){
-            ghostPlanes[i]->setPosition(curve->getPoint(ghostLocation[i] + indexOffset));
-            ghostPlanes[i]->setOrientation(getNewOrientation(ghostLocation[i] + indexOffset));
+            ghostPlanes[i].setPosition(curve->getPoint(ghostLocation[i] + indexOffset));
+            ghostPlanes[i].setOrientation(getNewOrientation(ghostLocation[i] + indexOffset));
         }
     }
 
@@ -36,10 +36,10 @@ void ViewerFibula::addGhostPlanes(int nb){
     ghostPlanes.clear();
 
     for(unsigned int i=0; i<static_cast<unsigned int>(nb); i++){
-        ghostPlanes.push_back(new Plane(40.0, Movable::STATIC));
+        ghostPlanes.push_back(Plane(40.0, Movable::STATIC));
 
-        ghostPlanes[i]->setPosition(curve->getCurve()[ghostLocation[i] + indexOffset]);
-        ghostPlanes[i]->setOrientation(getNewOrientation(ghostLocation[i] + indexOffset));
+        ghostPlanes[i].setPosition(curve->getCurve()[ghostLocation[i] + indexOffset]);
+        ghostPlanes[i].setOrientation(getNewOrientation(ghostLocation[i] + indexOffset));
     }
 
     update();
@@ -83,8 +83,8 @@ void ViewerFibula::moveGhostPlaneDistance(double distance){
     // move all planes by the offset
     for(unsigned int i=0; i<ghostPlanes.size(); i++){
         ghostLocation[i] += offset;
-        ghostPlanes[i]->setPosition(curve->getCurve()[ghostLocation[i] + indexOffset]);
-        ghostPlanes[i]->setOrientation(getNewOrientation(ghostLocation[i] + indexOffset));
+        ghostPlanes[i].setPosition(curve->getCurve()[ghostLocation[i] + indexOffset]);
+        ghostPlanes[i].setOrientation(getNewOrientation(ghostLocation[i] + indexOffset));
     }
 
     curveIndexR += offset;

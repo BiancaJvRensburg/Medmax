@@ -32,8 +32,8 @@ public:
 
 public Q_SLOTS:
     void reintialiseCurve();
-    void addControlPoint(ControlPoint*);
-    void moveToPoint(Vec);
+    //void addControlPoint(ControlPoint*);
+    //void moveToPoint(Vec);
 
 Q_SIGNALS:
     void curveReinitialised();
@@ -65,16 +65,16 @@ private:
     double* generateCatmullKnotVector(double alpha);
 
     void initConnections();
-    void updateConnections(ControlPoint*);
+    //void updateConnections(ControlPoint*);
 
     // Frenet frame
     Vec** dt;
 
-    void getModVec(int j, int r, double t, int kI, double offset, double* newPoints);
+    //void getModVec(int j, int r, double t, int kI, double offset, double* newPoints);
 
-    int isSpace();  // Is there space for another control point?
+    //int isSpace();  // Is there space for another control point?
 
-    const int MAX_CNTRL_POINTS = 20;
+    //const int MAX_CNTRL_POINTS = 20;
 
 };
 

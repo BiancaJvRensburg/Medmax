@@ -25,11 +25,17 @@ Plane::Plane(double s, Movable status)
     initBasePlane();
 }
 
+/*Plane::~Plane(){
+   // delete cp;
+    //delete mf;
+    delete position;
+}*/
+
 void Plane::initBasePlane(){
-        points[0] = new Vec(position->x - size, position->y - size, position->z);
-        points[1] = new Vec(position->x - size, position->y + size, position->z);
-        points[2] = new Vec(position->x + size, position->y + size, position->z);
-        points[3] = new Vec(position->x + size, position->y - size, position->z);
+        points[0] = Vec(position->x - size, position->y - size, position->z);
+        points[1] = Vec(position->x - size, position->y + size, position->z);
+        points[2] = Vec(position->x + size, position->y + size, position->z);
+        points[3] = Vec(position->x + size, position->y - size, position->z);
 }
 
 void Plane::draw(){
@@ -40,19 +46,19 @@ void Plane::draw(){
     glEnable(GL_DEPTH_TEST);
 
     glBegin(GL_QUADS);
-        glVertex3f(static_cast<float>(points[0]->x), static_cast<float>(points[0]->y), static_cast<float>(points[0]->z));
-        glVertex3f(static_cast<float>(points[1]->x), static_cast<float>(points[1]->y), static_cast<float>(points[1]->z));
-        glVertex3f(static_cast<float>(points[2]->x), static_cast<float>(points[2]->y), static_cast<float>(points[2]->z));
-        glVertex3f(static_cast<float>(points[3]->x), static_cast<float>(points[3]->y), static_cast<float>(points[3]->z));
+        glVertex3f(static_cast<float>(points[0].x), static_cast<float>(points[0].y), static_cast<float>(points[0].z));
+        glVertex3f(static_cast<float>(points[1].x), static_cast<float>(points[1].y), static_cast<float>(points[1].z));
+        glVertex3f(static_cast<float>(points[2].x), static_cast<float>(points[2].y), static_cast<float>(points[2].z));
+        glVertex3f(static_cast<float>(points[3].x), static_cast<float>(points[3].y), static_cast<float>(points[3].z));
     glEnd();
+
+    if(status==Movable::DYNAMIC) cp->draw();
 
     glDisable(GL_DEPTH);
     glDisable(GL_DEPTH_TEST);
 
     /*glColor3f(1,1,1);
     QGLViewer::drawAxis(15.0);*/
-
-    if(status==Movable::DYNAMIC) cp->draw();
 
     glPopMatrix();
 }

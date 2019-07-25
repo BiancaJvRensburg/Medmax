@@ -34,7 +34,7 @@ Q_SIGNALS:
     void cntrlPointTranslated();
 
 protected:
-    ManipulatedFrame* mf;
+    Frame* mf;
     Vec* p;
 };
 

@@ -5,9 +5,8 @@
 Curve::Curve(long nbCP)
 {
     this->nbU = new long();
-    TabControlPoint = new ControlPoint*[static_cast<unsigned long long>(MAX_CNTRL_POINTS)];
-    if(nbCP <= MAX_CNTRL_POINTS) nbControlPoint = nbCP;
-    else nbControlPoint = MAX_CNTRL_POINTS;
+    nbControlPoint = nbCP;
+    TabControlPoint = new ControlPoint*[static_cast<unsigned long long>(nbControlPoint)];
 
     for(int i=0; i<nbCP; i++){
         TabControlPoint[i] = new ControlPoint();
@@ -18,9 +17,8 @@ Curve::Curve(long nbCP)
 
 Curve::Curve(long nbCP, ControlPoint *cntrlPoints[]){
     this->nbU = new long();
-    TabControlPoint = new ControlPoint*[static_cast<unsigned long long>(MAX_CNTRL_POINTS)];
-    if(nbCP <= MAX_CNTRL_POINTS) nbControlPoint = nbCP;
-    else nbControlPoint = MAX_CNTRL_POINTS;
+    nbControlPoint = nbCP;
+    TabControlPoint = new ControlPoint*[static_cast<unsigned long long>(nbControlPoint)];
 
     for(int i=0; i<nbCP; i++){
         TabControlPoint[i] = cntrlPoints[i];
@@ -35,9 +33,9 @@ void Curve::initConnections(){
     }
 }
 
-void Curve::updateConnections(ControlPoint* p){
+/*void Curve::updateConnections(ControlPoint* p){
     connect(p, &ControlPoint::cntrlPointTranslated, this, &Curve::reintialiseCurve);
-}
+}*/
 
 void Curve::generateBSpline(long nbU, int degree){
     *this->nbU = nbU;
@@ -122,7 +120,7 @@ double* Curve::generateUniformKnotVector(int a){
     return kv;
 }
 
-void Curve::moveToPoint(Vec offset){
+//void Curve::moveToPoint(Vec offset){
     /*int kIndex = 0;
 
     while(t >= knotVector[kIndex+1] && knotVector[kIndex+1] != 1.0) kIndex++;
@@ -160,9 +158,9 @@ void Curve::moveToPoint(Vec offset){
 
     delete[] offsetPoints;
     reintialiseCurve();*/
-}
+//}
 
-void Curve::getModVec(int j, int r, double t, int kI, double offset, double* offsetPoints){
+/*void Curve::getModVec(int j, int r, double t, int kI, double offset, double* offsetPoints){
     if(r==0){
         offsetPoints[j - (kI-degree)] += offset;
         return;
@@ -170,7 +168,7 @@ void Curve::getModVec(int j, int r, double t, int kI, double offset, double* off
     double alpha = (t - knotVector[j]) / (knotVector[j + degree - (r-1)] - knotVector[j]);
     getModVec(j-1, r-1, t, kI, offset*(1.0 - alpha), offsetPoints);
     getModVec(j, r-1, t, kI, offset*alpha, offsetPoints);
-}
+}*/
 
 void Curve::reintialiseCurve(){
    catmullrom();
@@ -181,7 +179,7 @@ void Curve::reintialiseCurve(){
     Q_EMIT curveReinitialised();
 }
 
-void Curve::addControlPoint(ControlPoint* p){
+/*void Curve::addControlPoint(ControlPoint* p){
     if(isSpace()==-1) return;
 
     int i = 0;
@@ -203,7 +201,7 @@ void Curve::addControlPoint(ControlPoint* p){
 int Curve::isSpace(){
     if(nbControlPoint < MAX_CNTRL_POINTS) return 0;
     else return -1;
-}
+}*/
 
 double* Curve::generateCatmullKnotVector(double alpha){
     double* kv = new double[static_cast<unsigned long long>(nbControlPoint)];

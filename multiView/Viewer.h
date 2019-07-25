@@ -27,6 +27,7 @@ public Q_SLOTS:
     virtual void updatePlanes();
     virtual void cutMesh();
     virtual void uncutMesh();
+    virtual void ghostPlaneMoved();
     void drawMesh();
 
 Q_SIGNALS:
@@ -49,6 +50,7 @@ protected:
     Quaternion updateOrientation(int index);
 
     double angle(Vec a, Vec b);
+    double segmentLength(Vec a, Vec b);
     //static int cmpfunc (const void * a, const void * b);
     int partition(int sorted[], int start, int end);
     void quicksort(int sorted[], int start, int end);
@@ -56,7 +58,7 @@ protected:
     Plane *leftPlane;
     Plane *rightPlane;
     Curve *curve;
-    std::vector<Plane*> ghostPlanes;
+    std::vector<Plane> ghostPlanes;
     int nbGhostPlanes;
     int currentNbGhostPlanes;
     bool isGhostPlanes;

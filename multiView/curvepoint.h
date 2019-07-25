@@ -23,6 +23,7 @@ Q_SIGNALS:
     void curvePointTranslated(Vec offset);
 
 private:
+    ManipulatedFrame* manFrame;
     //double* curveIndex;
 };
 
