@@ -394,7 +394,9 @@ void Viewer::addGhostPlanes(int nb){
     double distances[nb+1];     // +1 for the last plane
 
     for(unsigned int i=0; i<static_cast<unsigned int>(nb); i++){
+        //std::cout << "adding plane " << this << std::endl;
         ghostPlanes.push_back(Plane(40.0, Movable::DYNAMIC));
+        //std::cout << "plane added " << this << std::endl;
         ghostPlanes[i].setOrientation(getNewOrientation(ghostLocation[i]));
         ghostPlanes[i].setPosition(curve->getPoint(ghostLocation[i]));
         if(i==0) distances[i] = curve->discreteLength(curveIndexL, ghostLocation[i]);

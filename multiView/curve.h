@@ -11,8 +11,8 @@ class Curve : public QObject
     Q_OBJECT
 
 public:
-    Curve(){}
-    Curve(long nbCP);
+    //Curve(){}
+    //Curve(long nbCP);
     Curve(long nbCP, ControlPoint *cntrlPoints[]);
 
     void generateBSpline(long nbU, int degree);

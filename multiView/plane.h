@@ -16,10 +16,14 @@ class Plane
 public:
     Plane(double s, Movable status);
     //virtual ~Plane();
+    ~Plane(){
+        //std::cout << "destroying plane " << this << std::endl;
+        //delete cp;
+    }
     void setSize(double s){ size = s; }
 
     void setPosition(Vec *pos);
-    void setOrientation(Quaternion q){ mf->setOrientation(q); }
+    void setOrientation(Quaternion q){ cp->getFrame()->setOrientation(q); }
     Quaternion fromRotatedBasis(Vec x, Vec y, Vec z);
 
     /*Vec coordinatesInRef(Vec v){ return mf->coordinatesOfIn(v, mf->referenceFrame()); }
@@ -35,19 +39,19 @@ public:
     double getSign(Vec v);
 
     Vec getProjection(Vec p);
-    Vec* getPosition(){ return position; }
+    Vec* getPosition(){ return cp->getPoint(); }
     CurvePoint* getCurvePoint(){ return cp; }
 
     Movable status;
 
 private:
-    Vec* position;
+    //Vec* position;
     Vec points[4];
     double size;
-    Frame* mf;
+    //Frame* mf;
     double rotationPercentage;
     void initBasePlane();
-    void rotate(Quaternion q) { mf->rotate(q); }
+    void rotate(Quaternion q) { cp->getFrame()->rotate(q); }
     //double* curveIndex; // parametre
     Vec normal;
     CurvePoint* cp;

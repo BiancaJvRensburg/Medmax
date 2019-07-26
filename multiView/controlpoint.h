@@ -13,14 +13,25 @@ class ControlPoint : public QObject
     Q_OBJECT
 
 public:
-    ControlPoint(){ p = new Vec(0,0,0);}
+    //ControlPoint(){ p = new Vec(0,0,0);}
     ControlPoint(Vec* p);
     ControlPoint(double x, double y, double z);
+    ~ControlPoint(){
+        delete mf;
+        delete p;
+    }
 
     Vec* getPoint(){ return p; }
     double getX(){ return p->x; }
     double getY(){ return p->y; }
     double getZ(){ return p->z; }
+    void setPoint(double x, double y, double z){
+        p->x = x;
+        p->y = y;
+        p->z = z;
+    }
+    void setPoint(Vec* p){ this->p = p; }
+    Frame* getFrame(){  return mf; };
 
     void moveControlPoint(Vec newPos);
 

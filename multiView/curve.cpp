@@ -2,7 +2,7 @@
 #include "math.h"
 #include <GL/gl.h>
 
-Curve::Curve(long nbCP)
+/*Curve::Curve(long nbCP)
 {
     this->nbU = new long();
     nbControlPoint = nbCP;
@@ -13,7 +13,7 @@ Curve::Curve(long nbCP)
     }
 
     initConnections();
-}
+}*/
 
 Curve::Curve(long nbCP, ControlPoint *cntrlPoints[]){
     this->nbU = new long();
