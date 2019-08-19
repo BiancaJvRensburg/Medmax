@@ -16,6 +16,7 @@ public Q_SLOTS:
     void movePlaneDistance(double);
     void moveGhostPlaneDistance(double);
     void ghostPlanesRecieved(int, double[]);
+    void middlePlaneMoved(int, double[]);
 
     void initCurve();
 

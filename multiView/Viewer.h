@@ -34,6 +34,7 @@ Q_SIGNALS:
     void leftPosChanged(double);
     void rightPosChanged(double);
     void ghostPlanesAdded(int, double[]);
+    void ghostPlanesTranslated(int, double[]);
 
 protected:
     void draw();

@@ -43,7 +43,7 @@ void Viewer::draw() {
 
     //glPolygonMode (GL_FRONT_AND_BACK, GL_LINE);
 
-    //curve->draw();
+    curve->draw();
 
     //curve->drawControl(); // We want to visualise this at all times
     // curve->drawTangent(curveIndexL);
@@ -412,6 +412,8 @@ void Viewer::ghostPlaneMoved(){
     // get the new distances
     // Optimisation: just get the distances from the plane moved
 
+    //std::cout << "ghost planes moved";
+
     unsigned int nb = ghostPlanes.size();
     double distances[nb+1];     // +1 for the last plane
 
@@ -422,7 +424,7 @@ void Viewer::ghostPlaneMoved(){
 
     distances[nb] = segmentLength(*(rightPlane->getPosition()), *(ghostPlanes[nb-1].getCurvePoint()->getPoint()));
 
-    Q_EMIT ghostPlanesAdded(nb, distances);
+    Q_EMIT ghostPlanesTranslated(nb, distances);
 }
 
 void Viewer::updateCamera(const Vec3Df & center, float radius){

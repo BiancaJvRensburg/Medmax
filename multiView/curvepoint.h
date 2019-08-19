@@ -21,10 +21,6 @@ public Q_SLOTS:
 
 Q_SIGNALS:
     void curvePointTranslated(Vec offset);
-
-//private:
-    //ManipulatedFrame* manFrame;
-    //double* curveIndex;
 };
 
 #endif // CURVEPOINT_H

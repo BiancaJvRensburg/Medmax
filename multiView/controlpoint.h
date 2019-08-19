@@ -13,7 +13,6 @@ class ControlPoint : public QObject
     Q_OBJECT
 
 public:
-    //ControlPoint(){ p = new Vec(0,0,0);}
     ControlPoint(Vec* p);
     ControlPoint(double x, double y, double z);
     ~ControlPoint(){

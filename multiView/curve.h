@@ -43,7 +43,7 @@ private:
     long nbControlPoint;
     Vec **curve;
     long* nbU;
-    bool *controlPointIndicies;
+    //bool *controlPointIndicies;
 
     // BSpline
     int degree;
@@ -60,7 +60,7 @@ private:
     void catmullrom();  // calculate the spline and the first derivative
     void calculateCatmullPoints(Vec* c, Vec* cp, double t);
 
-    bool isControlPoint(int index);
+    //bool isControlPoint(int index);
 
     double* generateCatmullKnotVector(double alpha);
 

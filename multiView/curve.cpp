@@ -249,14 +249,14 @@ void Curve::catmullrom(){
 
     curve = new Vec*[static_cast<unsigned long long>(*nbU)];
     dt = new Vec*[static_cast<unsigned long long>(*nbU)];
-    controlPointIndicies = new bool[static_cast<unsigned long long>(*nbU)];
+   // controlPointIndicies = new bool[static_cast<unsigned long long>(*nbU)];
 
-    for(int i=0; i<*nbU; i++) controlPointIndicies[i] = false;
+    //for(int i=0; i<*nbU; i++) controlPointIndicies[i] = false;
 
     for(int j=1; j<=nbSeg; j++){
         int it=0;
         knotIndex = j;
-        controlPointIndicies[(j-1)*uPerSeg] = true;
+        //controlPointIndicies[(j-1)*uPerSeg] = true;
         for(double i=knotVector[j]; i<knotVector[j+1]; i+=((knotVector[j+1]-knotVector[j])/static_cast<double>(uPerSeg))){
             if((j-1)*uPerSeg+it >= *nbU) return;
             curve[(j-1)*uPerSeg+it] = new Vec();
@@ -321,10 +321,10 @@ void Curve::drawControl(){
 }
 
 // Frenet frame
-bool Curve::isControlPoint(int index){
+/*bool Curve::isControlPoint(int index){
     if(controlPointIndicies[index]) return true;
     return false;
-}
+}*/
 
 Vec Curve::tangent(int index){
     Vec t = Vec(dt[index]->x, dt[index]->y, dt[index]->z);

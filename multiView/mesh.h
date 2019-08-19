@@ -74,7 +74,6 @@ protected:
 
     std::vector <Plane*> planes;
     std::vector <std::vector <unsigned int>> intersectionTriangles;    // Contains the index of the triangle instead of the actual triangle
-    std::vector <unsigned int> interIndex;    // the current index of intersectionTriangles
 
     std::vector <int> flooding;
     std::vector< std::vector<unsigned int>> vertexNeighbours;       // each vertex's neighbours

@@ -95,6 +95,35 @@ void ViewerFibula::moveGhostPlaneDistance(double distance){
     update();
 }
 
+void ViewerFibula::middlePlaneMoved(int nb, double distances[]){
+   // std::cout << "middle plane moved" << std::endl;
+   /* for(int i=0; i<=nb; i++) std::cout << distanes[i] << " ";
+    std::cout<<""<<std::endl;*/
+
+    if(nb==0) return;
+    ghostLocation = new int[nb];
+
+    // find the new locations
+    ghostLocation[0] = curve->indexForLength(curveIndexL, distances[0]);
+    for(int i=1; i<nb; i++) ghostLocation[i] = curve->indexForLength(ghostLocation[i-1], distances[i]);
+    curveIndexR = curve->indexForLength(ghostLocation[nb-1], distances[nb]);
+
+    // update the ghost planes
+    for(unsigned int i=0; i<static_cast<unsigned int>(nb); i++){
+        ghostPlanes[i].setPosition(curve->getCurve()[ghostLocation[i] + indexOffset]);
+        ghostPlanes[i].setOrientation(getNewOrientation(ghostLocation[i] + indexOffset));
+    }
+
+    // update the right plane
+    rightPlane->setPosition(curve->getCurve()[curveIndexR + indexOffset]);
+    rightPlane->setOrientation(getNewOrientation(curveIndexR + indexOffset));
+
+    // update the mesh intersections
+    mesh.updatePlaneIntersections(rightPlane);
+
+    update();
+}
+
 void ViewerFibula::initCurve(){
     const long nbCP = 6;
     ControlPoint* control[nbCP];

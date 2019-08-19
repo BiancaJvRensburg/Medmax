@@ -119,7 +119,6 @@ void Mesh::addPlane(Plane *p){
     std::vector<unsigned int> init;
     intersectionTriangles.push_back(init);
     updatePlaneIntersections(p);
-    interIndex.push_back(0);    // at zero by default
 }
 
 void Mesh::updatePlaneIntersections(){
@@ -229,7 +228,6 @@ void Mesh::createSmoothedTriangles(){
                     }
                     // else don't change the original
                 }
-
             }
         }
         break;
@@ -315,7 +313,6 @@ void Mesh::draw()
     glEnable(GL_DEPTH);
 
     glBegin (GL_TRIANGLES);
-    for(unsigned int i = 0 ; i < interIndex.size(); i++) interIndex[i] = 0;
 
     if(!isCut){
         for(unsigned int i = 0 ; i < triangles.size(); i++){
