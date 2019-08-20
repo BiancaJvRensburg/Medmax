@@ -51,6 +51,22 @@ void Viewer::draw() {
     glPopMatrix();
 }
 
+void Viewer::updatePolyline(){
+    polyline.clear();
+
+    Vec p = *leftPlane->getPosition();
+    polyline.push_back(p);
+
+    for(unsigned int i=0; i<ghostPlanes.size(); i++){
+        if(ghostPlanes[i].getCurvePoint()==NULL) continue;
+        p = Vec(ghostPlanes[i].getCurvePoint()->getX(), ghostPlanes[i].getCurvePoint()->getY(), ghostPlanes[i].getCurvePoint()->getZ());
+        polyline.push_back(p);
+    }
+
+    p = *rightPlane->getPosition();
+    polyline.push_back(p);
+}
+
 void Viewer::drawPolyline(){
     glEnable(GL_DEPTH);
     glEnable(GL_DEPTH_TEST);
@@ -59,17 +75,9 @@ void Viewer::drawPolyline(){
     glBegin(GL_LINE_STRIP);
     glColor3f(0.0, 0.0, 1.0);
 
-        Vec *p = leftPlane->getPosition();
-        glVertex3f(static_cast<float>(p->x), static_cast<float>(p->y), static_cast<float>(p->z));
-
-        for(unsigned int i=0; i<ghostPlanes.size(); i++){
-            if(ghostPlanes[i].getCurvePoint()==NULL) continue;
-            p = new Vec(ghostPlanes[i].getCurvePoint()->getX(), ghostPlanes[i].getCurvePoint()->getY(), ghostPlanes[i].getCurvePoint()->getZ());
-            glVertex3f(static_cast<float>(p->x), static_cast<float>(p->y), static_cast<float>(p->z));
+        for(unsigned int i=0; i<polyline.size(); i++){
+            glVertex3f(static_cast<float>(polyline[i].x), static_cast<float>(polyline[i].y), static_cast<float>(polyline[i].z));
         }
-
-        p = rightPlane->getPosition();
-        glVertex3f(static_cast<float>(p->x), static_cast<float>(p->y), static_cast<float>(p->z));
 
     glEnd();
 
@@ -214,6 +222,8 @@ void Viewer::initGhostPlanes(){
 
     }
     else Q_EMIT ghostPlanesAdded(0,0);
+
+    updatePolyline();
 }
 
 void Viewer::cutMesh(){
@@ -254,7 +264,10 @@ void Viewer::moveLeftPlane(int position){
     double distance;
 
     if(ghostPlanes.size()==0) distance = curve->discreteLength(curveIndexL, curveIndexR);
-    else distance = curve->discreteLength(curveIndexL, ghostLocation[0]);
+    else{
+        updatePolyline();
+        distance = curve->discreteLength(curveIndexL, ghostLocation[0]);
+    }
 
     update();
     Q_EMIT leftPosChanged(distance);
@@ -301,7 +314,10 @@ void Viewer::moveRightPlane(int position){
     double distance;
 
     if(ghostPlanes.size()==0) distance = curve->discreteLength(curveIndexL, curveIndexR);
-    else distance = curve->discreteLength(ghostLocation[ghostPlanes.size()-1], curveIndexR);
+    else{
+        updatePolyline();
+        distance = curve->discreteLength(ghostLocation[ghostPlanes.size()-1], curveIndexR);
+    }
 
     update();
     Q_EMIT rightPosChanged(distance);
@@ -425,6 +441,8 @@ void Viewer::ghostPlaneMoved(){
     distances[nb] = segmentLength(*(rightPlane->getPosition()), *(ghostPlanes[nb-1].getCurvePoint()->getPoint()));
 
     Q_EMIT ghostPlanesTranslated(nb, distances);
+
+    updatePolyline();
 }
 
 void Viewer::updateCamera(const Vec3Df & center, float radius){

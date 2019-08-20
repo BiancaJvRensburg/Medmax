@@ -38,6 +38,7 @@ Q_SIGNALS:
 
 protected:
     void draw();
+    void updatePolyline();
     void drawPolyline();
     void init();
     QString helpString() const;
@@ -60,6 +61,7 @@ protected:
     Plane *rightPlane;
     Curve *curve;
     std::vector<Plane> ghostPlanes;
+    std::vector<Vec> polyline;
     int nbGhostPlanes;
     int currentNbGhostPlanes;
     bool isGhostPlanes;
