@@ -51,14 +51,20 @@ void ViewerFibula::ghostPlanesRecieved(int nb, double distance[]){
         return;
     }
 
-    ghostLocation = new int[nb];
+    ghostLocation = new int[2*nb];
 
-    ghostLocation[0] = curve->indexForLength(curveIndexL, distance[0]);
-    for(int i=1; i<nb; i++) ghostLocation[i] = curve->indexForLength(ghostLocation[i-1], distance[i]);
-    curveIndexR = curve->indexForLength(ghostLocation[nb-1], distance[nb]);
+    int index = curve->indexForLength(curveIndexL, distance[0]);
+    ghostLocation[0] = index;
+    ghostLocation[1] = index+5;
+    for(int i=1; i<nb; i++){
+        index = curve->indexForLength(ghostLocation[2*i-1], distance[i]);
+        ghostLocation[2*i] = index;
+        ghostLocation[2*i+1] = index+5;
+    }
+    curveIndexR = curve->indexForLength(ghostLocation[2*nb-1], distance[nb]);
 
     // doesn't work if its done before the curve is initialised (should never happen)
-    addGhostPlanes(nb);
+    addGhostPlanes(2*nb);
 }
 
 void ViewerFibula::movePlaneDistance(double distance){
@@ -101,6 +107,7 @@ void ViewerFibula::middlePlaneMoved(int nb, double distances[]){
     std::cout<<""<<std::endl;*/
 
     if(nb==0) return;
+    //nb = ghostPlanes.size();
     ghostLocation = new int[nb];
 
     // find the new locations
