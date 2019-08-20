@@ -132,6 +132,21 @@ bool Plane::isIntersection(Vec v0, Vec v1, Vec v2){
     return false;   // if we haven't found a line that meets the criteria
 }
 
+// Polyline intersection angle
+double Plane::getIntersectionAngle(Vec v){
+    Vec a = cp->getFrame()->localCoordinatesOf(v);   // convert the polyline to local coords
+    Vec b;
+    if(a.z < 0 ) b = -normal;
+    else b = normal;
+
+    double na = a.norm();
+    double nb = b.norm();
+
+    double ab = a*b;
+
+    return acos(ab / (na*nb));
+}
+
 
 double Plane::getSign(Vec v){
     Vec tr0 = cp->getFrame()->localCoordinatesOf(v);

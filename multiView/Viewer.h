@@ -53,9 +53,12 @@ protected:
 
     double angle(Vec a, Vec b);
     double segmentLength(Vec a, Vec b);
+    void getPolylinePlaneAngles();
     //static int cmpfunc (const void * a, const void * b);
     int partition(int sorted[], int start, int end);
     void quicksort(int sorted[], int start, int end);
+
+    ManipulatedFrame* viewerFrame;
 
     Plane *leftPlane;
     Plane *rightPlane;

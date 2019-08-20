@@ -29,6 +29,17 @@ public:
     /*Vec coordinatesInRef(Vec v){ return mf->coordinatesOfIn(v, mf->referenceFrame()); }
     Vec refCoordinatesInFrame(Vec v){ return mf->coordinatesOfFrom(v, mf->referenceFrame()); }*/
 
+    Vec localCoordinatesOf(Vec v){ cp->getFrame()->localCoordinatesOf(v); }
+    Vec localInverseCoordinatesOf(Vec v){ cp->getFrame()->localInverseCoordinatesOf(v); }
+    Vec worldCoordinatesOf(Vec v){ cp->getFrame()->inverseCoordinatesOf(v); }
+    Vec worldTransformOf(Vec v){ cp->getFrame()->inverseTransformOf(v); }
+    Vec localCoordinatesFrom(Vec v, const Frame *f){ cp->getFrame()->coordinatesOfFrom(v, f); }
+    Vec coordinatesInFrame(Vec v, const Frame *f){ cp->getFrame()->coordinatesOfIn(v, f); }
+
+    Frame* getFrame(){ return cp->getFrame(); }
+
+    double getIntersectionAngle(Vec v); // angle between the plane normal and the polyline
+
     void rotatePlaneYZ(double percentage);   // rotate around the z axis
     void rotatePlane(Vec axis, double angle);
 

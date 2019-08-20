@@ -65,6 +65,8 @@ void Viewer::updatePolyline(){
 
     p = *rightPlane->getPosition();
     polyline.push_back(p);
+
+    getPolylinePlaneAngles();
 }
 
 void Viewer::drawPolyline(){
@@ -90,7 +92,9 @@ void Viewer::init() {
 
   restoreStateFromFile();
 
-  setManipulatedFrame(new ManipulatedFrame());
+  viewerFrame = new ManipulatedFrame();
+
+  setManipulatedFrame(viewerFrame);
 
   setAxisIsDrawn(false);
 
@@ -468,10 +472,27 @@ Quaternion Viewer::getNewOrientation(int index){
     return s.normalized();
 }
 
+void Viewer::getPolylinePlaneAngles(){
+    // There are always 2 intersections for each polyline segment
+    if(polyline.size()==0) return;
+    double angles[2*(polyline.size()-1)];
+
+    angles[0] = leftPlane->getIntersectionAngle(polyline[1]);
+
+    for(int i=1; i<polyline.size()-1; i++){
+        angles[2*i-1] = ghostPlanes[i-1].getIntersectionAngle(polyline[i-1]);
+        angles[2*i] = ghostPlanes[i-1].getIntersectionAngle(polyline[i+1]);
+    }
+
+    angles[2*(polyline.size()-1)-1] = rightPlane->getIntersectionAngle(polyline[polyline.size()-2]);
+
+    //for(int i=0; i<2*(polyline.size()-1); i++) std::cout << i << " : " << angles[i] * 180.0 / M_PI << std::endl;
+}
+
 double Viewer::angle(Vec a, Vec b){
 
-    double na = a.normalize();
-    double nb = b.normalize();
+    double na = a.norm();
+    double nb = b.norm();
 
     double ab = a*b;
 
