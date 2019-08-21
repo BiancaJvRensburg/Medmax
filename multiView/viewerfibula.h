@@ -24,6 +24,8 @@ public Q_SLOTS:
     void uncutMesh();
 
 private:
+    void findGhostLocations(int nb, double distance[]); // finds the location of the ghost planes + the right plane
+
     int indexOffset;
     int maxOffset;
 };

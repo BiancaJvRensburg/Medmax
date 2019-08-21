@@ -12,8 +12,6 @@ void ViewerFibula::movePlanes(int position){
 
     if(curveIndexL + offset < *nbU && curveIndexL + offset > 0 && curveIndexR + offset < *nbU && curveIndexR + offset > 0){
         indexOffset = offset;
-        /*double percentageL = static_cast<double>(curveIndexL + offset) / static_cast<double>(*nbU);
-        double percentageR = static_cast<double>(curveIndexR + offset) / static_cast<double>(*nbU);*/
 
         leftPlane->setPosition(curve->getPoint(curveIndexL + indexOffset));
         rightPlane->setPosition(curve->getPoint(curveIndexR + indexOffset));
@@ -45,23 +43,29 @@ void ViewerFibula::addGhostPlanes(int nb){
     update();
 }
 
+void ViewerFibula::findGhostLocations(int nb, double distance[]){
+    ghostLocation.clear();
+
+    int index = curve->indexForLength(curveIndexL, distance[0]);
+    ghostLocation.push_back(index);
+    ghostLocation.push_back(index+5);
+    for(int i=1; i<nb; i++){
+        index = curve->indexForLength(ghostLocation[2*i-1], distance[i]);
+        ghostLocation.push_back(index);
+        int nbU = curve->getNbU();
+        if((index+5)<nbU) ghostLocation.push_back(index+5);
+        else ghostLocation.push_back(nbU-1);
+    }
+    curveIndexR = curve->indexForLength(ghostLocation[2*nb-1], distance[nb]);
+}
+
 void ViewerFibula::ghostPlanesRecieved(int nb, double distance[]){
     if(nb==0){
         ghostPlanes.clear();
         return;
     }
 
-    ghostLocation = new int[2*nb];
-
-    int index = curve->indexForLength(curveIndexL, distance[0]);
-    ghostLocation[0] = index;
-    ghostLocation[1] = index+5;
-    for(int i=1; i<nb; i++){
-        index = curve->indexForLength(ghostLocation[2*i-1], distance[i]);
-        ghostLocation[2*i] = index;
-        ghostLocation[2*i+1] = index+5;
-    }
-    curveIndexR = curve->indexForLength(ghostLocation[2*nb-1], distance[nb]);
+    findGhostLocations(nb, distance);
 
     // doesn't work if its done before the curve is initialised (should never happen)
     addGhostPlanes(2*nb);
@@ -102,21 +106,12 @@ void ViewerFibula::moveGhostPlaneDistance(double distance){
 }
 
 void ViewerFibula::middlePlaneMoved(int nb, double distances[]){
-   // std::cout << "middle plane moved" << std::endl;
-   /* for(int i=0; i<=nb; i++) std::cout << distanes[i] << " ";
-    std::cout<<""<<std::endl;*/
-
     if(nb==0) return;
-    //nb = ghostPlanes.size();
-    ghostLocation = new int[nb];
 
-    // find the new locations
-    ghostLocation[0] = curve->indexForLength(curveIndexL, distances[0]);
-    for(int i=1; i<nb; i++) ghostLocation[i] = curve->indexForLength(ghostLocation[i-1], distances[i]);
-    curveIndexR = curve->indexForLength(ghostLocation[nb-1], distances[nb]);
+    findGhostLocations(nb, distances);
 
     // update the ghost planes
-    for(unsigned int i=0; i<static_cast<unsigned int>(nb); i++){
+    for(unsigned int i=0; i<static_cast<unsigned int>(2*nb); i++){
         ghostPlanes[i].setPosition(curve->getCurve()[ghostLocation[i] + indexOffset]);
         ghostPlanes[i].setOrientation(getNewOrientation(ghostLocation[i] + indexOffset));
     }
@@ -156,8 +151,6 @@ void ViewerFibula::initCurve(){
     connect(curve, &Curve::curveReinitialised, this, &Viewer::updatePlanes);
 
     initPlanes(Movable::STATIC);
-
-    //addGhostPlanes(2);
 }
 
 void ViewerFibula::cutMesh(){

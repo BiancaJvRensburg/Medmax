@@ -272,6 +272,16 @@ double Curve::discreteLength(int indexS, int indexE){
     return sqrt( pow((curve[indexE]->x - curve[indexS]->x), 2) + pow((curve[indexE]->y - curve[indexS]->y), 2) + pow((curve[indexE]->z - curve[indexS]->z), 2));
 }
 
+double Curve::discreteChordLength(int indexS, int indexE){
+    double sum = 0;
+
+    for(int i=indexS; i<indexE; i++){
+        sum += discreteLength(i, i+1);
+    }
+
+    return sum;
+}
+
 int Curve::indexForLength(int indexS, double length){
     int i=0;
 

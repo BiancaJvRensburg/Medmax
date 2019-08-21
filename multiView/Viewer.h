@@ -64,6 +64,7 @@ protected:
     Plane *rightPlane;
     Curve *curve;
     std::vector<Plane> ghostPlanes;
+    std::vector<int> ghostLocation;
     std::vector<Vec> polyline;
     int nbGhostPlanes;
     int currentNbGhostPlanes;
@@ -74,7 +75,6 @@ protected:
     long* nbU;
     int sliderMax;
     bool isDrawMesh;
-    int* ghostLocation;
 
     const double constraint = 25;
 

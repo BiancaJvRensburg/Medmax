@@ -208,9 +208,10 @@ void Viewer::initGhostPlanes(){
             }
         }
 
-        ghostLocation = new int[finalNb];
+       // ghostLocation = new int[finalNb];
 
-        for(int i=0; i<finalNb; i++) ghostLocation[i] = maxIndicies[i];
+        ghostLocation.clear();
+        for(int i=0; i<finalNb; i++) ghostLocation.push_back(maxIndicies[i]);
 
         currentNbGhostPlanes = finalNb;
 
@@ -267,7 +268,7 @@ void Viewer::moveLeftPlane(int position){
 
     double distance;
 
-    if(ghostPlanes.size()==0) distance = curve->discreteLength(curveIndexL, curveIndexR);
+    if(!isGhostPlanes) distance = curve->discreteChordLength(curveIndexL, curveIndexR);
     else{
         updatePolyline();
         distance = curve->discreteLength(curveIndexL, ghostLocation[0]);
@@ -317,7 +318,7 @@ void Viewer::moveRightPlane(int position){
 
     double distance;
 
-    if(ghostPlanes.size()==0) distance = curve->discreteLength(curveIndexL, curveIndexR);
+    if(!isGhostPlanes) distance = curve->discreteChordLength(curveIndexL, curveIndexR);
     else{
         updatePolyline();
         distance = curve->discreteLength(ghostLocation[ghostPlanes.size()-1], curveIndexR);
