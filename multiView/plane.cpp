@@ -60,7 +60,15 @@ void Plane::draw(){
 }
 
 void Plane::rotatePlane(Vec axis, double theta){
+    // std::cout << "rotation resetting : " << theta << std::endl;
     rotate(Quaternion(cos(theta/2.0)*axis.x, cos(theta/2.0)*axis.y, cos(theta/2.0)*axis.z, sin(theta/2.0)));
+}
+
+void Plane::rotateNormal(double angle){
+   // std::cout << "rotating : " << angle * 180.0/M_PI << std::endl;
+    Vec axis = Vec(1,0,0);
+    rotatePlane(axis, angle);
+   // std::cout<<"rotated" << std::endl;
 }
 
 void Plane::rotatePlaneYZ(double percentage){
@@ -135,9 +143,9 @@ bool Plane::isIntersection(Vec v0, Vec v1, Vec v2){
 // Polyline intersection angle
 double Plane::getIntersectionAngle(Vec v){
     Vec a = cp->getFrame()->localCoordinatesOf(v);   // convert the polyline to local coords
-    Vec b;
-    if(a.z < 0 ) b = -normal;
-    else b = normal;
+    Vec b = normal;
+    /*if(a.z < 0 ) b = -normal;
+    else b = normal;*/
 
     double na = a.norm();
     double nb = b.norm();

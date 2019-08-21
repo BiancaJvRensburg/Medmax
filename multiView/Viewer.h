@@ -31,14 +31,14 @@ public Q_SLOTS:
     void drawMesh();
 
 Q_SIGNALS:
-    void leftPosChanged(double);
-    void rightPosChanged(double);
-    void ghostPlanesAdded(int, double[]);
-    void ghostPlanesTranslated(int, double[]);
+    void leftPosChanged(double, std::vector<double>);
+    void rightPosChanged(double, std::vector<double>);
+    void ghostPlanesAdded(int, double[], std::vector<double>);
+    void ghostPlanesTranslated(int, double[], std::vector<double>);
 
 protected:
     void draw();
-    void updatePolyline();
+    std::vector<double> updatePolyline();   // returns the new angles between the polyline and the planes
     void drawPolyline();
     void init();
     QString helpString() const;
@@ -53,7 +53,7 @@ protected:
 
     double angle(Vec a, Vec b);
     double segmentLength(Vec a, Vec b);
-    void getPolylinePlaneAngles();
+    std::vector<double> getPolylinePlaneAngles();
     //static int cmpfunc (const void * a, const void * b);
     int partition(int sorted[], int start, int end);
     void quicksort(int sorted[], int start, int end);

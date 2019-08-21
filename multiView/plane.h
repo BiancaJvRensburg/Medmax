@@ -42,6 +42,7 @@ public:
 
     void rotatePlaneYZ(double percentage);   // rotate around the z axis
     void rotatePlane(Vec axis, double angle);
+    void rotateNormal(double angle);
 
     //double getCurveIndex(){ return *curveIndex; }
     void draw();
