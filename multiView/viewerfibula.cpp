@@ -6,13 +6,16 @@ ViewerFibula::ViewerFibula(QWidget *parent, StandardCamera *camera, int sliderMa
     maxOffset = fibulaOffset;
 }
 
+// Move all planes by the same offset (right plane INCLUDED) - when the slider is dragged
 void ViewerFibula::movePlanes(int position){
 
     int offset = static_cast<int>(static_cast<double>(position)/ static_cast<double>(maxOffset) * static_cast<double>(*nbU));
 
+    // Check that it this offset doesn't exceed the size of the fibula
     if(curveIndexL + offset < *nbU && curveIndexL + offset > 0 && curveIndexR + offset < *nbU && curveIndexR + offset > 0){
         indexOffset = offset;
 
+        // Reset the position and orientations of ALL planes
         leftPlane->setPosition(curve->getPoint(curveIndexL + indexOffset));
         rightPlane->setPosition(curve->getPoint(curveIndexR + indexOffset));
         leftPlane->setOrientation(getNewOrientation(curveIndexL + indexOffset));
@@ -24,18 +27,20 @@ void ViewerFibula::movePlanes(int position){
         }
     }
 
+    setPlaneOrientations(angleVectors);
+
     mesh.updatePlaneIntersections();
 
     update();
 
 }
 
+// Add the ghost planes (this should only be called once)
 void ViewerFibula::addGhostPlanes(int nb){
     ghostPlanes.clear();
 
     for(unsigned int i=0; i<static_cast<unsigned int>(nb); i++){
         ghostPlanes.push_back(Plane(25.0, Movable::STATIC));
-
         ghostPlanes[i].setPosition(curve->getCurve()[ghostLocation[i] + indexOffset]);
         ghostPlanes[i].setOrientation(getNewOrientation(ghostLocation[i] + indexOffset));
     }
@@ -43,48 +48,52 @@ void ViewerFibula::addGhostPlanes(int nb){
     update();
 }
 
+
+// Find the locations of the ghost planes from the distances from the planes in the mandible
 void ViewerFibula::findGhostLocations(int nb, double distance[]){
     ghostLocation.clear();
 
     int index = curve->indexForLength(curveIndexL, distance[0]);
     ghostLocation.push_back(index);
-    ghostLocation.push_back(index+15);
-    for(int i=1; i<nb; i++){
+    ghostLocation.push_back(index+15);      // NOTE 15 is just a temporary value
+    for(unsigned int i=1; i<static_cast<unsigned int>(nb); i++){
         index = curve->indexForLength(ghostLocation[2*i-1], distance[i]);
         ghostLocation.push_back(index);
         int nbU = curve->getNbU();
         if((index+15)<nbU) ghostLocation.push_back(index+15);
         else ghostLocation.push_back(nbU-1);
     }
-    curveIndexR = curve->indexForLength(ghostLocation[2*nb-1], distance[nb]);
+    curveIndexR = curve->indexForLength(ghostLocation[2*static_cast<unsigned int>(nb)-1], distance[nb]);
 }
 
+// Re-orientate the planes to correspond to the same angles as the jaw
 void ViewerFibula::setPlaneOrientations(std::vector<Vec> angles){
     if(angles.size()==0) return;
 
-    /*leftPlane->rotateNormal(angles[0]);
-    for(int i=0; i<ghostPlanes.size(); i++) ghostPlanes[i].rotateNormal(angles[i+1]);
-    rightPlane->rotateNormal(angles[angles.size()-1]);*/
+    angleVectors.clear();
+    angleVectors = angles;
 
-    //std::cout << "recieved" <<std::endl;
-    //Vec a = Vec(1.0, 0, 0);
-    Vec normal = Vec(0,0,1.0);
+    // Orientate the left plane
+    Vec normal = leftPlane->getNormal();
     Quaternion s = Quaternion(normal, angles[0]);
     leftPlane->setOrientation(s.normalized());
 
+    // Orientate the ghost planes
     for(unsigned int i=0; i<ghostPlanes.size(); i++){
+        normal = ghostPlanes[i].getNormal();
         s = Quaternion(normal, angles[i]);
         ghostPlanes[i].setOrientation(s.normalized());
     }
 
+    // Orientate the right plane
+    normal = rightPlane->getNormal();
     s = Quaternion(normal, angles[angles.size()-1]);
     rightPlane->setOrientation(s.normalized());
-
 }
 
+// Add ghost planes that correspond to the ghost planes in the jaw
 void ViewerFibula::ghostPlanesRecieved(int nb, double distance[], std::vector<Vec> angles){
-    // TODO use the angles
-
+    // if no ghost planes were actually recieved
     if(nb==0){
         ghostPlanes.clear();
         return;
@@ -93,14 +102,17 @@ void ViewerFibula::ghostPlanesRecieved(int nb, double distance[], std::vector<Ve
     findGhostLocations(nb, distance);
 
     // doesn't work if its done before the curve is initialised (should never happen)
+    // 2*nb ghost planes : there are 2 angles for each plane in the manible, so twice the number of ghost planes
     addGhostPlanes(2*nb);
 
     // Once everything is initialised, adjust the rotation
     setPlaneOrientations(angles);
 }
 
+// When we want to move the right plane (the right plane is moved in the jaw)
 void ViewerFibula::movePlaneDistance(double distance, std::vector<Vec> angles){
     int newIndex;
+
     if(ghostPlanes.size()==0) newIndex = curve->indexForLength(curveIndexL, distance);
     else newIndex = curve->indexForLength(ghostLocation[ghostPlanes.size()-1], distance);
 
@@ -110,12 +122,16 @@ void ViewerFibula::movePlaneDistance(double distance, std::vector<Vec> angles){
     rightPlane->setPosition(curve->getCurve()[curveIndexR + indexOffset]);
     rightPlane->setOrientation(getNewOrientation(curveIndexR + indexOffset));   // initial orientation
 
+    angleVectors.clear();
+    angleVectors = angles;
+
     setPlaneOrientations(angles);
 
     mesh.updatePlaneIntersections(rightPlane);
     update();
 }
 
+// When we want to move all the planes (except the static left) by a distance (the left plane is moved in the jaw)
 void ViewerFibula::moveGhostPlaneDistance(double distance, std::vector<Vec> angles){
     int offset = 0;
     if(ghostPlanes.size()==0) movePlaneDistance(distance, angles);
@@ -132,14 +148,17 @@ void ViewerFibula::moveGhostPlaneDistance(double distance, std::vector<Vec> angl
     rightPlane->setPosition(curve->getCurve()[curveIndexR + indexOffset]);
     rightPlane->setOrientation(getNewOrientation(curveIndexR + indexOffset));   // initial orientation
 
+    angleVectors.clear();
+    angleVectors = angles;
+
     setPlaneOrientations(angles);
 
     mesh.updatePlaneIntersections(rightPlane);
     update();
 }
 
+// One of the ghost planes is moved in the jaw
 void ViewerFibula::middlePlaneMoved(int nb, double distances[], std::vector<Vec> angles){
-    // TODO use the angles
     if(nb==0) return;
 
     findGhostLocations(nb, distances);
@@ -154,6 +173,9 @@ void ViewerFibula::middlePlaneMoved(int nb, double distances[], std::vector<Vec>
     rightPlane->setPosition(curve->getCurve()[curveIndexR + indexOffset]);
     rightPlane->setOrientation(getNewOrientation(curveIndexR + indexOffset));
 
+    angleVectors.clear();
+    angleVectors = angles;
+
     setPlaneOrientations(angles);
 
     // update the mesh intersections
@@ -162,17 +184,16 @@ void ViewerFibula::middlePlaneMoved(int nb, double distances[], std::vector<Vec>
     update();
 }
 
+// Initialise the curve that the planes follow (to eventually be changed to automatically calculate the points)
 void ViewerFibula::initCurve(){
     const long nbCP = 6;
     ControlPoint* control[nbCP];
 
     control[0] = new ControlPoint(108.241, 69.6891, -804.132);
-
     control[1] = new ControlPoint(97.122, 82.1788, -866.868);
     control[2] = new ControlPoint(93.5364, 90.1045, -956.126);
     control[3] = new ControlPoint(83.3966, 92.5807, -1069.7);
     control[4] = new ControlPoint(80.9, 90.1, -1155);
-
     control[5] = new ControlPoint(86.4811, 90.9929, -1199.7);
 
     curve = new Curve(nbCP, control);
@@ -198,6 +219,6 @@ void ViewerFibula::cutMesh(){
 void ViewerFibula::uncutMesh(){
     mesh.setIsCut(Side::EXTERIOR, false);
     isGhostPlanes = false;
-    ghostPlanes.clear();
+    ghostPlanes.clear();        // NOTE To eventually be changed
     update();
 }

@@ -51,16 +51,12 @@ void Plane::rotatePlane(Vec axis, double theta){
     rotate(Quaternion(cos(theta/2.0)*axis.x, cos(theta/2.0)*axis.y, cos(theta/2.0)*axis.z, sin(theta/2.0)));
 }
 
-// May be rendered useless
-void Plane::rotateNormal(double angle){
-    Vec axis = Vec(1,0,0);
-    rotatePlane(axis, angle);
-}
-
-void Plane::rotatePlaneYZ(double percentage){
+void Plane::rotatePlaneXY(double percentage){
+    // Get the percentage to rotate it by
     double r = (percentage - rotationPercentage);
     rotationPercentage = percentage;
 
+    // Get the theta from the percentage
     double theta = (M_PI*2.0)*r + M_PI;
     Vec axis = Vec(1,0,0);
 
@@ -71,11 +67,13 @@ void Plane::setPosition(Vec* pos){
     cp->setPosition(pos);
     cp->getFrame()->setPosition(cp->getX(), cp->getY(), cp->getZ());
 
+    // Only move it if cp is dynamic
     if(status==Movable::DYNAMIC){
         cp->setPosition(pos);
     }
 }
 
+// Set the base from a basis x,y,z
 Quaternion Plane::fromRotatedBasis(Vec x, Vec y, Vec z){
     Quaternion q = Quaternion();
 
@@ -92,13 +90,15 @@ Quaternion Plane::fromRotatedBasis(Vec x, Vec y, Vec z){
 * This is the only thing that the plane deals with
 */
 bool Plane::isIntersection(Vec v0, Vec v1, Vec v2){
+
+    // Put it all into local coordinates
     Vec tr0 = cp->getFrame()->localCoordinatesOf(v0);
     Vec tr1 = cp->getFrame()->localCoordinatesOf(v1);
     Vec tr2 = cp->getFrame()->localCoordinatesOf(v2);
 
     Vec tr[3] = {tr0, tr1, tr2};
 
-    if( (tr0.z < 0 && tr1.z < 0 && tr2.z < 0) || (tr0.z > 0 && tr1.z > 0 && tr2.z > 0) ) return false;
+    if( (tr0.z < 0 && tr1.z < 0 && tr2.z < 0) || (tr0.z > 0 && tr1.z > 0 && tr2.z > 0) ) return false;  // if they all have the same sign
     else{
         for(int i=0; i<3; i++){
 
@@ -110,8 +110,6 @@ bool Plane::isIntersection(Vec v0, Vec v1, Vec v2){
                 }
                 else continue;  // the line is parallel
             }
-
-            double baseD = l.norm();    // the actual length of the segment
 
             double d = normal*(-tr[i]) / (normal*l);
 
@@ -125,26 +123,6 @@ bool Plane::isIntersection(Vec v0, Vec v1, Vec v2){
 
     return false;   // if we haven't found a line that meets the criteria
 }
-
-// Polyline intersection angle
-double Plane::getIntersectionAngle(Vec v){
-    Vec a = cp->getFrame()->localCoordinatesOf(v);   // convert the polyline to local coords
-    Vec b = normal;
-    /*if(a.z < 0 ) b = -normal;
-    else b = normal;*/
-
-    double na = a.norm();
-    double nb = b.norm();
-
-    double ab = a*b;
-
-    return acos(ab / (na*nb));
-}
-
-Vec Plane::getPolylineVector(Vec v){
-    return cp->getFrame()->localCoordinatesOf(v);
-}
-
 
 double Plane::getSign(Vec v){
     Vec tr0 = cp->getFrame()->localCoordinatesOf(v);

@@ -358,22 +358,6 @@ void Viewer::openOFF(QString filename) {
 }
 
 void Viewer::initCurve(){
-    /*const long nbCP = 9;
-    ControlPoint *control[nbCP];
-
-    control[0] = new ControlPoint(-51.946, -19.1294, -18.4682);
-    control[1] = new ControlPoint(-47.56, -22.74, -35.3152);
-    control[2] = new ControlPoint(-38, -40, -60);
-    control[3] = new ControlPoint(-24, -70, -70);
-
-    control[4] = new ControlPoint(0, -91.5282, -74.3305);
-
-    control[5] = new ControlPoint(24, -70, -70);
-    control[6] = new ControlPoint(38, -40, -60);
-    control[7] = new ControlPoint(47.56, -22.74, -35.3152);
-
-    control[8] = new ControlPoint(51.946, -19.1294, -18.4682);*/
-
     const long nbCP = 9;
     ControlPoint *control[nbCP];
 
@@ -400,7 +384,6 @@ void Viewer::initCurve(){
     curve->generateCatmull(nbU);
 
    initPlanes(Movable::STATIC);
-
 }
 
 void Viewer::initPlanes(Movable status){

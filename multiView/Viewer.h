@@ -20,14 +20,14 @@ public :
     Mesh mesh;
 
 public Q_SLOTS:
-    virtual void moveLeftPlane(int);
-    virtual void moveRightPlane(int);
-    virtual void rotateLeftPlane(int);
-    virtual void rotateRightPlane(int);
-    virtual void updatePlanes();
+    void moveLeftPlane(int);
+    void moveRightPlane(int);
+    void rotateLeftPlane(int);
+    void rotateRightPlane(int);
+    void updatePlanes();
     virtual void cutMesh();
     virtual void uncutMesh();
-    virtual void ghostPlaneMoved();
+    void ghostPlaneMoved();
     void drawMesh();
 
 Q_SIGNALS:
@@ -47,14 +47,13 @@ protected:
     virtual void initCurve();
     void initPlanes(Movable status);
     virtual void addGhostPlanes(int nb);
-    virtual void initGhostPlanes();
+    void initGhostPlanes();
     Quaternion getNewOrientation(int index);
     Quaternion updateOrientation(int index);
 
     double angle(Vec a, Vec b);
     double segmentLength(Vec a, Vec b);
     std::vector<Vec> getPolylinePlaneAngles();
-    //static int cmpfunc (const void * a, const void * b);
     int partition(int sorted[], int start, int end);
     void quicksort(int sorted[], int start, int end);
 

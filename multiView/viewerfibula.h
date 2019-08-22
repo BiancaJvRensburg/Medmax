@@ -19,7 +19,6 @@ public Q_SLOTS:
     void middlePlaneMoved(int, double[], std::vector<Vec>);
 
     void initCurve();
-
     void cutMesh();
     void uncutMesh();
 
@@ -29,6 +28,7 @@ private:
 
     int indexOffset;
     int maxOffset;
+    std::vector<Vec> angleVectors;  // the last set of orientation vectors we recieved (kept for when we want to slide the planes along the fibula)
 };
 
 #endif // VIEWERFIBULA_H
