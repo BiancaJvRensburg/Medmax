@@ -142,7 +142,7 @@ void MainWindow::initFileActions(){
 
     QAction *cutMeshAction = new QAction("Cut", this);
     connect(cutMeshAction, &QAction::triggered, skullViewer, &Viewer::cutMesh);
-    connect(cutMeshAction, &QAction::triggered, fibulaViewer, &ViewerFibula::cutMesh);
+    connect(skullViewer, &Viewer::okToCut, fibulaViewer, &ViewerFibula::cutMesh);
 
     QAction *unCutMeshAction = new QAction("Undo cut", this);
     connect(unCutMeshAction, &QAction::triggered, skullViewer, &Viewer::uncutMesh);

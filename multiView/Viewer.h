@@ -35,6 +35,7 @@ Q_SIGNALS:
     void rightPosChanged(double, std::vector<Vec>);
     void ghostPlanesAdded(int, double[], std::vector<Vec>);
     void ghostPlanesTranslated(int, double[], std::vector<Vec>);
+    void okToCut();
 
 protected:
     void draw();

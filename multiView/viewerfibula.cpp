@@ -144,6 +144,7 @@ void ViewerFibula::moveGhostPlaneDistance(double distance, std::vector<Vec> angl
         ghostPlanes[i].setOrientation(getNewOrientation(ghostLocation[i] + indexOffset));
     }
 
+    // TODO gives a problem in extreme cases : check the index is still within bounds
     curveIndexR += offset;
     rightPlane->setPosition(curve->getCurve()[curveIndexR + indexOffset]);
     rightPlane->setOrientation(getNewOrientation(curveIndexR + indexOffset));   // initial orientation
@@ -220,5 +221,8 @@ void ViewerFibula::uncutMesh(){
     mesh.setIsCut(Side::EXTERIOR, false);
     isGhostPlanes = false;
     ghostPlanes.clear();        // NOTE To eventually be changed
+    // Reset their orientations
+    leftPlane->setOrientation(getNewOrientation(curveIndexL));
+    rightPlane->setOrientation(getNewOrientation(curveIndexR));
     update();
 }

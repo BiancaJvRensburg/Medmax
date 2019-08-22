@@ -237,9 +237,12 @@ void Viewer::initGhostPlanes(){
         // Update the fibula planes and polyline
         std::vector<Vec> angles = updatePolyline();
 
-        double distance = curve->discreteLength(curveIndexL, ghostLocation[0]);
+        double distance;
+        if(finalNb > 0) distance = curve->discreteLength(curveIndexL, ghostLocation[0]);
+        else distance = curve->discreteLength(curveIndexL, curveIndexR);
         Q_EMIT leftPosChanged(distance, angles);
-        distance = curve->discreteLength(curveIndexR, ghostLocation[finalNb-1]);
+        if(finalNb > 0) distance = curve->discreteLength(curveIndexR, ghostLocation[finalNb-1]);
+        else distance = curve->discreteLength(curveIndexL, curveIndexR);
         Q_EMIT rightPosChanged(distance, angles);
 
     }
@@ -250,6 +253,16 @@ void Viewer::initGhostPlanes(){
 }
 
 void Viewer::cutMesh(){
+
+    // Get the number of ghost planes from the total number of pieces dialog
+    bool isNumberRecieved;
+    int nbPieces = QInputDialog::getInt(this, "Cut mesh", "Number of pieces", 0, 1, 10, 1, &isNumberRecieved, Qt::WindowFlags());
+    if(isNumberRecieved) nbGhostPlanes = nbPieces-1;
+    else return;
+
+    // The dialog wasn't cancelled so the fibula can be cut
+    Q_EMIT okToCut();
+
     mesh.setIsCut(Side::INTERIOR, true);
     isGhostPlanes = true;
     initGhostPlanes();
@@ -291,6 +304,7 @@ void Viewer::moveLeftPlane(int position){
     std::vector<Vec> angles = updatePolyline();
 
     if(!isGhostPlanes) distance = curve->discreteChordLength(curveIndexL, curveIndexR);
+    else if(ghostPlanes.size()==0) distance = curve->discreteLength(curveIndexL, curveIndexR);  // is cut but no ghost planes
     else{
         distance = curve->discreteLength(curveIndexL, ghostLocation[0]);
     }
@@ -342,6 +356,7 @@ void Viewer::moveRightPlane(int position){
     std::vector<Vec> angles = updatePolyline();
 
     if(!isGhostPlanes) distance = curve->discreteChordLength(curveIndexL, curveIndexR);
+    else if(ghostPlanes.size()==0) distance = curve->discreteLength(curveIndexL, curveIndexR);  // is cut but no ghost planes
     else{
         distance = curve->discreteLength(ghostLocation[ghostPlanes.size()-1], curveIndexR);
     }
@@ -417,6 +432,7 @@ void Viewer::initPlanes(Movable status){
 }
 
 void Viewer::addGhostPlanes(int nb){
+    if(nb==0) return;
     double distances[nb+1];     // +1 for the last plane
 
     for(unsigned int i=0; i<static_cast<unsigned int>(nb); i++){
