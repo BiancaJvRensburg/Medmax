@@ -2,7 +2,6 @@
 
 Plane::Plane(double s, Movable status)
 {
-    //std::cout << "creating plane " << this << std::endl;
     Vec* position = new Vec(0, 0, 0);
     size = s;
     rotationPercentage = 0;
@@ -10,19 +9,8 @@ Plane::Plane(double s, Movable status)
 
     this->status = status;
 
-    //curveIndex = new double();
-
-    if(status==Movable::DYNAMIC){
-        //mf = new ManipulatedFrame();
-        //*curveIndex = 0;
-        cp = new CurvePoint(position);
-    }
-    else{
-        //mf = new Frame();
-        //*curveIndex = 0;
-        //cp = NULL;
-        cp = new CurvePoint(position);
-    }
+    if(status==Movable::DYNAMIC) cp = new CurvePoint(position);
+    else cp = new CurvePoint(position);
 
     initBasePlane();
 }
@@ -60,15 +48,13 @@ void Plane::draw(){
 }
 
 void Plane::rotatePlane(Vec axis, double theta){
-    // std::cout << "rotation resetting : " << theta << std::endl;
     rotate(Quaternion(cos(theta/2.0)*axis.x, cos(theta/2.0)*axis.y, cos(theta/2.0)*axis.z, sin(theta/2.0)));
 }
 
+// May be rendered useless
 void Plane::rotateNormal(double angle){
-   // std::cout << "rotating : " << angle * 180.0/M_PI << std::endl;
     Vec axis = Vec(1,0,0);
     rotatePlane(axis, angle);
-   // std::cout<<"rotated" << std::endl;
 }
 
 void Plane::rotatePlaneYZ(double percentage){
@@ -153,6 +139,10 @@ double Plane::getIntersectionAngle(Vec v){
     double ab = a*b;
 
     return acos(ab / (na*nb));
+}
+
+Vec Plane::getPolylineVector(Vec v){
+    return cp->getFrame()->localCoordinatesOf(v);
 }
 
 

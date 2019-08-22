@@ -39,6 +39,7 @@ public:
     Frame* getFrame(){ return cp->getFrame(); }
 
     double getIntersectionAngle(Vec v); // angle between the plane normal and the polyline
+    Vec getPolylineVector(Vec v);   // Return the vector v in the coordinates of this plane (could be done w/ another function)
 
     void rotatePlaneYZ(double percentage);   // rotate around the z axis
     void rotatePlane(Vec axis, double angle);

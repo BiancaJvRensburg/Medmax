@@ -59,16 +59,30 @@ void ViewerFibula::findGhostLocations(int nb, double distance[]){
     curveIndexR = curve->indexForLength(ghostLocation[2*nb-1], distance[nb]);
 }
 
-void ViewerFibula::setPlaneOrientations(std::vector<double> angles){
+void ViewerFibula::setPlaneOrientations(std::vector<Vec> angles){
     if(angles.size()==0) return;
 
-    leftPlane->rotateNormal(angles[0]);
+    /*leftPlane->rotateNormal(angles[0]);
     for(int i=0; i<ghostPlanes.size(); i++) ghostPlanes[i].rotateNormal(angles[i+1]);
-    rightPlane->rotateNormal(angles[angles.size()-1]);
+    rightPlane->rotateNormal(angles[angles.size()-1]);*/
+
+    //std::cout << "recieved" <<std::endl;
+    //Vec a = Vec(1.0, 0, 0);
+    Vec normal = Vec(0,0,1.0);
+    Quaternion s = Quaternion(normal, angles[0]);
+    leftPlane->setOrientation(s.normalized());
+
+    for(unsigned int i=0; i<ghostPlanes.size(); i++){
+        s = Quaternion(normal, angles[i]);
+        ghostPlanes[i].setOrientation(s.normalized());
+    }
+
+    s = Quaternion(normal, angles[angles.size()-1]);
+    rightPlane->setOrientation(s.normalized());
 
 }
 
-void ViewerFibula::ghostPlanesRecieved(int nb, double distance[], std::vector<double> angles){
+void ViewerFibula::ghostPlanesRecieved(int nb, double distance[], std::vector<Vec> angles){
     // TODO use the angles
 
     if(nb==0){
@@ -80,9 +94,12 @@ void ViewerFibula::ghostPlanesRecieved(int nb, double distance[], std::vector<do
 
     // doesn't work if its done before the curve is initialised (should never happen)
     addGhostPlanes(2*nb);
+
+    // Once everything is initialised, adjust the rotation
+    setPlaneOrientations(angles);
 }
 
-void ViewerFibula::movePlaneDistance(double distance, std::vector<double> angles){
+void ViewerFibula::movePlaneDistance(double distance, std::vector<Vec> angles){
     int newIndex;
     if(ghostPlanes.size()==0) newIndex = curve->indexForLength(curveIndexL, distance);
     else newIndex = curve->indexForLength(ghostLocation[ghostPlanes.size()-1], distance);
@@ -99,7 +116,7 @@ void ViewerFibula::movePlaneDistance(double distance, std::vector<double> angles
     update();
 }
 
-void ViewerFibula::moveGhostPlaneDistance(double distance, std::vector<double> angles){
+void ViewerFibula::moveGhostPlaneDistance(double distance, std::vector<Vec> angles){
     int offset = 0;
     if(ghostPlanes.size()==0) movePlaneDistance(distance, angles);
     else offset = curve->indexForLength(curveIndexL, distance) - ghostLocation[0];
@@ -121,7 +138,7 @@ void ViewerFibula::moveGhostPlaneDistance(double distance, std::vector<double> a
     update();
 }
 
-void ViewerFibula::middlePlaneMoved(int nb, double distances[], std::vector<double> angles){
+void ViewerFibula::middlePlaneMoved(int nb, double distances[], std::vector<Vec> angles){
     // TODO use the angles
     if(nb==0) return;
 
@@ -136,6 +153,8 @@ void ViewerFibula::middlePlaneMoved(int nb, double distances[], std::vector<doub
     // update the right plane
     rightPlane->setPosition(curve->getCurve()[curveIndexR + indexOffset]);
     rightPlane->setOrientation(getNewOrientation(curveIndexR + indexOffset));
+
+    setPlaneOrientations(angles);
 
     // update the mesh intersections
     mesh.updatePlaneIntersections(rightPlane);

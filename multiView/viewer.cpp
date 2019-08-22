@@ -51,10 +51,10 @@ void Viewer::draw() {
     glPopMatrix();
 }
 
-std::vector<double> Viewer::updatePolyline(){
+std::vector<Vec> Viewer::updatePolyline(){
 
     if(!isGhostPlanes){
-        std::vector<double> angles;
+        std::vector<Vec> angles;
         return angles;   // return an empty vector
     }
     polyline.clear();
@@ -225,7 +225,7 @@ void Viewer::initGhostPlanes(){
         for(unsigned int i=0; i<ghostPlanes.size(); i++) connect(ghostPlanes[i].getCurvePoint(), &CurvePoint::curvePointTranslated, this, &Viewer::ghostPlaneMoved);
 
         // Update the fibula planes and polyline
-        std::vector<double> angles = updatePolyline();
+        std::vector<Vec> angles = updatePolyline();
 
         double distance = curve->discreteLength(curveIndexL, ghostLocation[0]);
         Q_EMIT leftPosChanged(distance, angles);
@@ -234,7 +234,7 @@ void Viewer::initGhostPlanes(){
 
     }
     else{
-        std::vector<double> angles = updatePolyline();
+        std::vector<Vec> angles = updatePolyline();
         Q_EMIT ghostPlanesAdded(0,0,angles);
     }
 }
@@ -276,7 +276,7 @@ void Viewer::moveLeftPlane(int position){
 
     double distance;
 
-    std::vector<double> angles = updatePolyline();
+    std::vector<Vec> angles = updatePolyline();
 
     if(!isGhostPlanes) distance = curve->discreteChordLength(curveIndexL, curveIndexR);
     else{
@@ -327,7 +327,8 @@ void Viewer::moveRightPlane(int position){
 
     double distance;
 
-    std::vector<double> angles = updatePolyline();
+    std::vector<Vec> angles = updatePolyline();
+
     if(!isGhostPlanes) distance = curve->discreteChordLength(curveIndexL, curveIndexR);
     else{
         distance = curve->discreteLength(ghostLocation[ghostPlanes.size()-1], curveIndexR);
@@ -435,7 +436,7 @@ void Viewer::addGhostPlanes(int nb){
 
     distances[nb] = curve->discreteLength(ghostLocation[nb-1], curveIndexR);
 
-    std::vector<double> angles = updatePolyline();
+    std::vector<Vec> angles = updatePolyline();
 
     Q_EMIT ghostPlanesAdded(nb, distances, angles);
 }
@@ -456,7 +457,7 @@ void Viewer::ghostPlaneMoved(){
 
     distances[nb] = segmentLength(*(rightPlane->getPosition()), *(ghostPlanes[nb-1].getCurvePoint()->getPoint()));
 
-    std::vector<double> angles = updatePolyline();
+    std::vector<Vec> angles = updatePolyline();
 
     Q_EMIT ghostPlanesTranslated(nb, distances, angles);
 }
@@ -485,21 +486,21 @@ Quaternion Viewer::getNewOrientation(int index){
     return s.normalized();
 }
 
-std::vector<double> Viewer::getPolylinePlaneAngles(){
+std::vector<Vec> Viewer::getPolylinePlaneAngles(){
     // There are always 2 intersections for each polyline segment
-    std::vector<double> angles;
+    std::vector<Vec> angles;
 
     if(polyline.size()==0) return angles;
     //std::vector<double> angles = new double[2*(polyline.size()-1)];
 
-    angles.push_back(leftPlane->getIntersectionAngle(polyline[1]));
+    angles.push_back(leftPlane->getPolylineVector(polyline[1]));
 
     for(int i=1; i<polyline.size()-1; i++){
-        angles.push_back(ghostPlanes[i-1].getIntersectionAngle(polyline[i-1]));
-        angles.push_back(ghostPlanes[i-1].getIntersectionAngle(polyline[i+1]));
+        angles.push_back(ghostPlanes[i-1].getPolylineVector(polyline[i-1]));
+        angles.push_back(ghostPlanes[i-1].getPolylineVector(polyline[i+1]));
     }
 
-    angles.push_back(rightPlane->getIntersectionAngle(polyline[polyline.size()-2]));
+    angles.push_back(rightPlane->getPolylineVector(polyline[polyline.size()-2]));
 
     //for(int i=0; i<2*(polyline.size()-1); i++) std::cout << i << " : " << angles[i] * 180.0 / M_PI << std::endl;
 

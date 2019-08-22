@@ -13,10 +13,10 @@ public:
 
 public Q_SLOTS:
     void movePlanes(int);
-    void movePlaneDistance(double, std::vector<double>);
-    void moveGhostPlaneDistance(double, std::vector<double>);
-    void ghostPlanesRecieved(int, double[], std::vector<double>);
-    void middlePlaneMoved(int, double[], std::vector<double>);
+    void movePlaneDistance(double, std::vector<Vec>);
+    void moveGhostPlaneDistance(double, std::vector<Vec>);
+    void ghostPlanesRecieved(int, double[], std::vector<Vec>);
+    void middlePlaneMoved(int, double[], std::vector<Vec>);
 
     void initCurve();
 
@@ -25,7 +25,7 @@ public Q_SLOTS:
 
 private:
     void findGhostLocations(int nb, double distance[]); // finds the location of the ghost planes + the right plane
-    void setPlaneOrientations(std::vector<double> angles);
+    void setPlaneOrientations(std::vector<Vec> angles);
 
     int indexOffset;
     int maxOffset;
