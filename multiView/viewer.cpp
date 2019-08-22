@@ -51,19 +51,22 @@ void Viewer::draw() {
     glPopMatrix();
 }
 
+// Updates the polyline vector and angles when a plane is moved (sends the angles to the fibula)
 std::vector<Vec> Viewer::updatePolyline(){
 
+    // if its not cut / are no ghost planes
     if(!isGhostPlanes){
         std::vector<Vec> angles;
         return angles;   // return an empty vector
     }
+
     polyline.clear();
 
     Vec p = *leftPlane->getPosition();
     polyline.push_back(p);
 
     for(unsigned int i=0; i<ghostPlanes.size(); i++){
-        if(ghostPlanes[i].getCurvePoint()==NULL) continue;
+        if(ghostPlanes[i].getCurvePoint()==nullptr) continue;
         p = Vec(ghostPlanes[i].getCurvePoint()->getX(), ghostPlanes[i].getCurvePoint()->getY(), ghostPlanes[i].getCurvePoint()->getZ());
         polyline.push_back(p);
     }
@@ -77,16 +80,23 @@ std::vector<Vec> Viewer::updatePolyline(){
 void Viewer::drawPolyline(){
     glEnable(GL_DEPTH);
     glEnable(GL_DEPTH_TEST);
-    glColor3f(0.0, 1.0, 0.0);
+
+    glLineWidth(5.0);
 
     glBegin(GL_LINE_STRIP);
-    glColor3f(0.0, 0.0, 1.0);
 
         for(unsigned int i=0; i<polyline.size(); i++){
+            // Looks at the previous
+            // if the distance is greater than the constraint : blue
+            if(i==0 || segmentLength(polyline[i], polyline[i-1]) > constraint) glColor3f(0.0, 0.0, 1.0);
+            // if it violates the constraint, then red
+            else glColor3f(1.0, 0.0, 0.0);
             glVertex3f(static_cast<float>(polyline[i].x), static_cast<float>(polyline[i].y), static_cast<float>(polyline[i].z));
         }
 
     glEnd();
+
+    glLineWidth(1.0);
 
     glDisable(GL_DEPTH);
     glDisable(GL_DEPTH_TEST);
@@ -161,7 +171,6 @@ void Viewer::drawMesh(){
 
 void Viewer::initGhostPlanes(){
     ghostPlanes.clear();
-    //delete[] ghostLocation;
 
     int finalNb = nbGhostPlanes;
 
@@ -171,6 +180,7 @@ void Viewer::initGhostPlanes(){
     const int endI = curve->indexForLength(curveIndexR, -constraint);
     const int searchArea = endI - startI;
 
+    // if there's enough space for a plane
     if(searchArea > 0){
 
         int sorted[searchArea];
@@ -179,13 +189,14 @@ void Viewer::initGhostPlanes(){
             sorted[i] = startI+i;
         }
 
+        // Sort the indicies according to their tangent angles
         quicksort(sorted, 0, searchArea-1);
 
         maxIndicies[0] = sorted[0];
         int sortedIndex = 1;
 
         for(int i=1; i<nbGhostPlanes; i++){
-            // the constraint
+            // the constraint (don't take it if it's too close to another existing plane)
             bool tooClose;
             do{
                 tooClose = false;
@@ -213,11 +224,10 @@ void Viewer::initGhostPlanes(){
             }
         }
 
-       // ghostLocation = new int[finalNb];
-
         ghostLocation.clear();
         for(int i=0; i<finalNb; i++) ghostLocation.push_back(maxIndicies[i]);
 
+        // the number of ghost planes we can currently fit
         currentNbGhostPlanes = finalNb;
 
         addGhostPlanes(finalNb);
@@ -253,6 +263,7 @@ void Viewer::uncutMesh(){
     update();
 }
 
+// Slide the left plane
 void Viewer::moveLeftPlane(int position){
 
     double percentage = static_cast<double>(position) / static_cast<double>(sliderMax);
@@ -264,10 +275,10 @@ void Viewer::moveLeftPlane(int position){
         if(curveIndexL >= *nbU) curveIndexL = *nbU-1;
         else if(curveIndexL < 0) curveIndexL = 0;   // shouldn't ever happen
     }
-    else if( (curveIndexL == curve->indexForLength(curveIndexR, -constraint)) ) return;
+    else if( curveIndexL == curve->indexForLength(curveIndexR, -constraint) ) return;
     else curveIndexL = curve->indexForLength(curveIndexR, -constraint);
 
-    if(isGhostPlanes) initGhostPlanes();
+    if(isGhostPlanes) initGhostPlanes();        // TODO change this
 
     leftPlane->setPosition(curve->getPoint(curveIndexL));
     leftPlane->setOrientation(getNewOrientation(curveIndexL));
@@ -276,6 +287,7 @@ void Viewer::moveLeftPlane(int position){
 
     double distance;
 
+    // Get the info and send it to the fibula
     std::vector<Vec> angles = updatePolyline();
 
     if(!isGhostPlanes) distance = curve->discreteChordLength(curveIndexL, curveIndexR);
@@ -318,7 +330,7 @@ void Viewer::moveRightPlane(int position){
     else if(curveIndexR == curve->indexForLength(curveIndexL, constraint)) return;
     else curveIndexR = curve->indexForLength(curveIndexL, constraint);
 
-    if(isGhostPlanes) initGhostPlanes();
+    if(isGhostPlanes) initGhostPlanes();        // TODO to change
 
     rightPlane->setPosition(curve->getPoint(curveIndexR));
     rightPlane->setOrientation(getNewOrientation(curveIndexR));
@@ -358,22 +370,6 @@ void Viewer::openOFF(QString filename) {
 }
 
 void Viewer::initCurve(){
-    /*const long nbCP = 9;
-    ControlPoint *control[nbCP];
-
-    control[0] = new ControlPoint(-51.946, -19.1294, -18.4682);
-    control[1] = new ControlPoint(-47.56, -22.74, -35.3152);
-    control[2] = new ControlPoint(-38, -40, -60);
-    control[3] = new ControlPoint(-24, -70, -70);
-
-    control[4] = new ControlPoint(0, -91.5282, -74.3305);
-
-    control[5] = new ControlPoint(24, -70, -70);
-    control[6] = new ControlPoint(38, -40, -60);
-    control[7] = new ControlPoint(47.56, -22.74, -35.3152);
-
-    control[8] = new ControlPoint(51.946, -19.1294, -18.4682);*/
-
     const long nbCP = 9;
     ControlPoint *control[nbCP];
 
@@ -400,7 +396,6 @@ void Viewer::initCurve(){
     curve->generateCatmull(nbU);
 
    initPlanes(Movable::STATIC);
-
 }
 
 void Viewer::initPlanes(Movable status){
@@ -434,7 +429,7 @@ void Viewer::addGhostPlanes(int nb){
         else distances[i] = curve->discreteLength(ghostLocation[i-1], ghostLocation[i]);
     }
 
-    distances[nb] = curve->discreteLength(ghostLocation[nb-1], curveIndexR);
+    distances[nb] = curve->discreteLength(ghostLocation[static_cast<unsigned int>(nb-1)], curveIndexR);
 
     std::vector<Vec> angles = updatePolyline();
 
@@ -442,12 +437,7 @@ void Viewer::addGhostPlanes(int nb){
 }
 
 void Viewer::ghostPlaneMoved(){
-    // get the new distances
-    // Optimisation: just get the distances from the plane moved
-
-    //std::cout << "ghost planes moved";
-
-    unsigned int nb = ghostPlanes.size();
+    int nb = ghostPlanes.size();
     double distances[nb+1];     // +1 for the last plane
 
     for(unsigned int i=0; i<static_cast<unsigned int>(nb); i++){
@@ -481,7 +471,6 @@ void Viewer::updatePlanes(){
 }
 
 Quaternion Viewer::getNewOrientation(int index){
-    //std::cout << "rotation resetting : " << std::endl;
     Quaternion s = Quaternion(Vec(0,0,1.0), curve->tangent(index));
     return s.normalized();
 }
@@ -491,18 +480,15 @@ std::vector<Vec> Viewer::getPolylinePlaneAngles(){
     std::vector<Vec> angles;
 
     if(polyline.size()==0) return angles;
-    //std::vector<double> angles = new double[2*(polyline.size()-1)];
 
     angles.push_back(leftPlane->getPolylineVector(polyline[1]));
 
-    for(int i=1; i<polyline.size()-1; i++){
+    for(unsigned int i=1; i<polyline.size()-1; i++){
         angles.push_back(ghostPlanes[i-1].getPolylineVector(polyline[i-1]));
         angles.push_back(ghostPlanes[i-1].getPolylineVector(polyline[i+1]));
     }
 
     angles.push_back(rightPlane->getPolylineVector(polyline[polyline.size()-2]));
-
-    //for(int i=0; i<2*(polyline.size()-1); i++) std::cout << i << " : " << angles[i] * 180.0 / M_PI << std::endl;
 
     return angles;
 }
