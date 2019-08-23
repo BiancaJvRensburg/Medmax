@@ -102,6 +102,13 @@ void MainWindow::initDisplayDockWidgets(){
     connect(leftPlaneRotationSlider, static_cast<void (QSlider::*)(int)>(&QSlider::sliderMoved), fibulaViewer, &ViewerFibula::rotateLeftPlane);
     connect(rightPlaneRotationSlider, static_cast<void (QSlider::*)(int)>(&QSlider::sliderMoved), fibulaViewer, &ViewerFibula::rotateRightPlane);
 
+    // Allow the viewers to change the values
+    connect(skullViewer, &Viewer::setLRSliderValue, leftPlaneRotationSlider, &QSlider::setValue);
+    connect(skullViewer, &Viewer::setRRSliderValue, rightPlaneRotationSlider, &QSlider::setValue);
+    //connect(leftPlaneSilder, &QSlider::sliderReleased, skullViewer, &Viewer::onLeftSliderReleased);
+    connect(skullViewer, &Viewer::setLMSliderValue, leftPlaneSilder, &QSlider::setValue);
+    connect(skullViewer, &Viewer::setRMSliderValue, rightPlaneSilder, &QSlider::setValue);
+
     // Add the slider (fibula)
     QSlider *fibulaSlider = new QSlider(Qt::Horizontal);
     contentLayoutFibula->addRow("Fibula position slider", fibulaSlider);
@@ -109,6 +116,7 @@ void MainWindow::initDisplayDockWidgets(){
 
     // Connect the fibula slider
     connect(fibulaSlider, static_cast<void (QSlider::*)(int)>(&QSlider::sliderMoved), fibulaViewer, &ViewerFibula::movePlanes);
+    connect(fibulaViewer, &ViewerFibula::setPlaneSliderValue, fibulaSlider, &QSlider::setValue);
 
     // Connect the two views
     connect(skullViewer, &Viewer::leftPosChanged, fibulaViewer, &ViewerFibula::moveGhostPlaneDistance);

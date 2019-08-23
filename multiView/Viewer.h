@@ -29,6 +29,7 @@ public Q_SLOTS:
     virtual void uncutMesh();
     void ghostPlaneMoved();
     void drawMesh();
+    //void onLeftSliderReleased();
 
 Q_SIGNALS:
     void leftPosChanged(double, std::vector<Vec>);
@@ -36,6 +37,11 @@ Q_SIGNALS:
     void ghostPlanesAdded(int, double[], std::vector<Vec>);
     void ghostPlanesTranslated(int, double[], std::vector<Vec>);
     void okToCut();
+    // set the slider to the value
+    void setLRSliderValue(int);   // Left rotation
+    void setRRSliderValue(int);   // Right rotation
+    void setLMSliderValue(int);   // Left movement
+    void setRMSliderValue(int);   // Right movement
 
 protected:
     void draw();

@@ -22,6 +22,9 @@ public Q_SLOTS:
     void cutMesh();
     void uncutMesh();
 
+Q_SIGNALS:
+    void setPlaneSliderValue(int);
+
 private:
     void findGhostLocations(int nb, double distance[]); // finds the location of the ghost planes + the right plane
     void setPlaneOrientations(std::vector<Vec> angles);

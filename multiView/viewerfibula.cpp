@@ -48,6 +48,7 @@ void ViewerFibula::addGhostPlanes(int nb){
         if(overload > 0){
             indexOffset -= overload;
             reinitialisePlanes(i+1);
+            // Q_EMIT setPlaneSliderValue(static_cast<int>( (static_cast<double>(indexOffset)/static_cast<double>(*nbU)) * static_cast<double>(maxOffset) ));
         }
         ghostPlanes[i].setPosition(curve->getCurve()[index + indexOffset]);
         ghostPlanes[i].setOrientation(getNewOrientation(index + indexOffset));
@@ -161,6 +162,7 @@ void ViewerFibula::moveGhostPlaneDistance(double distance, std::vector<Vec> angl
     if(overload > 0){
         indexOffset -= overload;
         reinitialisePlanes(ghostPlanes.size()+1);
+        Q_EMIT setPlaneSliderValue(static_cast<int>( (static_cast<double>(indexOffset)/static_cast<double>(*nbU)) * static_cast<double>(maxOffset) ));
     }
 
     rightPlane->setPosition(curve->getCurve()[curveIndexR + indexOffset]);
@@ -192,6 +194,7 @@ void ViewerFibula::middlePlaneMoved(int nb, double distances[], std::vector<Vec>
     if(overload > 0){
         indexOffset -= overload;
         reinitialisePlanes(ghostPlanes.size()+1); // reinit everything but the right plane
+        Q_EMIT setPlaneSliderValue(static_cast<int>( (static_cast<double>(indexOffset)/static_cast<double>(*nbU)) * static_cast<double>(maxOffset) ));
     }
 
     // update the right plane

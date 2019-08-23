@@ -278,6 +278,7 @@ void Viewer::uncutMesh(){
 
 // Slide the left plane
 void Viewer::moveLeftPlane(int position){
+    //bool isPassed = false;
 
     double percentage = static_cast<double>(position) / static_cast<double>(sliderMax);
     int index = static_cast<int>(percentage * static_cast<double>(*nbU) );
@@ -289,7 +290,10 @@ void Viewer::moveLeftPlane(int position){
         else if(curveIndexL < 0) curveIndexL = 0;   // shouldn't ever happen
     }
     else if( curveIndexL == curve->indexForLength(curveIndexR, -constraint) ) return;
-    else curveIndexL = curve->indexForLength(curveIndexR, -constraint);
+    else{
+        // isPassed = true;
+        curveIndexL = curve->indexForLength(curveIndexR, -constraint);
+    }
 
     if(isGhostPlanes) initGhostPlanes();        // TODO change this
 
@@ -311,8 +315,15 @@ void Viewer::moveLeftPlane(int position){
 
     update();
     Q_EMIT leftPosChanged(distance, angles);
-
+    Q_EMIT setLRSliderValue(0);     // Reset the rotation slider
+    // if(isPassed) Q_EMIT setLMSliderValue( static_cast<int>( (static_cast<double>(curveIndexL)/static_cast<double>(*nbU)) * static_cast<double>(sliderMax) ) );
 }
+
+/*void Viewer::onLeftSliderReleased(){
+    // creates an infinite loop if done when the slider value changes
+    // TODO this means moveLeftPlane called twice
+    Q_EMIT setLMSliderValue( (curveIndexL/(*nbU)) / sliderMax );
+}*/
 
 void Viewer::rotateLeftPlane(int position){
     double percentage = static_cast<double>(position) / static_cast<double>(sliderMax);
@@ -331,18 +342,23 @@ void Viewer::rotateRightPlane(int position){
 }
 
 void Viewer::moveRightPlane(int position){
+   // bool isPassed = false;
 
     double percentage = static_cast<double>(position) / static_cast<double>(sliderMax);
     int index = *nbU - 1 - static_cast<int>(percentage * static_cast<double>(*nbU) );
 
-    if( index > curve->indexForLength(curveIndexL, constraint)){
+    if( index > curve->indexForLength(curveIndexL, constraint)){        // its within the correct boundaries
         curveIndexR = index;
 
         if(curveIndexR >= *nbU) curveIndexR = *nbU-1; // shouldn't ever happen either, outside of testing
         else if(curveIndexR < 0) curveIndexR = 0;   // shouldn't ever happen
     }
     else if(curveIndexR == curve->indexForLength(curveIndexL, constraint)) return;
-    else curveIndexR = curve->indexForLength(curveIndexL, constraint);
+    else{
+        //isPassed = true;
+        curveIndexR = curve->indexForLength(curveIndexL, constraint);
+        //Q_EMIT setRMSliderValue( static_cast<int>( (static_cast<double>(curveIndexR)/static_cast<double>(*nbU)) * static_cast<double>(sliderMax) ) );
+    }
 
     if(isGhostPlanes) initGhostPlanes();        // TODO to change
 
@@ -363,6 +379,8 @@ void Viewer::moveRightPlane(int position){
 
     update();
     Q_EMIT rightPosChanged(distance, angles);
+    Q_EMIT setRRSliderValue(0); // Reset the rotation slider
+    //if(isPassed) Q_EMIT setRMSliderValue( static_cast<int>( (static_cast<double>(curveIndexR)/static_cast<double>(*nbU)) * static_cast<double>(sliderMax) ) );
 }
 
 void Viewer::openOFF(QString filename) {
@@ -436,9 +454,11 @@ void Viewer::addGhostPlanes(int nb){
     double distances[nb+1];     // +1 for the last plane
 
     for(unsigned int i=0; i<static_cast<unsigned int>(nb); i++){
-        //std::cout << "adding plane " << this << std::endl;
+        //std::cout << "adding plane " << std::endl;
         ghostPlanes.push_back(Plane(40.0, Movable::DYNAMIC));
-        //std::cout << "plane added " << this << std::endl;
+        //std::cout << "plane added " << std::endl;
+        //std::cout << "size : " << ghostPlanes.size() << std::endl;
+        // ! HERE IS WHERE THE DESTRUCTOR CRASHES (in set Orientation)
         ghostPlanes[i].setOrientation(getNewOrientation(ghostLocation[i]));
         ghostPlanes[i].setPosition(curve->getPoint(ghostLocation[i]));
         if(i==0) distances[i] = curve->discreteLength(curveIndexL, ghostLocation[i]);
