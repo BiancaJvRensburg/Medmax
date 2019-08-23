@@ -53,7 +53,7 @@ protected:
     Quaternion updateOrientation(int index);
 
     double angle(Vec a, Vec b);
-    double segmentLength(Vec a, Vec b);
+    double segmentLength(const Vec a, const Vec b);
     std::vector<Vec> getPolylinePlaneAngles();
     int partition(int sorted[], int start, int end);
     void quicksort(int sorted[], int start, int end);

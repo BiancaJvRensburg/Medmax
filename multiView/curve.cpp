@@ -120,56 +120,6 @@ double* Curve::generateUniformKnotVector(int a){
     return kv;
 }
 
-//void Curve::moveToPoint(Vec offset){
-    /*int kIndex = 0;
-
-    while(t >= knotVector[kIndex+1] && knotVector[kIndex+1] != 1.0) kIndex++;
-
-    double* offsetPoints = new double[static_cast<unsigned long long>(degree+1)];
-    for(int i=0; i<(degree+1); i++) offsetPoints[i] = 0;
-
-    getModVec(kIndex, degree, t, kIndex, 1, offsetPoints);
-
-    double maxOffset = 0;
-    int maxJ = 0;
-
-    for(int i=0; i<(degree+1); i++){
-        int j = i + (kIndex - degree);
-        if(offsetPoints[i] > maxOffset){
-            maxOffset = offsetPoints[i];
-            maxJ = j;
-        }
-    }
-
-    // Fix the first and last points
-    if(maxJ == 0){
-        maxJ = 1;
-        maxOffset = offsetPoints[1];
-    }
-
-    if(maxJ == nbControlPoint-1){
-        maxJ = nbControlPoint-2;
-        maxOffset = offsetPoints[degree-1];
-    }
-
-    offset *= 1.0 / maxOffset;
-
-    TabControlPoint[maxJ]->moveControlPoint( Vec(TabControlPoint[maxJ]->getX() + offset.x, TabControlPoint[maxJ]->getY() + offset.y, TabControlPoint[maxJ]->getZ() + offset.z) );
-
-    delete[] offsetPoints;
-    reintialiseCurve();*/
-//}
-
-/*void Curve::getModVec(int j, int r, double t, int kI, double offset, double* offsetPoints){
-    if(r==0){
-        offsetPoints[j - (kI-degree)] += offset;
-        return;
-    }
-    double alpha = (t - knotVector[j]) / (knotVector[j + degree - (r-1)] - knotVector[j]);
-    getModVec(j-1, r-1, t, kI, offset*(1.0 - alpha), offsetPoints);
-    getModVec(j, r-1, t, kI, offset*alpha, offsetPoints);
-}*/
-
 void Curve::reintialiseCurve(){
    catmullrom();
 
@@ -179,37 +129,13 @@ void Curve::reintialiseCurve(){
     Q_EMIT curveReinitialised();
 }
 
-/*void Curve::addControlPoint(ControlPoint* p){
-    if(isSpace()==-1) return;
-
-    int i = 0;
-    ControlPoint* nextP;
-
-    while(TabControlPoint[i]->getPoint() != p->getPoint()) i++;
-    if(i < *nbU-1) nextP = TabControlPoint[i+1];
-    else return;    // don't do anything for the end point
-
-    ControlPoint* halfway = new ControlPoint( (nextP->getX() + p->getX())/2.0, (nextP->getY() + p->getY())/2.0, (nextP->getZ() + p->getZ())/2.0);
-
-    for(int j=nbControlPoint; j>i+1; j--) TabControlPoint[j] = TabControlPoint[j-1];
-    TabControlPoint[i+1] = halfway;
-    nbControlPoint++;
-    //generateBSpline(nbU, degree);
-    updateConnections(halfway);
-}
-
-int Curve::isSpace(){
-    if(nbControlPoint < MAX_CNTRL_POINTS) return 0;
-    else return -1;
-}*/
-
 double* Curve::generateCatmullKnotVector(double alpha){
     double* kv = new double[static_cast<unsigned long long>(nbControlPoint)];
 
     kv[0] = 0;
 
     for(int i=1; i<nbControlPoint; i++){
-        Vec p = *(TabControlPoint[i]->getPoint()) - *(TabControlPoint[i-1]->getPoint());
+        Vec p = TabControlPoint[i]->getPoint() - TabControlPoint[i-1]->getPoint();
         kv[i] =  pow(p.norm(),alpha) + kv[i-1];
     }
 
@@ -218,7 +144,7 @@ double* Curve::generateCatmullKnotVector(double alpha){
 
 // Catmull rom
 void Curve::calculateCatmullPoints(Vec* c, Vec* cp, double t){
-    Vec p[4] = {*TabControlPoint[knotIndex-1]->getPoint(), *TabControlPoint[knotIndex]->getPoint(), *TabControlPoint[knotIndex+1]->getPoint(), *TabControlPoint[knotIndex+2]->getPoint()};
+    Vec p[4] = {TabControlPoint[knotIndex-1]->getPoint(), TabControlPoint[knotIndex]->getPoint(), TabControlPoint[knotIndex+1]->getPoint(), TabControlPoint[knotIndex+2]->getPoint()};
 
     double t0 = knotVector[knotIndex-1];
     double t1 = knotVector[knotIndex];
@@ -268,10 +194,12 @@ void Curve::catmullrom(){
     }
 }
 
+// Length as the crow flies
 double Curve::discreteLength(int indexS, int indexE){
     return sqrt( pow((curve[indexE]->x - curve[indexS]->x), 2) + pow((curve[indexE]->y - curve[indexS]->y), 2) + pow((curve[indexE]->z - curve[indexS]->z), 2));
 }
 
+// Length of the chord
 double Curve::discreteChordLength(int indexS, int indexE){
     double sum = 0;
 
@@ -282,6 +210,7 @@ double Curve::discreteChordLength(int indexS, int indexE){
     return sum;
 }
 
+// Returns the index which is length away from indexS
 int Curve::indexForLength(int indexS, double length){
     int i=0;
 

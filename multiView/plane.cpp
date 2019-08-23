@@ -16,10 +16,10 @@ Plane::Plane(double s, Movable status)
 }
 
 void Plane::initBasePlane(){
-        points[0] = Vec(cp->getPoint()->x - size, cp->getPoint()->y - size, cp->getPoint()->z);
-        points[1] = Vec(cp->getPoint()->x - size, cp->getPoint()->y + size, cp->getPoint()->z);
-        points[2] = Vec(cp->getPoint()->x + size, cp->getPoint()->y + size, cp->getPoint()->z);
-        points[3] = Vec(cp->getPoint()->x + size, cp->getPoint()->y - size, cp->getPoint()->z);
+        points[0] = Vec(cp->getPoint().x - size, cp->getPoint().y - size, cp->getPoint().z);
+        points[1] = Vec(cp->getPoint().x - size, cp->getPoint().y + size, cp->getPoint().z);
+        points[2] = Vec(cp->getPoint().x + size, cp->getPoint().y + size, cp->getPoint().z);
+        points[3] = Vec(cp->getPoint().x + size, cp->getPoint().y - size, cp->getPoint().z);
 }
 
 void Plane::draw(){

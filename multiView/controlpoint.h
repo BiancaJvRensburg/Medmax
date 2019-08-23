@@ -20,7 +20,7 @@ public:
         delete p;
     }
 
-    Vec* getPoint(){ return p; }
+    const Vec& getPoint(){ return *p; }
     double getX(){ return p->x; }
     double getY(){ return p->y; }
     double getZ(){ return p->z; }

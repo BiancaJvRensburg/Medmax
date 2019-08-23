@@ -62,7 +62,7 @@ std::vector<Vec> Viewer::updatePolyline(){
 
     polyline.clear();
 
-    Vec p = *leftPlane->getPosition();
+    Vec p = leftPlane->getPosition();
     polyline.push_back(p);
 
     for(unsigned int i=0; i<ghostPlanes.size(); i++){
@@ -71,7 +71,7 @@ std::vector<Vec> Viewer::updatePolyline(){
         polyline.push_back(p);
     }
 
-    p = *rightPlane->getPosition();
+    p = rightPlane->getPosition();
     polyline.push_back(p);
 
     return getPolylinePlaneAngles();
@@ -457,11 +457,11 @@ void Viewer::ghostPlaneMoved(){
     double distances[nb+1];     // +1 for the last plane
 
     for(unsigned int i=0; i<static_cast<unsigned int>(nb); i++){
-        if(i==0) distances[i] = segmentLength(*(leftPlane->getPosition()), *(ghostPlanes[i].getCurvePoint()->getPoint()));
-        else distances[i] = segmentLength(*(ghostPlanes[i-1].getCurvePoint()->getPoint()), *(ghostPlanes[i].getCurvePoint()->getPoint()));
+        if(i==0) distances[i] = segmentLength(leftPlane->getPosition(), ghostPlanes[i].getCurvePoint()->getPoint());
+        else distances[i] = segmentLength(ghostPlanes[i-1].getCurvePoint()->getPoint(), ghostPlanes[i].getCurvePoint()->getPoint());
     }
 
-    distances[nb] = segmentLength(*(rightPlane->getPosition()), *(ghostPlanes[nb-1].getCurvePoint()->getPoint()));
+    distances[nb] = segmentLength(rightPlane->getPosition(), ghostPlanes[nb-1].getCurvePoint()->getPoint());
 
     std::vector<Vec> angles = updatePolyline();
 
@@ -519,7 +519,7 @@ double Viewer::angle(Vec a, Vec b){
     return acos(ab / (na*nb));
 }
 
-double Viewer::segmentLength(Vec a, Vec b){
+double Viewer::segmentLength(const Vec a, const Vec b){
     return sqrt( pow((b.x - a.x), 2) + pow((b.y - a.y), 2) + pow((b.z - a.z), 2));
 }
 

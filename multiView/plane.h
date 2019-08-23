@@ -35,9 +35,9 @@ public:
     double getSign(Vec v);
 
     Vec getNormal(){ return normal; }
-    Frame* getFrame(){ return cp->getFrame(); }
+    //const Frame& getFrame(){ return *cp->getFrame(); }
     Vec getProjection(Vec p);
-    Vec* getPosition(){ return cp->getPoint(); }
+    const Vec& getPosition(){ return cp->getPoint(); }
     CurvePoint* getCurvePoint(){ return cp; }
 
     Movable status;
