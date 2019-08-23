@@ -25,6 +25,7 @@ public Q_SLOTS:
 private:
     void findGhostLocations(int nb, double distance[]); // finds the location of the ghost planes + the right plane
     void setPlaneOrientations(std::vector<Vec> angles);
+    void reinitialisePlanes(unsigned int nbToInit);      // Reinitialises the position and orientation of the planes
 
     int indexOffset;
     int maxOffset;

@@ -41,8 +41,16 @@ void ViewerFibula::addGhostPlanes(int nb){
 
     for(unsigned int i=0; i<static_cast<unsigned int>(nb); i++){
         ghostPlanes.push_back(Plane(25.0, Movable::STATIC));
-        ghostPlanes[i].setPosition(curve->getCurve()[ghostLocation[i] + indexOffset]);
-        ghostPlanes[i].setOrientation(getNewOrientation(ghostLocation[i] + indexOffset));
+        int index = ghostLocation[i];
+
+        // If we're too far along the fibula, take it all back
+        int overload = index + indexOffset - curve->getNbU() + 1;   // The amount by which the actual index passes the end of the curve
+        if(overload > 0){
+            indexOffset -= overload;
+            reinitialisePlanes(i+1);
+        }
+        ghostPlanes[i].setPosition(curve->getCurve()[index + indexOffset]);
+        ghostPlanes[i].setOrientation(getNewOrientation(index + indexOffset));
     }
 
     update();
@@ -144,8 +152,17 @@ void ViewerFibula::moveGhostPlaneDistance(double distance, std::vector<Vec> angl
         ghostPlanes[i].setOrientation(getNewOrientation(ghostLocation[i] + indexOffset));
     }
 
-    // TODO gives a problem in extreme cases : check the index is still within bounds
+    // Gives a problem in extreme cases, so we check the index is still within bounds
     curveIndexR += offset;
+    //if(curveIndexR + indexOffset > curve->getNbU()) curveIndexR = curve->getNbU() - 1 - indexOffset;        // Crash protection
+
+    // If we're too far along the fibula, take it all back
+    int overload = curveIndexR + indexOffset - curve->getNbU() + 1;   // The amount by which the actual index passes the end of the curve
+    if(overload > 0){
+        indexOffset -= overload;
+        reinitialisePlanes(ghostPlanes.size()+1);
+    }
+
     rightPlane->setPosition(curve->getCurve()[curveIndexR + indexOffset]);
     rightPlane->setOrientation(getNewOrientation(curveIndexR + indexOffset));   // initial orientation
 
@@ -170,6 +187,13 @@ void ViewerFibula::middlePlaneMoved(int nb, double distances[], std::vector<Vec>
         ghostPlanes[i].setOrientation(getNewOrientation(ghostLocation[i] + indexOffset));
     }
 
+    // If we're too far along the fibula, take it all back
+    int overload = curveIndexR + indexOffset - curve->getNbU() + 1;   // The amount by which the actual index passes the end of the curve
+    if(overload > 0){
+        indexOffset -= overload;
+        reinitialisePlanes(ghostPlanes.size()+1); // reinit everything but the right plane
+    }
+
     // update the right plane
     rightPlane->setPosition(curve->getCurve()[curveIndexR + indexOffset]);
     rightPlane->setOrientation(getNewOrientation(curveIndexR + indexOffset));
@@ -183,6 +207,25 @@ void ViewerFibula::middlePlaneMoved(int nb, double distances[], std::vector<Vec>
     mesh.updatePlaneIntersections(rightPlane);
 
     update();
+}
+
+void ViewerFibula::reinitialisePlanes(unsigned int nbToInit){
+    if(nbToInit==0) return;
+
+    //Move the left plane and all the already initialised ghost planes back
+    leftPlane->setPosition(curve->getCurve()[curveIndexL + indexOffset]);
+    leftPlane->setOrientation(getNewOrientation(curveIndexL + indexOffset));
+
+    if(nbToInit>=ghostPlanes.size()+2){
+        rightPlane->setPosition(curve->getCurve()[curveIndexR + indexOffset]);
+        rightPlane->setOrientation(getNewOrientation(curveIndexR + indexOffset));
+        nbToInit = ghostPlanes.size() + 1;
+    }
+
+    for(unsigned int j=0; j<nbToInit-1; j++){
+        ghostPlanes[j].setPosition(curve->getCurve()[ghostLocation[j] + indexOffset]);
+        ghostPlanes[j].setOrientation(getNewOrientation(ghostLocation[j] + indexOffset));
+    }
 }
 
 // Initialise the curve that the planes follow (to eventually be changed to automatically calculate the points)
