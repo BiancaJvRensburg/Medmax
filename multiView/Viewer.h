@@ -29,7 +29,8 @@ public Q_SLOTS:
     virtual void uncutMesh();
     void ghostPlaneMoved();
     void drawMesh();
-    //void onLeftSliderReleased();
+    void onLeftSliderReleased();
+    void onRightSliderReleased();
 
 Q_SIGNALS:
     void leftPosChanged(double, std::vector<Vec>);

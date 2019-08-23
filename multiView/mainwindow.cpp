@@ -77,13 +77,13 @@ void MainWindow::initDisplayDockWidgets(){
     QFormLayout *contentLayoutFibula = new QFormLayout();
 
     // Add the sliders (skull)
-    QSlider *leftPlaneSilder = new QSlider(Qt::Horizontal);
-    leftPlaneSilder->setMaximum(sliderMax);
-    contentLayoutMand->addRow("Left slider", leftPlaneSilder);
+    QSlider *leftPlaneSlider = new QSlider(Qt::Horizontal);
+    leftPlaneSlider->setMaximum(sliderMax);
+    contentLayoutMand->addRow("Left slider", leftPlaneSlider);
 
-    QSlider *rightPlaneSilder = new QSlider(Qt::Horizontal);
-    rightPlaneSilder->setMaximum(sliderMax);
-    contentLayoutMand->addRow("Right slider", rightPlaneSilder);
+    QSlider *rightPlaneSlider = new QSlider(Qt::Horizontal);
+    rightPlaneSlider->setMaximum(sliderMax);
+    contentLayoutMand->addRow("Right slider", rightPlaneSlider);
 
     // PlaneRotation sliders (skull)
     QSlider *leftPlaneRotationSlider = new QSlider(Qt::Horizontal);
@@ -95,8 +95,8 @@ void MainWindow::initDisplayDockWidgets(){
     contentLayoutMand->addRow("Right rotation", rightPlaneRotationSlider);
 
     // Connect the skull sliders
-    connect(leftPlaneSilder, static_cast<void (QSlider::*)(int)>(&QSlider::sliderMoved), skullViewer, &Viewer::moveLeftPlane);
-    connect(rightPlaneSilder, static_cast<void (QSlider::*)(int)>(&QSlider::sliderMoved), skullViewer, &Viewer::moveRightPlane);
+    connect(leftPlaneSlider, static_cast<void (QSlider::*)(int)>(&QSlider::sliderMoved), skullViewer, &Viewer::moveLeftPlane);
+    connect(rightPlaneSlider, static_cast<void (QSlider::*)(int)>(&QSlider::sliderMoved), skullViewer, &Viewer::moveRightPlane);
     connect(leftPlaneRotationSlider, static_cast<void (QSlider::*)(int)>(&QSlider::sliderMoved), skullViewer, &Viewer::rotateLeftPlane);
     connect(rightPlaneRotationSlider, static_cast<void (QSlider::*)(int)>(&QSlider::sliderMoved), skullViewer, &Viewer::rotateRightPlane);
     connect(leftPlaneRotationSlider, static_cast<void (QSlider::*)(int)>(&QSlider::sliderMoved), fibulaViewer, &ViewerFibula::rotateLeftPlane);
@@ -105,9 +105,10 @@ void MainWindow::initDisplayDockWidgets(){
     // Allow the viewers to change the values
     connect(skullViewer, &Viewer::setLRSliderValue, leftPlaneRotationSlider, &QSlider::setValue);
     connect(skullViewer, &Viewer::setRRSliderValue, rightPlaneRotationSlider, &QSlider::setValue);
-    //connect(leftPlaneSilder, &QSlider::sliderReleased, skullViewer, &Viewer::onLeftSliderReleased);
-    connect(skullViewer, &Viewer::setLMSliderValue, leftPlaneSilder, &QSlider::setValue);
-    connect(skullViewer, &Viewer::setRMSliderValue, rightPlaneSilder, &QSlider::setValue);
+    connect(leftPlaneSlider, &QSlider::sliderReleased, skullViewer, &Viewer::onLeftSliderReleased);
+    connect(rightPlaneSlider, &QSlider::sliderReleased, skullViewer, &Viewer::onRightSliderReleased);
+    connect(skullViewer, &Viewer::setLMSliderValue, leftPlaneSlider, &QSlider::setValue);
+    connect(skullViewer, &Viewer::setRMSliderValue, rightPlaneSlider, &QSlider::setValue);
 
     // Add the slider (fibula)
     QSlider *fibulaSlider = new QSlider(Qt::Horizontal);

@@ -319,11 +319,17 @@ void Viewer::moveLeftPlane(int position){
     // if(isPassed) Q_EMIT setLMSliderValue( static_cast<int>( (static_cast<double>(curveIndexL)/static_cast<double>(*nbU)) * static_cast<double>(sliderMax) ) );
 }
 
-/*void Viewer::onLeftSliderReleased(){
+void Viewer::onLeftSliderReleased(){
     // creates an infinite loop if done when the slider value changes
     // TODO this means moveLeftPlane called twice
-    Q_EMIT setLMSliderValue( (curveIndexL/(*nbU)) / sliderMax );
-}*/
+    Q_EMIT setLMSliderValue( static_cast<int>( (static_cast<double>(curveIndexL)/static_cast<double>(*nbU)) * static_cast<double>(sliderMax) ) );
+}
+
+void Viewer::onRightSliderReleased(){
+    // creates an infinite loop if done when the slider value changes
+    // TODO this means moveLeftPlane called twice
+    Q_EMIT setRMSliderValue( static_cast<int>( sliderMax - (static_cast<double>(curveIndexR)/static_cast<double>(*nbU)) * static_cast<double>(sliderMax) ) );
+}
 
 void Viewer::rotateLeftPlane(int position){
     double percentage = static_cast<double>(position) / static_cast<double>(sliderMax);
@@ -437,7 +443,6 @@ void Viewer::initPlanes(Movable status){
 
     leftPlane = new Plane(40.0, status);
     rightPlane = new Plane(40.0, status);
-
 
     leftPlane->setPosition(curve->getPoint(curveIndexL));
     rightPlane->setPosition(curve->getPoint(curveIndexR));
