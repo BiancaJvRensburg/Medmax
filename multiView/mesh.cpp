@@ -119,6 +119,7 @@ void Mesh::addPlane(Plane *p){
     std::vector<unsigned int> init;
     intersectionTriangles.push_back(init);
     updatePlaneIntersections(p);
+    std::cout << "Plane size : " << planeNeighbours.size() << std::endl;
 }
 
 void Mesh::updatePlaneIntersections(){
@@ -161,9 +162,11 @@ void Mesh::cutMesh(){
                         }
                     }
                 }
-        }
+            }
+            //for(int i=0; i<4; i++) std::cout << i << " (interior) : " << planeNeighbours[i] << std::endl;
         break;
 
+            // fibula
         case Side::EXTERIOR:
             for(unsigned int i=0; i<flooding.size(); i++){
                 if(planeNeighbours[flooding[i]]!= -1){
@@ -177,6 +180,7 @@ void Mesh::cutMesh(){
                     }
                 }
             }
+            for(int i=0; i<8; i++) std::cout << i << " : " << planeNeighbours[i] << std::endl;
         break;
     }
 

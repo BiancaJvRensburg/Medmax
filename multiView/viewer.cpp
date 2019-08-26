@@ -316,7 +316,6 @@ void Viewer::moveLeftPlane(int position){
     update();
     Q_EMIT leftPosChanged(distance, angles);
     Q_EMIT setLRSliderValue(0);     // Reset the rotation slider
-    // if(isPassed) Q_EMIT setLMSliderValue( static_cast<int>( (static_cast<double>(curveIndexL)/static_cast<double>(*nbU)) * static_cast<double>(sliderMax) ) );
 }
 
 void Viewer::onLeftSliderReleased(){
@@ -348,7 +347,6 @@ void Viewer::rotateRightPlane(int position){
 }
 
 void Viewer::moveRightPlane(int position){
-   // bool isPassed = false;
 
     double percentage = static_cast<double>(position) / static_cast<double>(sliderMax);
     int index = *nbU - 1 - static_cast<int>(percentage * static_cast<double>(*nbU) );
@@ -360,11 +358,7 @@ void Viewer::moveRightPlane(int position){
         else if(curveIndexR < 0) curveIndexR = 0;   // shouldn't ever happen
     }
     else if(curveIndexR == curve->indexForLength(curveIndexL, constraint)) return;
-    else{
-        //isPassed = true;
-        curveIndexR = curve->indexForLength(curveIndexL, constraint);
-        //Q_EMIT setRMSliderValue( static_cast<int>( (static_cast<double>(curveIndexR)/static_cast<double>(*nbU)) * static_cast<double>(sliderMax) ) );
-    }
+    else curveIndexR = curve->indexForLength(curveIndexL, constraint);
 
     if(isGhostPlanes) initGhostPlanes();        // TODO to change
 
@@ -386,7 +380,6 @@ void Viewer::moveRightPlane(int position){
     update();
     Q_EMIT rightPosChanged(distance, angles);
     Q_EMIT setRRSliderValue(0); // Reset the rotation slider
-    //if(isPassed) Q_EMIT setRMSliderValue( static_cast<int>( (static_cast<double>(curveIndexR)/static_cast<double>(*nbU)) * static_cast<double>(sliderMax) ) );
 }
 
 void Viewer::openOFF(QString filename) {

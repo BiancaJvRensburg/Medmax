@@ -4,6 +4,8 @@ ViewerFibula::ViewerFibula(QWidget *parent, StandardCamera *camera, int sliderMa
 {
     indexOffset = 0;
     maxOffset = fibulaOffset;
+    isPlanesRecieved = false;
+    isCutSignal = false;
 }
 
 // Move all planes by the same offset (right plane INCLUDED) - when the slider is dragged
@@ -116,6 +118,10 @@ void ViewerFibula::ghostPlanesRecieved(int nb, double distance[], std::vector<Ve
 
     // Once everything is initialised, adjust the rotation
     setPlaneOrientations(angles);
+
+    isPlanesRecieved = true;
+    handleCut();
+    //cutMesh();
 }
 
 // When we want to move the right plane (the right plane is moved in the jaw)
@@ -258,9 +264,38 @@ void ViewerFibula::initCurve(){
 }
 
 void ViewerFibula::cutMesh(){
-    mesh.setIsCut(Side::EXTERIOR, true);
-    isGhostPlanes = true;
+    // This happens before the ghost planes are recieved
+    // Send pointers to the mesh
+    /*std::cout << "Ghost planes in fibula " << ghostPlanes.size() << std::endl;
+    Plane *planes[ghostPlanes.size()];
+    for(int i=0; i<ghostPlanes.size(); i++){
+        *planes[i] = ghostPlanes[i];
+        mesh.addPlane(planes[i]);
+    }*/
+
+    isCutSignal = true;
+    handleCut();
     update();
+}
+
+void ViewerFibula::handleCut(){
+    if(isCutSignal && isPlanesRecieved){
+        // Send pointers to the mesh
+        //std::cout << "Ghost planes in fibula " << ghostPlanes.size() << std::endl;
+        //Plane *planes[ghostPlanes.size()];
+        for(int i=0; i<ghostPlanes.size(); i++){
+            //*planes[i] = ghostPlanes[i];
+            //std::cout<<"Adding plane"<<std::endl;
+            mesh.addPlane(&ghostPlanes[i]);
+            //std::cout<<"Plane added"<<std::endl;
+        }
+
+        //std::cout<<"Cutting"<<std::endl;
+        mesh.setIsCut(Side::EXTERIOR, true);
+        isGhostPlanes = true;
+        isCutSignal = false;
+        isPlanesRecieved = false;
+    }
 }
 
 void ViewerFibula::uncutMesh(){

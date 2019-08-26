@@ -10,6 +10,7 @@ class ViewerFibula : public Viewer
 public:
     ViewerFibula(QWidget *parent, StandardCamera *camera, int sliderMax, int fibulaOffsetMax);
     void addGhostPlanes(int nb);
+    void handleCut();
 
 public Q_SLOTS:
     void movePlanes(int);
@@ -29,6 +30,9 @@ private:
     void findGhostLocations(int nb, double distance[]); // finds the location of the ghost planes + the right plane
     void setPlaneOrientations(std::vector<Vec> angles);
     void reinitialisePlanes(unsigned int nbToInit);      // Reinitialises the position and orientation of the planes
+
+    bool isCutSignal;
+    bool isPlanesRecieved;
 
     int indexOffset;
     int maxOffset;
