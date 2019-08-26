@@ -183,7 +183,16 @@ void Mesh::cutMesh(){
             // fibula
         case Side::EXTERIOR:
             for(unsigned int i=0; i<flooding.size(); i++){
-                if(planeNeighbours[flooding[i]]!= -1){
+                bool isKeep = false;
+                // Only keep it if it belongs to a kept segment
+                for(int k=0; k<segmentsConserved.size(); k++){
+                    if(segmentsConserved[k]==flooding[i]){
+                        isKeep = true;
+                        break;
+                    }
+                }
+                if(isKeep){
+                //if(planeNeighbours[flooding[i]]!= -1){
                     // Get the triangles they belong to
                     for(unsigned int j=0; j<vertexTriangles[i].size(); j++){
                         // If it's not already in the list
