@@ -40,6 +40,8 @@ public:
     const Vec& getPosition(){ return cp->getPoint(); }
     CurvePoint* getCurvePoint(){ return cp; }
 
+    Vec getLocalCoordinates(Vec v) { cp->getFrame()->localCoordinatesOf(v); }
+
     Movable status;
 
 private:

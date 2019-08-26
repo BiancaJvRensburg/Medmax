@@ -212,9 +212,11 @@ void Mesh::cutMesh(){
         if(!truthTriangles[i]) trianglesExtracted.push_back(i);
     }
 
+    if(cuttingSide == Side::EXTERIOR){
+        getSegmentsToKeep();
+    }
     createSmoothedTriangles();
-    // This is called after the flood is merged
-    if(cuttingSide == Side::EXTERIOR) getSegmentsToKeep();
+    if(cuttingSide == Side::EXTERIOR) sendToManible();
 
 }
 
@@ -405,6 +407,63 @@ void Mesh::planeIntersection(unsigned int index){
             }
         }
     }
+}
+
+void Mesh::sendToManible(){
+    std::vector<int> planeNb;       // the plane nb associated
+    std::vector<Vec> convertedVerticies;    // the vertex coordinates in relation to the plane nb
+    std::vector<std::vector<int>>convertedTriangles; // the new indicies of the triangles (3 indicies)
+    int tempVerticies[smoothedVerticies.size()];   // a temporary marker for already converted verticies
+
+    for(int i=0; i<smoothedVerticies.size(); i++) tempVerticies[i] = -1;
+
+    // For every triangle we want to send
+    for(unsigned int i=0; i<trianglesCut.size(); i++){
+
+        // Get the 3 verticies of the triangle
+        unsigned int triVert;
+        std::vector<int> newTriangle;
+
+
+        //std::cout << "Smoothed size " << smoothedVerticies.size() << std::endl;
+
+        for(int j=0; j<3; j++){
+            triVert = triangles[trianglesCut[i]].getVertex(j);       // this must go into smoothedVerticies[triV....]
+           // std::cout << "TriVert " << triVert << std::endl;
+
+            // If converted already
+            if(tempVerticies[triVert] != -1) newTriangle.push_back(tempVerticies[triVert]);
+            // convert to the corresponding plane
+            else{
+                // Get the plane nb
+                int pNb = flooding[triVert];
+                if(pNb >= planes.size()) pNb -= planes.size();
+                planeNb.push_back(pNb);
+
+                // Convert the vertex
+                Vec unConverted = Vec(smoothedVerticies[triVert][0], smoothedVerticies[triVert][1], smoothedVerticies[triVert][3]);
+               // std::cout << "Unconverted : " << unConverted.x << " " << unConverted.y << " " << unConverted.z << std::endl;
+                Vec convertedCoords = unConverted; //planes[i]->getLocalCoordinates(unConverted);
+                //std::cout << "Converted : " << convertedCoords.x << " " << convertedCoords.y << " " << convertedCoords.z << std::endl;
+                convertedVerticies.push_back(convertedCoords);
+                int vertexIndex = convertedVerticies.size() - 1;
+                newTriangle.push_back(vertexIndex);  // set it to the last index of convertedVerticies
+
+                // Store the corresponding index in tempVerticies
+                tempVerticies[triVert] = vertexIndex;
+            }
+        }
+
+        // Add the triangle
+        convertedTriangles.push_back(newTriangle);
+
+    }
+
+    /*for(int i=0; i<convertedTriangles.size(); i++){
+        for(int j=0; j<3; j++){
+            std::cout << i << " : (plane) " << planeNb[i] << " , (vertice) : " << smoothedVerticies[convertedTriangles[i][j]][0] << " " << smoothedVerticies[convertedTriangles[i][j]][1] << " " << smoothedVerticies[convertedTriangles[i][j]][2] << std::endl;
+        }
+    }*/
 }
 
 void Mesh::draw()

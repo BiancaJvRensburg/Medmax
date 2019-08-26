@@ -71,6 +71,8 @@ protected:
 
     void cutMesh();
 
+    void sendToManible();
+
     std::vector <Vec3Df> vertices;      // starting verticies
     std::vector <Triangle> triangles;       // starting triangles
 
@@ -82,7 +84,7 @@ protected:
     std::vector< std::vector<unsigned int>> vertexTriangles;        // the triangles each vertex belongs to
     std::vector<int> planeNeighbours;       // which planes are neighbours
     bool isCut = false;
-    std::vector<unsigned int> trianglesCut;     // The list of triangles after the cutting
+    std::vector<unsigned int> trianglesCut;     // The list of triangles after the cutting (a list of triangle indicies)
     std::vector<unsigned int> trianglesExtracted;       // The list of triangles taken out (the complement of trianglesCut)
     std::vector<int> segmentsConserved; // filled with flooding values to keep
 
