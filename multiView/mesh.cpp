@@ -269,6 +269,7 @@ void Mesh::createSmoothedTriangles(){
                  // find which verticies to keep
                 for(unsigned int k=0; k<3; k++){
                     unsigned int vertexIndex = triangles[intersectionTriangles[i][j]].getVertex(k);
+                    // here we only change it if it's outside of the cut (fine for mandible)
                     if(planeNeighbours[flooding[vertexIndex]] != -1){   // if we need to change it
                         Vec newVertex = planes[i]->getProjection(Vec(static_cast<double>(vertices[vertexIndex][0]), static_cast<double>(vertices[vertexIndex][1]), static_cast<double>(vertices[vertexIndex][2])) );
                         smoothedVerticies[vertexIndex] = Vec3Df(static_cast<float>(newVertex.x), static_cast<float>(newVertex.y), static_cast<float>(newVertex.z)); // get the projection
@@ -280,22 +281,47 @@ void Mesh::createSmoothedTriangles(){
         }
         break;
 
-        case Side::EXTERIOR:
+        /*case Side::EXTERIOR:
         for(unsigned int i=0; i<planes.size(); i++){
             // for each triangle cut
             for(unsigned long long j=0; j<intersectionTriangles[static_cast<unsigned long long>(i)].size(); j++){
                  // find which verticies to keep
                 for(unsigned int k=0; k<3; k++){
                     unsigned int vertexIndex = triangles[intersectionTriangles[i][j]].getVertex(k);
-                    if(planeNeighbours[flooding[vertexIndex]] ==  -1){   // if we need to change it
+                    // We need to change it if they have different flooding values
+                    //int vertexIndex = getStrayIndex(i,j);
+                    if(planeNeighbours[flooding[vertexIndex]] != -1){   // if we need to change it
+                        // std::cout << "changing " << std::endl;
                         Vec newVertex = planes[i]->getProjection(Vec(static_cast<double>(vertices[vertexIndex][0]), static_cast<double>(vertices[vertexIndex][1]), static_cast<double>(vertices[vertexIndex][2])) );
                         smoothedVerticies[vertexIndex] = Vec3Df(static_cast<float>(newVertex.x), static_cast<float>(newVertex.y), static_cast<float>(newVertex.z)); // get the projection
                     }
                     // else don't change the original
-                }
+               }
             }
         }
-        break;
+        break;*/
+
+        case Side::EXTERIOR:
+            for(unsigned int i=0; i<planes.size(); i++){
+                // for each triangle cut
+                for(unsigned long long j=0; j<intersectionTriangles[static_cast<unsigned long long>(i)].size(); j++){
+                     // find which verticies to keep
+                    for(unsigned int k=0; k<3; k++){
+                        unsigned int vertexIndex = triangles[intersectionTriangles[i][j]].getVertex(k);
+
+                        bool isOutlier = true;
+                        for(int l=0; l<segmentsConserved.size(); l++)
+                            if(flooding[vertexIndex] == segmentsConserved[l]) isOutlier = false;
+
+                        if(planeNeighbours[flooding[vertexIndex]]==-1 || isOutlier){   // if we need to change it
+                            Vec newVertex = planes[i]->getProjection(Vec(static_cast<double>(vertices[vertexIndex][0]), static_cast<double>(vertices[vertexIndex][1]), static_cast<double>(vertices[vertexIndex][2])) );
+                            smoothedVerticies[vertexIndex] = Vec3Df(static_cast<float>(newVertex.x), static_cast<float>(newVertex.y), static_cast<float>(newVertex.z)); // get the projection
+                        }
+                        // else don't change the original
+                    }
+                }
+            }
+            break;
 
     }
 }
