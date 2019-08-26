@@ -114,6 +114,9 @@ void Mesh::glTriangleSmooth(unsigned int i){
             if(flooding[t.getVertex(j)] == 3) glColor3f(0, 0.5, 0.5);
             if(flooding[t.getVertex(j)] == planes.size()+2) glColor3f(1, 0, 0);
             if(flooding[t.getVertex(j)] == planes.size()+3) glColor3f(1, 1, 0);*/
+            for(int i=0; i<segmentsConserved.size(); i++){
+                if(flooding[t.getVertex(j)] == segmentsConserved[i]) glColor3f(0, 0, 1);
+            }
         }
 
         glNormal(verticesNormals[t.getVertex(j)]*normalDirection);
@@ -201,7 +204,54 @@ void Mesh::cutMesh(){
     }
 
     createSmoothedTriangles();
+    // This is called after the flood is merged
+    if(cuttingSide == Side::EXTERIOR) getSegmentsToKeep();
 
+}
+
+// WARNING : this assumes that the left and right planes are the first planes added!
+// Could search for the exterior planes beforehand using the fact that the other sides = -1
+void Mesh::getSegmentsToKeep(){
+    segmentsConserved.clear();
+
+    //for(int i=0; i<planes.size()*2; i++) std::cout << i << " : " << planeNeighbours[i] << " , flooding " << flooding[planeNeighbours[i]] << std::endl;
+
+    // Find the non-discarded side of the left plane
+    int planeToKeep;
+    if(flooding[0]!=-1) planeToKeep = 0;
+    else planeToKeep = planes.size();   // keep the otherside if 0 is discared
+
+    // while we haven't found the right plane
+    while(planeToKeep!=1 && planeToKeep!=planes.size()+1){
+        //std::cout << "Plane : " << planeToKeep << std::endl;
+
+        int nextPlane = planeNeighbours[planeToKeep];   // move on to the next plane
+        //std::cout << "NExt plane : " << nextPlane << std::endl;
+
+        // Keep the smaller of the two values to match the merge flood
+        if(planeToKeep < nextPlane) segmentsConserved.push_back(planeToKeep);
+        else segmentsConserved.push_back(nextPlane);
+
+        // discard the other side
+        int toDiscard;
+        if( nextPlane < planes.size() ) toDiscard = nextPlane + planes.size();
+        else toDiscard = nextPlane - planes.size();
+
+        if(toDiscard==1 || toDiscard==planes.size()+1) break;
+
+        //std::cout << "To discard : " << toDiscard << std::endl;
+
+        // move on to the next plane
+        nextPlane = planeNeighbours[toDiscard];
+
+        //std::cout << "Next plane : " << nextPlane << std::endl;
+
+        // keep the other side
+        if( nextPlane < planes.size() ) planeToKeep = nextPlane + planes.size();
+        else planeToKeep = nextPlane - planes.size();
+    }
+
+    //for(int i=0; i<segmentsConserved.size(); i++) std::cout<< i << " : (conserved) " << segmentsConserved[i] << std::endl;
 }
 
 void Mesh::createSmoothedTriangles(){
@@ -288,6 +338,7 @@ void Mesh::floodNeighbour(unsigned int index, unsigned int id){
 void Mesh::mergeFlood(){
     for(int i=0; i<flooding.size(); i++){
         if(planeNeighbours[flooding[i]] != -1 && planeNeighbours[flooding[i]] < flooding[i]){
+            // From the two neighbours, set them both to the lowest value
             flooding[i] = planeNeighbours[flooding[i]];
         }
     }

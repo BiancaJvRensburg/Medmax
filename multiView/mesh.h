@@ -67,6 +67,8 @@ protected:
 
     void createSmoothedTriangles();
 
+    void getSegmentsToKeep();   // Only for the fibula mesh
+
     void cutMesh();
 
     std::vector <Vec3Df> vertices;      // starting verticies
@@ -82,6 +84,7 @@ protected:
     bool isCut = false;
     std::vector<unsigned int> trianglesCut;     // The list of triangles after the cutting
     std::vector<unsigned int> trianglesExtracted;       // The list of triangles taken out (the complement of trianglesCut)
+    std::vector<int> segmentsConserved; // filled with flooding values to keep
 
     std::vector<Vec3Df> smoothedVerticies;      // New verticies which line up with the cutting plane
 
