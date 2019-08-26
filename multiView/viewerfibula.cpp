@@ -66,12 +66,12 @@ void ViewerFibula::findGhostLocations(int nb, double distance[]){
 
     int index = curve->indexForLength(curveIndexL, distance[0]);
     ghostLocation.push_back(index);
-    ghostLocation.push_back(index+15);      // NOTE 15 is just a temporary value
+    ghostLocation.push_back(index+25);      // NOTE 25 is just a temporary value
     for(unsigned int i=1; i<static_cast<unsigned int>(nb); i++){
         index = curve->indexForLength(ghostLocation[2*i-1], distance[i]);
         ghostLocation.push_back(index);
         int nbU = curve->getNbU();
-        if((index+15)<nbU) ghostLocation.push_back(index+15);
+        if((index+25)<nbU) ghostLocation.push_back(index+25);
         else ghostLocation.push_back(nbU-1);
     }
     curveIndexR = curve->indexForLength(ghostLocation[2*static_cast<unsigned int>(nb)-1], distance[nb]);

@@ -105,6 +105,17 @@ void Mesh::glTriangleSmooth(unsigned int i){
     const Triangle & t = triangles[i];
 
     for(unsigned int j = 0 ; j < 3 ; j++ ){
+        if(cuttingSide == Side::EXTERIOR){
+            /*if(flooding[t.getVertex(j)] == 0) glColor3f(0, 0, 1);
+            if(flooding[t.getVertex(j)] == 1) glColor3f(0, 0.5, 0.5);
+            if(flooding[t.getVertex(j)] == planes.size()) glColor3f(1, 0, 0);
+            if(flooding[t.getVertex(j)] == planes.size()+1) glColor3f(1, 1, 0);*/
+            /*if(flooding[t.getVertex(j)] == 2) glColor3f(0, 0, 1);
+            if(flooding[t.getVertex(j)] == 3) glColor3f(0, 0.5, 0.5);
+            if(flooding[t.getVertex(j)] == planes.size()+2) glColor3f(1, 0, 0);
+            if(flooding[t.getVertex(j)] == planes.size()+3) glColor3f(1, 1, 0);*/
+        }
+
         glNormal(verticesNormals[t.getVertex(j)]*normalDirection);
         glVertex(smoothedVerticies[t.getVertex(j)]);
     }
@@ -119,7 +130,7 @@ void Mesh::addPlane(Plane *p){
     std::vector<unsigned int> init;
     intersectionTriangles.push_back(init);
     updatePlaneIntersections(p);
-    std::cout << "Plane size : " << planeNeighbours.size() << std::endl;
+    //std::cout << "Plane size : " << planeNeighbours.size() << std::endl;
 }
 
 void Mesh::updatePlaneIntersections(){
@@ -180,7 +191,7 @@ void Mesh::cutMesh(){
                     }
                 }
             }
-            for(int i=0; i<8; i++) std::cout << i << " : " << planeNeighbours[i] << std::endl;
+            //for(int i=0; i<2*planes.size(); i++) std::cout << i << " : " << planeNeighbours[i] << std::endl;
         break;
     }
 
