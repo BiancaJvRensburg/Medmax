@@ -118,8 +118,8 @@ void Viewer::init() {
   // Set up gl settings
   glEnable(GL_LIGHTING);
 
-  glPolygonMode (GL_FRONT_AND_BACK, GL_FILL);
-  //glPolygonMode (GL_FRONT_AND_BACK, GL_LINE);
+  //glPolygonMode (GL_FRONT_AND_BACK, GL_FILL);
+  glPolygonMode (GL_FRONT_AND_BACK, GL_LINE);
 
   glLineWidth (1.0f);
 

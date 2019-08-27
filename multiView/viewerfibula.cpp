@@ -13,7 +13,6 @@ void ViewerFibula::initSignals(){
 }
 
 void ViewerFibula::recieveFromFibulaMesh(std::vector<int> planes, std::vector<Vec> verticies, std::vector<std::vector<int>> triangles){
-    std::cout << "Info reached viewer fibula, sending to viewer mandible" << std::endl;
     Q_EMIT sendToManible(planes, verticies, triangles);
 }
 
@@ -95,7 +94,7 @@ void ViewerFibula::setPlaneOrientations(std::vector<Vec> angles){
 
     // Orientate the left plane
     Vec normal = leftPlane->getNormal();
-    Quaternion s = Quaternion(normal, angles[0]);
+    Quaternion s = Quaternion(-normal, angles[0]);  // -normal so it doesnt do a 180 flip
     leftPlane->setOrientation(s.normalized());
 
     // Orientate the ghost planes

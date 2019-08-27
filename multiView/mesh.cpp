@@ -487,7 +487,7 @@ void Mesh::draw()
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_DEPTH);
 
-    glBegin (GL_TRIANGLES);
+    glBegin (GL_POINTS);
 
     if(!isCut){
         for(unsigned int i = 0 ; i < triangles.size(); i++){

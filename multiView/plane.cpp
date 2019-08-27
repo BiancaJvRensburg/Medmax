@@ -41,8 +41,8 @@ void Plane::draw(){
     glDisable(GL_DEPTH);
     glDisable(GL_DEPTH_TEST);
 
-    /*glColor3f(1,1,1);
-    QGLViewer::drawAxis(15.0);*/
+    glColor3f(1,1,1);
+    QGLViewer::drawAxis(15.0);
 
     glPopMatrix();
 }
