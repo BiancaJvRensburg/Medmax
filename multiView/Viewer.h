@@ -31,6 +31,7 @@ public Q_SLOTS:
     void drawMesh();
     void onLeftSliderReleased();
     void onRightSliderReleased();
+    void recieveFromFibulaMesh(std::vector<int>, std::vector<Vec>, std::vector<std::vector<int>>);
 
 Q_SIGNALS:
     void leftPosChanged(double, std::vector<Vec>);
@@ -43,6 +44,7 @@ Q_SIGNALS:
     void setRRSliderValue(int);   // Right rotation
     void setLMSliderValue(int);   // Left movement
     void setRMSliderValue(int);   // Right movement
+    void sendFibulaToMesh(std::vector<int>, std::vector<Vec>, std::vector<std::vector<int>>);
 
 protected:
     void draw();
@@ -52,6 +54,7 @@ protected:
     QString helpString() const;
     void updateCamera(const Vec3Df & center, float radius);
 
+    virtual void initSignals();
     virtual void initCurve();
     void initPlanes(Movable status);
     virtual void addGhostPlanes(int nb);

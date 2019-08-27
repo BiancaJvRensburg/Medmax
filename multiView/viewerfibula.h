@@ -23,13 +23,17 @@ public Q_SLOTS:
     void cutMesh();
     void uncutMesh();
 
+    void recieveFromFibulaMesh(std::vector<int>, std::vector<Vec>, std::vector<std::vector<int>>);
+
 Q_SIGNALS:
     void setPlaneSliderValue(int);
+    void sendToManible(std::vector<int>, std::vector<Vec>, std::vector<std::vector<int>>);
 
 private:
     void findGhostLocations(int nb, double distance[]); // finds the location of the ghost planes + the right plane
     void setPlaneOrientations(std::vector<Vec> angles);
     void reinitialisePlanes(unsigned int nbToInit);      // Reinitialises the position and orientation of the planes
+    void initSignals();
 
     bool isCutSignal;
     bool isPlanesRecieved;

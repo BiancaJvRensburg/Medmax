@@ -123,6 +123,16 @@ void Viewer::init() {
 
   glLineWidth (1.0f);
 
+  initSignals();
+}
+
+void Viewer::initSignals(){
+    connect(this, &Viewer::sendFibulaToMesh, &mesh, &Mesh::recieveInfoFromFibula);
+}
+
+void Viewer::recieveFromFibulaMesh(std::vector<int> planes, std::vector<Vec> verticies, std::vector<std::vector<int>> triangles){
+    std::cout << "Viewer manible info recieved, sending to the mesh " << std::endl;
+    Q_EMIT sendFibulaToMesh(planes, verticies, triangles);
 }
 
 QString Viewer::helpString() const {

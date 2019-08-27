@@ -8,6 +8,15 @@ ViewerFibula::ViewerFibula(QWidget *parent, StandardCamera *camera, int sliderMa
     isCutSignal = false;
 }
 
+void ViewerFibula::initSignals(){
+    connect(&mesh, &Mesh::sendInfoToManible, this, &ViewerFibula::recieveFromFibulaMesh);
+}
+
+void ViewerFibula::recieveFromFibulaMesh(std::vector<int> planes, std::vector<Vec> verticies, std::vector<std::vector<int>> triangles){
+    std::cout << "Info reached viewer fibula, sending to viewer mandible" << std::endl;
+    Q_EMIT sendToManible(planes, verticies, triangles);
+}
+
 // Move all planes by the same offset (right plane INCLUDED) - when the slider is dragged
 void ViewerFibula::movePlanes(int position){
 

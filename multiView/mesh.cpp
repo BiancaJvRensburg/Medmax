@@ -477,6 +477,13 @@ void Mesh::sendToManible(){
     }*/
 
     // Need to send the three initial tables (+ a new table of normals to be dealt with later)
+    Q_EMIT sendInfoToManible(planeNb, convertedVerticies, convertedTriangles);
+}
+
+void Mesh::recieveInfoFromFibula(std::vector<int> planeNb, std::vector<Vec> convertedVerticies, std::vector<std::vector<int>> convertedTriangles){
+    if(cuttingSide != Side::INTERIOR) return;
+
+    std::cout << "Info has reached the manible mesh " << std::endl;
 }
 
 void Mesh::draw()

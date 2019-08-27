@@ -8,8 +8,10 @@
 
 enum Side {INTERIOR, EXTERIOR};
 
-class Mesh
+class Mesh : public QObject
 {
+    Q_OBJECT
+
 public:
 
     Mesh():normalDirection(1.){}
@@ -50,6 +52,13 @@ public:
     typedef std::priority_queue< std::pair< float , int > , std::deque< std::pair< float , int > > , std::greater< std::pair< float , int > > > FacesQueue;
 
     void invertNormal(){normalDirection *= -1;}
+
+public Q_SLOTS:
+    void recieveInfoFromFibula(std::vector<int>, std::vector<Vec>, std::vector<std::vector<int>>);
+
+Q_SIGNALS:
+    void sendInfoToManible(std::vector<int>, std::vector<Vec>, std::vector<std::vector<int>>);
+
 protected:
     void init();
     void computeBB();
