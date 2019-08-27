@@ -480,10 +480,15 @@ void Mesh::sendToManible(){
     Q_EMIT sendInfoToManible(planeNb, convertedVerticies, convertedTriangles);
 }
 
-void Mesh::recieveInfoFromFibula(std::vector<int> planeNb, std::vector<Vec> convertedVerticies, std::vector<std::vector<int>> convertedTriangles){
+void Mesh::recieveInfoFromFibula(std::vector<Vec> convertedVerticies, std::vector<std::vector<int>> convertedTriangles){
     if(cuttingSide != Side::INTERIOR) return;
 
-    std::cout << "Info has reached the manible mesh " << std::endl;
+    fibInMandVerticies = convertedVerticies;
+
+    for(unsigned int i=0; i<convertedTriangles.size(); i++){
+        Triangle t = Triangle(convertedTriangles[i][0], convertedTriangles[i][1], convertedTriangles[i][2]);
+        fibInMandTriangles.push_back(t);
+    }
 }
 
 void Mesh::draw()

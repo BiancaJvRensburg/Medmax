@@ -44,7 +44,7 @@ Q_SIGNALS:
     void setRRSliderValue(int);   // Right rotation
     void setLMSliderValue(int);   // Left movement
     void setRMSliderValue(int);   // Right movement
-    void sendFibulaToMesh(std::vector<int>, std::vector<Vec>, std::vector<std::vector<int>>);
+    void sendFibulaToMesh(std::vector<Vec>, std::vector<std::vector<int>>);
 
 protected:
     void draw();

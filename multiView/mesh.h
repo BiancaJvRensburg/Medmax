@@ -54,7 +54,7 @@ public:
     void invertNormal(){normalDirection *= -1;}
 
 public Q_SLOTS:
-    void recieveInfoFromFibula(std::vector<int>, std::vector<Vec>, std::vector<std::vector<int>>);
+    void recieveInfoFromFibula(std::vector<Vec>, std::vector<std::vector<int>>);
 
 Q_SIGNALS:
     void sendInfoToManible(std::vector<int>, std::vector<Vec>, std::vector<std::vector<int>>);
@@ -101,6 +101,10 @@ protected:
 
     std::vector<Vec3Df> normals;
     std::vector<Vec3Df> verticesNormals;
+
+    // The fibula in the manible
+    std::vector<Vec> fibInMandVerticies;
+    std::vector<Triangle> fibInMandTriangles;
 
     Side cuttingSide = Side::INTERIOR;
 

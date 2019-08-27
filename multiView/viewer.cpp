@@ -132,7 +132,27 @@ void Viewer::initSignals(){
 
 void Viewer::recieveFromFibulaMesh(std::vector<int> planes, std::vector<Vec> verticies, std::vector<std::vector<int>> triangles){
     std::cout << "Viewer manible info recieved, sending to the mesh " << std::endl;
-    Q_EMIT sendFibulaToMesh(planes, verticies, triangles);
+
+    // TODO : Be careful of this!
+    /*
+     * 0 : left plane
+     * 1 : right plane
+     * n : ghostPlane[n-2]
+    */
+
+    // For each vertex, convert it from the corresponding plane's coordinates to the mesh coordinates
+    for(int i=0; i<verticies.size(); i++){
+        if(planes[i]==0) verticies[i] = leftPlane->getMeshCoordinatesFromLocal(verticies[i]);
+        else if(planes[i]==1) verticies[i] = rightPlane->getMeshCoordinatesFromLocal(verticies[i]);
+        else {
+            int mandPlane = (planes[i]+2) / 2 - 2;
+            verticies[i] = ghostPlanes[mandPlane].getMeshCoordinatesFromLocal(verticies[i]);
+        }
+
+        // std::cout << verticies[i].x << " " << verticies[i].y << " " << verticies[i].z << " " << std::endl;
+    }
+
+    Q_EMIT sendFibulaToMesh(verticies, triangles);
 }
 
 QString Viewer::helpString() const {

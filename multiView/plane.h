@@ -40,7 +40,8 @@ public:
     const Vec& getPosition(){ return cp->getPoint(); }
     CurvePoint* getCurvePoint(){ return cp; }
 
-    Vec getLocalCoordinates(Vec v) { return cp->getFrame()->localCoordinatesOf(v); }
+    Vec getLocalCoordinates(Vec v) { return cp->getFrame()->localCoordinatesOf(v); }    // same as get polyline
+    Vec getMeshCoordinatesFromLocal(Vec v){ return cp->getFrame()->localInverseCoordinatesOf(v); }
 
     Movable status;
 
