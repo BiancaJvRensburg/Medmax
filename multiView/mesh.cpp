@@ -126,6 +126,21 @@ void Mesh::glTriangleSmooth(unsigned int i){
     glColor3f(1.0, 1.0, 1.0);
 }
 
+void Mesh::glTriangleFibInMand(unsigned int i){
+    const Triangle & t = triangles[i];
+
+    glColor3f(1.0, 0, 0);
+
+    //  TODO : normals are all wrong
+
+    for(unsigned int j = 0 ; j < 3 ; j++ ){
+        glNormal(verticesNormals[t.getVertex(j)]*normalDirection);
+        glVertex(fibInMandVerticies[t.getVertex(j)]);
+    }
+
+    glColor3f(1.0, 1.0, 1.0);
+}
+
 void Mesh::addPlane(Plane *p){
     planes.push_back(p);
     planeNeighbours.push_back(-1);  // This is done once for the neg and once for the pos
@@ -224,8 +239,6 @@ void Mesh::cutMesh(){
 void Mesh::getSegmentsToKeep(){
     segmentsConserved.clear();
 
-    //for(int i=0; i<planes.size()*2; i++) std::cout << i << " : " << planeNeighbours[i] << " , flooding " << flooding[planeNeighbours[i]] << std::endl;
-
     // Find the non-discarded side of the left plane
     int planeToKeep;
     if(flooding[0]!=-1) planeToKeep = 0;
@@ -233,10 +246,8 @@ void Mesh::getSegmentsToKeep(){
 
     // while we haven't found the right plane
     while(planeToKeep!=1 && planeToKeep!=planes.size()+1){
-        //std::cout << "Plane : " << planeToKeep << std::endl;
 
         int nextPlane = planeNeighbours[planeToKeep];   // move on to the next plane
-        //std::cout << "NExt plane : " << nextPlane << std::endl;
 
         // Keep the smaller of the two values to match the merge flood
         if(planeToKeep < nextPlane) segmentsConserved.push_back(planeToKeep);
@@ -249,12 +260,8 @@ void Mesh::getSegmentsToKeep(){
 
         if(toDiscard==1 || toDiscard==planes.size()+1) break;
 
-        //std::cout << "To discard : " << toDiscard << std::endl;
-
         // move on to the next plane
         nextPlane = planeNeighbours[toDiscard];
-
-        //std::cout << "Next plane : " << nextPlane << std::endl;
 
         // keep the other side
         if( nextPlane < planes.size() ) planeToKeep = nextPlane + planes.size();
@@ -291,26 +298,6 @@ void Mesh::createSmoothedTriangles(){
             }
         }
         break;
-
-        /*case Side::EXTERIOR:
-        for(unsigned int i=0; i<planes.size(); i++){
-            // for each triangle cut
-            for(unsigned long long j=0; j<intersectionTriangles[static_cast<unsigned long long>(i)].size(); j++){
-                 // find which verticies to keep
-                for(unsigned int k=0; k<3; k++){
-                    unsigned int vertexIndex = triangles[intersectionTriangles[i][j]].getVertex(k);
-                    // We need to change it if they have different flooding values
-                    //int vertexIndex = getStrayIndex(i,j);
-                    if(planeNeighbours[flooding[vertexIndex]] != -1){   // if we need to change it
-                        // std::cout << "changing " << std::endl;
-                        Vec newVertex = planes[i]->getProjection(Vec(static_cast<double>(vertices[vertexIndex][0]), static_cast<double>(vertices[vertexIndex][1]), static_cast<double>(vertices[vertexIndex][2])) );
-                        smoothedVerticies[vertexIndex] = Vec3Df(static_cast<float>(newVertex.x), static_cast<float>(newVertex.y), static_cast<float>(newVertex.z)); // get the projection
-                    }
-                    // else don't change the original
-               }
-            }
-        }
-        break;*/
 
         case Side::EXTERIOR:
             for(unsigned int i=0; i<planes.size(); i++){
@@ -483,7 +470,10 @@ void Mesh::sendToManible(){
 void Mesh::recieveInfoFromFibula(std::vector<Vec> convertedVerticies, std::vector<std::vector<int>> convertedTriangles){
     if(cuttingSide != Side::INTERIOR) return;
 
-    fibInMandVerticies = convertedVerticies;
+    for(unsigned int i=0; i<convertedVerticies.size(); i++){
+        Vec3Df v = Vec3Df(convertedVerticies[i].x, convertedVerticies[i].y, convertedVerticies[i].z);
+        fibInMandVerticies.push_back(v);
+    }
 
     for(unsigned int i=0; i<convertedTriangles.size(); i++){
         Triangle t = Triangle(convertedTriangles[i][0], convertedTriangles[i][1], convertedTriangles[i][2]);
@@ -507,6 +497,10 @@ void Mesh::draw()
     else{
         for(unsigned int i = 0 ; i < trianglesCut.size(); i++){
             glTriangleSmooth(trianglesCut[i]);
+        }
+
+        for(unsigned int i=0; i<fibInMandTriangles.size(); i++){
+            glTriangleFibInMand(i);
         }
     }
 

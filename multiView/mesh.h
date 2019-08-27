@@ -68,6 +68,7 @@ protected:
     void computeVerticesNormals();
     void glTriangle(unsigned int i);
     void glTriangleSmooth(unsigned int i);
+    void glTriangleFibInMand(unsigned int i);
 
     void planeIntersection(unsigned int index);
 
@@ -103,7 +104,7 @@ protected:
     std::vector<Vec3Df> verticesNormals;
 
     // The fibula in the manible
-    std::vector<Vec> fibInMandVerticies;
+    std::vector<Vec3Df> fibInMandVerticies;
     std::vector<Triangle> fibInMandTriangles;
 
     Side cuttingSide = Side::INTERIOR;
