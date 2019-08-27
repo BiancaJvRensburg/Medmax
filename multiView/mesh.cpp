@@ -212,9 +212,8 @@ void Mesh::cutMesh(){
         if(!truthTriangles[i]) trianglesExtracted.push_back(i);
     }
 
-    if(cuttingSide == Side::EXTERIOR){
-        getSegmentsToKeep();
-    }
+    // ! Conserve this order
+    if(cuttingSide == Side::EXTERIOR) getSegmentsToKeep();
     createSmoothedTriangles();
     if(cuttingSide == Side::EXTERIOR) sendToManible();
 
@@ -268,6 +267,7 @@ void Mesh::getSegmentsToKeep(){
 void Mesh::createSmoothedTriangles(){
     smoothedVerticies.clear();
 
+    // Copy the verticies table
     for(unsigned int i=0; i<vertices.size(); i++){
         smoothedVerticies.push_back(vertices[i]);
     }
@@ -316,19 +316,32 @@ void Mesh::createSmoothedTriangles(){
             for(unsigned int i=0; i<planes.size(); i++){
                 // for each triangle cut
                 for(unsigned long long j=0; j<intersectionTriangles[static_cast<unsigned long long>(i)].size(); j++){
-                     // find which verticies to keep
+                    // Conserve the "real" flooding value
+                    int actualFlooding = -1;    // will never stay at -1
+                     // find which verticies are on the otherside of the cut
                     for(unsigned int k=0; k<3; k++){
                         unsigned int vertexIndex = triangles[intersectionTriangles[i][j]].getVertex(k);
 
                         bool isOutlier = true;
-                        for(int l=0; l<segmentsConserved.size(); l++)
-                            if(flooding[vertexIndex] == segmentsConserved[l]) isOutlier = false;
+                        for(int l=0; l<segmentsConserved.size(); l++){
+                            if(flooding[vertexIndex] == segmentsConserved[l]){
+                                actualFlooding = flooding[vertexIndex];
+                                isOutlier = false;
+                            }
+                        }
 
-                        if(planeNeighbours[flooding[vertexIndex]]==-1 || isOutlier){   // if we need to change it
+                        // if we need to change it
+                        if(planeNeighbours[flooding[vertexIndex]]==-1 || isOutlier){
                             Vec newVertex = planes[i]->getProjection(Vec(static_cast<double>(vertices[vertexIndex][0]), static_cast<double>(vertices[vertexIndex][1]), static_cast<double>(vertices[vertexIndex][2])) );
                             smoothedVerticies[vertexIndex] = Vec3Df(static_cast<float>(newVertex.x), static_cast<float>(newVertex.y), static_cast<float>(newVertex.z)); // get the projection
                         }
                         // else don't change the original
+                    }
+
+                    // Set the whole triangle to the correct flooding value
+                    for(unsigned int k=0; k<3; k++){
+                        unsigned int vertexIndex = triangles[intersectionTriangles[i][j]].getVertex(k);
+                        flooding[vertexIndex] = actualFlooding;
                     }
                 }
             }
@@ -417,19 +430,15 @@ void Mesh::sendToManible(){
 
     for(int i=0; i<smoothedVerticies.size(); i++) tempVerticies[i] = -1;
 
-    // For every triangle we want to send
+    // For every triangle we want to send (we've already filtered out the rest when cutting the mesh)
     for(unsigned int i=0; i<trianglesCut.size(); i++){
 
         // Get the 3 verticies of the triangle
         unsigned int triVert;
         std::vector<int> newTriangle;
 
-
-        //std::cout << "Smoothed size " << smoothedVerticies.size() << std::endl;
-
         for(int j=0; j<3; j++){
             triVert = triangles[trianglesCut[i]].getVertex(j);       // this must go into smoothedVerticies[triV....]
-           // std::cout << "TriVert " << triVert << std::endl;
 
             // If converted already
             if(tempVerticies[triVert] != -1) newTriangle.push_back(tempVerticies[triVert]);
@@ -437,13 +446,15 @@ void Mesh::sendToManible(){
             else{
                 // Get the plane nb
                 int pNb = flooding[triVert];
+
                 if(pNb >= planes.size()) pNb -= planes.size();
+
                 planeNb.push_back(pNb);
 
                 // Convert the vertex
-                Vec unConverted = Vec(smoothedVerticies[triVert][0], smoothedVerticies[triVert][1], smoothedVerticies[triVert][3]);
-               // std::cout << "Unconverted : " << unConverted.x << " " << unConverted.y << " " << unConverted.z << std::endl;
-                Vec convertedCoords = unConverted; //planes[i]->getLocalCoordinates(unConverted);
+                Vec unConverted = Vec(smoothedVerticies[triVert][0], smoothedVerticies[triVert][1], smoothedVerticies[triVert][2]);
+                //std::cout << "Unconverted : " << unConverted.x << " " << unConverted.y << " " << unConverted.z << std::endl;
+                Vec convertedCoords = planes[pNb]->getLocalCoordinates(unConverted);
                 //std::cout << "Converted : " << convertedCoords.x << " " << convertedCoords.y << " " << convertedCoords.z << std::endl;
                 convertedVerticies.push_back(convertedCoords);
                 int vertexIndex = convertedVerticies.size() - 1;
@@ -461,9 +472,11 @@ void Mesh::sendToManible(){
 
     /*for(int i=0; i<convertedTriangles.size(); i++){
         for(int j=0; j<3; j++){
-            std::cout << i << " : (plane) " << planeNb[i] << " , (vertice) : " << smoothedVerticies[convertedTriangles[i][j]][0] << " " << smoothedVerticies[convertedTriangles[i][j]][1] << " " << smoothedVerticies[convertedTriangles[i][j]][2] << std::endl;
+            std::cout << i << " : (plane) " << planeNb[convertedTriangles[i][j]] << " , (vertice) : " << convertedVerticies[convertedTriangles[i][j]][0] << " " << convertedVerticies[convertedTriangles[i][j]][1] << " " << convertedVerticies[convertedTriangles[i][j]][2] << std::endl;
         }
     }*/
+
+    // Need to send the three initial tables (+ a new table of normals to be dealt with later)
 }
 
 void Mesh::draw()
