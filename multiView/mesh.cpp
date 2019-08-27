@@ -127,7 +127,7 @@ void Mesh::glTriangleSmooth(unsigned int i){
 }
 
 void Mesh::glTriangleFibInMand(unsigned int i){
-    const Triangle & t = triangles[i];
+    const Triangle & t = fibInMandTriangles[i];
 
     glColor3f(1.0, 0, 0);
 
@@ -487,7 +487,7 @@ void Mesh::draw()
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_DEPTH);
 
-    glBegin (GL_POINTS);
+    glBegin (GL_TRIANGLES);
 
     if(!isCut){
         for(unsigned int i = 0 ; i < triangles.size(); i++){
