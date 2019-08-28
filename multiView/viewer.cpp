@@ -130,7 +130,7 @@ void Viewer::initSignals(){
     connect(this, &Viewer::sendFibulaToMesh, &mesh, &Mesh::recieveInfoFromFibula);
 }
 
-void Viewer::recieveFromFibulaMesh(std::vector<int> planes, std::vector<Vec> verticies, std::vector<std::vector<int>> triangles, std::vector<Vec> fibulaPolyline){
+void Viewer::recieveFromFibulaMesh(std::vector<int> planes, std::vector<Vec> verticies, std::vector<std::vector<int>> triangles, std::vector<Vec> fibulaPolyline, std::vector<int> colours, std::vector<Vec3Df> normals, int nbColours){
    // Rotate the planes to match the fibula (just the extremities for now)
    /* Vec mandPolylineSegment;
     Vec axis;
@@ -164,7 +164,7 @@ void Viewer::recieveFromFibulaMesh(std::vector<int> planes, std::vector<Vec> ver
         // std::cout << verticies[i].x << " " << verticies[i].y << " " << verticies[i].z << " " << std::endl;
     }
 
-    Q_EMIT sendFibulaToMesh(verticies, triangles);
+    Q_EMIT sendFibulaToMesh(verticies, triangles, colours, normals, nbColours);
 }
 
 QString Viewer::helpString() const {

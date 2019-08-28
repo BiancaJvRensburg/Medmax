@@ -105,20 +105,7 @@ void Mesh::glTriangleSmooth(unsigned int i){
     const Triangle & t = triangles[i];
 
     for(unsigned int j = 0 ; j < 3 ; j++ ){
-        if(cuttingSide == Side::EXTERIOR){
-            /*if(flooding[t.getVertex(j)] == 0) glColor3f(0, 0, 1);
-            if(flooding[t.getVertex(j)] == 1) glColor3f(0, 0.5, 0.5);
-            if(flooding[t.getVertex(j)] == planes.size()) glColor3f(1, 0, 0);
-            if(flooding[t.getVertex(j)] == planes.size()+1) glColor3f(1, 1, 0);*/
-            /*if(flooding[t.getVertex(j)] == 2) glColor3f(0, 0, 1);
-            if(flooding[t.getVertex(j)] == 3) glColor3f(0, 0.5, 0.5);
-            if(flooding[t.getVertex(j)] == planes.size()+2) glColor3f(1, 0, 0);
-            if(flooding[t.getVertex(j)] == planes.size()+3) glColor3f(1, 1, 0);*/
-            for(int i=0; i<segmentsConserved.size(); i++){
-                if(flooding[t.getVertex(j)] == segmentsConserved[i]) glColor3f(0, 0, 1);
-            }
-        }
-
+        if(cuttingSide==Side::EXTERIOR) getColour(t.getVertex(j));
         glNormal(verticesNormals[t.getVertex(j)]*normalDirection);
         glVertex(smoothedVerticies[t.getVertex(j)]);
     }
@@ -129,16 +116,46 @@ void Mesh::glTriangleSmooth(unsigned int i){
 void Mesh::glTriangleFibInMand(unsigned int i){
     const Triangle & t = fibInMandTriangles[i];
 
-    glColor3f(1.0, 0, 0);
-
     //  TODO : normals are all wrong
 
     for(unsigned int j = 0 ; j < 3 ; j++ ){
-        glNormal(verticesNormals[t.getVertex(j)]*normalDirection);
+        getColour(t.getVertex(j));
+        glNormal(fibInMandNormals[t.getVertex(j)]*normalDirection);
         glVertex(fibInMandVerticies[t.getVertex(j)]);
     }
 
     glColor3f(1.0, 1.0, 1.0);
+}
+
+void Mesh::getColour(unsigned int vertex){
+    int colour;
+    float nb;
+
+    if(cuttingSide==Side::EXTERIOR && coloursIndicies.size()!=0){ // TODO protect this higher up
+        colour = coloursIndicies[vertex];
+        nb = static_cast<float>(planes.size())/2.f;
+    }
+    else if(cuttingSide==Side::INTERIOR && fibInMandColour.size()!=0){
+        colour = fibInMandColour[vertex];
+        nb = static_cast<float>(fibInMandNbColours);
+    }
+    else return;
+
+    if(colour != -1){
+        float r,g,b;
+        float c = static_cast<float>(colour);
+        r = ((c+1.f)/nb);
+        g = (c+1.f)/nb + (1.f/3.f);
+        b = (c+1.f)/nb + (2.f/3.f);
+
+        // mod doesn't work on doubles
+        while(r>nb) r -= nb;
+        while(g>nb) g -= nb;
+        while(b>nb) b -= nb;
+
+        // set the colour
+        glColor3f(r,g,b);
+    }
 }
 
 void Mesh::addPlane(Plane *p){
@@ -174,6 +191,12 @@ void Mesh::updatePlaneIntersections(){
 
 void Mesh::cutMesh(){
     trianglesCut.clear();
+
+    // TODO : find a better location for this (in meshreader.h)
+    /*coloursIndicies.clear();
+    for(int i=0; i<vertices.size(); i++){
+        coloursIndicies.push_back(-1);
+    }*/
 
     bool truthTriangles[triangles.size()];  // keeps a record of the triangles who are already added
     for(unsigned int i=0; i<triangles.size(); i++) truthTriangles[i] = false;
@@ -230,8 +253,30 @@ void Mesh::cutMesh(){
     // ! Conserve this order
     if(cuttingSide == Side::EXTERIOR) getSegmentsToKeep();
     createSmoothedTriangles();
-    if(cuttingSide == Side::EXTERIOR) sendToManible();
+    if(cuttingSide == Side::EXTERIOR){
+        fillColours();
+        sendToManible();
+    }
 
+}
+
+void Mesh::fillColours(){
+    int tempColours[planes.size()];
+    coloursIndicies.clear();
+
+    // init all to -1
+    for(int i=0; i<planes.size(); i++){
+        tempColours[i] = -1;
+    }
+
+    // change to the seg colours value
+    for(int i=0; i<segmentsConserved.size(); i++) tempColours[segmentsConserved[i]] = i;
+
+    for(int i=0; i<vertices.size(); i++){
+        int index = flooding[i];
+        // Fill the colours
+        coloursIndicies.push_back(tempColours[index]);
+    }
 }
 
 // WARNING : this assumes that the left and right planes are the first planes added!
@@ -413,6 +458,8 @@ void Mesh::sendToManible(){
     std::vector<int> planeNb;       // the plane nb associated
     std::vector<Vec> convertedVerticies;    // the vertex coordinates in relation to the plane nb
     std::vector<std::vector<int>>convertedTriangles; // the new indicies of the triangles (3 indicies)
+    std::vector<int> convertedColours;
+    std::vector<Vec3Df> convertedNormals;
     int tempVerticies[smoothedVerticies.size()];   // a temporary marker for already converted verticies
 
     for(int i=0; i<smoothedVerticies.size(); i++) tempVerticies[i] = -1;
@@ -425,7 +472,7 @@ void Mesh::sendToManible(){
         std::vector<int> newTriangle;
 
         for(int j=0; j<3; j++){
-            triVert = triangles[trianglesCut[i]].getVertex(j);       // this must go into smoothedVerticies[triV....]
+            triVert = triangles[trianglesCut[i]].getVertex(j);       // this must go into smoothedVerticies[triV....] (ie. index in the original)
 
             // If converted already
             if(tempVerticies[triVert] != -1) newTriangle.push_back(tempVerticies[triVert]);
@@ -440,10 +487,12 @@ void Mesh::sendToManible(){
 
                 // Convert the vertex
                 Vec unConverted = Vec(smoothedVerticies[triVert][0], smoothedVerticies[triVert][1], smoothedVerticies[triVert][2]);
-                //std::cout << "Unconverted : " << unConverted.x << " " << unConverted.y << " " << unConverted.z << std::endl;
                 Vec convertedCoords = planes[pNb]->getLocalCoordinates(unConverted);
-                //std::cout << "Converted : " << convertedCoords.x << " " << convertedCoords.y << " " << convertedCoords.z << std::endl;
+                // add the converted vertex triVert
                 convertedVerticies.push_back(convertedCoords);
+                // add its corresponding colour and normal
+                convertedColours.push_back(coloursIndicies[triVert]);
+                convertedNormals.push_back(normals[triVert]);       // TODO convert this
                 int vertexIndex = convertedVerticies.size() - 1;
                 newTriangle.push_back(vertexIndex);  // set it to the last index of convertedVerticies
 
@@ -464,19 +513,25 @@ void Mesh::sendToManible(){
     }*/
 
     // Need to send the three initial tables (+ a new table of normals to be dealt with later)
-    Q_EMIT sendInfoToManible(planeNb, convertedVerticies, convertedTriangles);
+    Q_EMIT sendInfoToManible(planeNb, convertedVerticies, convertedTriangles, convertedColours, convertedNormals, (planes.size()/2));
 }
 
-void Mesh::recieveInfoFromFibula(std::vector<Vec> convertedVerticies, std::vector<std::vector<int>> convertedTriangles){
+void Mesh::recieveInfoFromFibula(std::vector<Vec> convertedVerticies, std::vector<std::vector<int>> convertedTriangles, std::vector<int> convertedColours, std::vector<Vec3Df> convertedNormals, int nbColours){
     if(cuttingSide != Side::INTERIOR) return;
 
     fibInMandTriangles.clear();
     fibInMandVerticies.clear();
+    fibInMandColour.clear();
+    fibInMandNormals.clear();
     std::cout << "Recieved info" << std::endl;
+
+    fibInMandNbColours = nbColours;
 
     for(unsigned int i=0; i<convertedVerticies.size(); i++){
         Vec3Df v = Vec3Df(convertedVerticies[i].x, convertedVerticies[i].y, convertedVerticies[i].z);
         fibInMandVerticies.push_back(v);
+        fibInMandColour.push_back(convertedColours[i]);
+        fibInMandNormals.push_back(convertedNormals[i]);
     }
 
     for(unsigned int i=0; i<convertedTriangles.size(); i++){
