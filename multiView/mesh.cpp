@@ -470,6 +470,10 @@ void Mesh::sendToManible(){
 void Mesh::recieveInfoFromFibula(std::vector<Vec> convertedVerticies, std::vector<std::vector<int>> convertedTriangles){
     if(cuttingSide != Side::INTERIOR) return;
 
+    fibInMandTriangles.clear();
+    fibInMandVerticies.clear();
+    std::cout << "Recieved info" << std::endl;
+
     for(unsigned int i=0; i<convertedVerticies.size(); i++){
         Vec3Df v = Vec3Df(convertedVerticies[i].x, convertedVerticies[i].y, convertedVerticies[i].z);
         fibInMandVerticies.push_back(v);

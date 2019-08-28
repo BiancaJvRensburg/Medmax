@@ -130,8 +130,20 @@ void Viewer::initSignals(){
     connect(this, &Viewer::sendFibulaToMesh, &mesh, &Mesh::recieveInfoFromFibula);
 }
 
-void Viewer::recieveFromFibulaMesh(std::vector<int> planes, std::vector<Vec> verticies, std::vector<std::vector<int>> triangles){
-    std::cout << "Viewer manible info recieved, sending to the mesh " << std::endl;
+void Viewer::recieveFromFibulaMesh(std::vector<int> planes, std::vector<Vec> verticies, std::vector<std::vector<int>> triangles, std::vector<Vec> fibulaPolyline){
+   // Rotate the planes to match the fibula (just the extremities for now)
+   /* Vec mandPolylineSegment;
+    Vec axis;
+    Quaternion s;
+    double anglePoly;
+
+    mandPolylineSegment = polyline[1];
+    anglePoly = angle(mandPolylineSegment, fibulaPolyline[0]);
+    axis = Vec(0,0,1);
+    s = Quaternion(axis, anglePoly);
+    leftPlane->setOrientation(s.normalized());
+
+    std::cout << "Plane rotated" << std::endl;*/
 
     // TODO : Be careful of this!
     /*

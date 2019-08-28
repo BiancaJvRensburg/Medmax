@@ -31,7 +31,7 @@ public Q_SLOTS:
     void drawMesh();
     void onLeftSliderReleased();
     void onRightSliderReleased();
-    void recieveFromFibulaMesh(std::vector<int>, std::vector<Vec>, std::vector<std::vector<int>>);
+    void recieveFromFibulaMesh(std::vector<int>, std::vector<Vec>, std::vector<std::vector<int>>, std::vector<Vec>);
 
 Q_SIGNALS:
     void leftPosChanged(double, std::vector<Vec>);

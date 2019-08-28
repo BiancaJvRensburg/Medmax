@@ -13,7 +13,40 @@ void ViewerFibula::initSignals(){
 }
 
 void ViewerFibula::recieveFromFibulaMesh(std::vector<int> planes, std::vector<Vec> verticies, std::vector<std::vector<int>> triangles){
-    Q_EMIT sendToManible(planes, verticies, triangles);
+    std::vector<Vec> polylineInPlanes;
+    Vec v;
+
+    createPolyline();
+
+    std::cout << polyline.size() << std::endl;
+
+    // Get the polyline vector in relation to the planes
+    v = leftPlane->getPolylineVector(polyline[1]);
+    polylineInPlanes.push_back(v);
+
+    for(unsigned int i=0; i<ghostPlanes.size(); i++){
+        // +1 offset for the left plane
+        if(i%2==0) v = ghostPlanes[i].getPolylineVector(polyline[i]);     // even: look behind
+        else v = ghostPlanes[i].getPolylineVector(polyline[i+2]);       // odd : look forward
+        polylineInPlanes.push_back(v);
+    }
+
+    v = rightPlane->getPolylineVector(polyline[polyline.size()-2]);
+    polylineInPlanes.push_back(v);
+
+    std::cout << "Poly in plane size : " << polylineInPlanes.size() << std::endl;
+
+    Q_EMIT sendToManible(planes, verticies, triangles, polylineInPlanes);
+}
+
+void ViewerFibula::createPolyline(){
+    polyline.clear();
+
+    polyline.push_back(leftPlane->getPosition());
+
+    for(int i=0; i<ghostPlanes.size(); i++) polyline.push_back(ghostPlanes[i].getPosition());
+
+    polyline.push_back(rightPlane->getPosition());
 }
 
 // Move all planes by the same offset (right plane INCLUDED) - when the slider is dragged
