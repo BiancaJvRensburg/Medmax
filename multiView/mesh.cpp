@@ -24,6 +24,7 @@ void Mesh::computeBB(){
 void Mesh::update(){
     computeBB();
     recomputeNormals();
+    std::cout << "Updating the mesh" << std::endl;
     updatePlaneIntersections();
 }
 
@@ -63,10 +64,11 @@ Vec3Df Mesh::computeTriangleNormal(unsigned int id ){
 
 }
 
-void Mesh::setIsCut(Side s, bool isCut){
+void Mesh::setIsCut(Side s, bool isCut, bool isUpdate){
     this->isCut = isCut;
     this->cuttingSide = s;
-    if(isCut) updatePlaneIntersections();
+    std::cout << "Setting is cut" << std::endl;
+    if(isUpdate) updatePlaneIntersections();
 }
 
 void Mesh::computeVerticesNormals(){
@@ -159,6 +161,7 @@ void Mesh::getColour(unsigned int vertex){
 }
 
 void Mesh::addPlane(Plane *p){
+    std::cout << "Adding plane" << std::endl;
     planes.push_back(p);
     planeNeighbours.push_back(-1);  // This is done once for the neg and once for the pos
     planeNeighbours.push_back(-1);
@@ -183,14 +186,18 @@ void Mesh::updatePlaneIntersections(){
                 }
             }
         }
-
+        std::cout << "ACTUALLY UPDATING" << std::endl;
         mergeFlood();
-        cutMesh();
+        cutMesh();  // cut it if its already cut
     }
 }
 
 void Mesh::cutMesh(){
     trianglesCut.clear();
+
+    std::cout << "Cutting the actual mesh : ";
+    if(cuttingSide==Side::EXTERIOR) std::cout << "fibula" << std::endl;
+    else std::cout << "manible" << std::endl;
 
     // TODO : find a better location for this (in meshreader.h)
     /*coloursIndicies.clear();

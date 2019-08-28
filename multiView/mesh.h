@@ -45,7 +45,7 @@ public:
 
     void addPlane(Plane *p);
 
-    void setIsCut(Side s, bool isCut);
+    void setIsCut(Side s, bool isCut, bool isUpdate);
     // void switchIsCut(Side s);
     void drawCut();
 

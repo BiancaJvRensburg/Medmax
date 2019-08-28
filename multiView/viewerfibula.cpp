@@ -6,6 +6,7 @@ ViewerFibula::ViewerFibula(QWidget *parent, StandardCamera *camera, int sliderMa
     maxOffset = fibulaOffset;
     isPlanesRecieved = false;
     isCutSignal = false;
+    isCutInitialising = false;
 }
 
 void ViewerFibula::initSignals(){
@@ -45,9 +46,7 @@ void ViewerFibula::createPolyline(){
     polyline.clear();
 
     polyline.push_back(leftPlane->getPosition());
-
     for(int i=0; i<ghostPlanes.size(); i++) polyline.push_back(ghostPlanes[i].getPosition());
-
     polyline.push_back(rightPlane->getPosition());
 }
 
@@ -74,7 +73,8 @@ void ViewerFibula::movePlanes(int position){
 
     setPlaneOrientations(angleVectors);
 
-    mesh.updatePlaneIntersections();
+    std::cout << "Updating intersections from move planes" << std::endl;
+    if(!isCutInitialising) mesh.updatePlaneIntersections();
 
     update();
 
@@ -185,7 +185,8 @@ void ViewerFibula::movePlaneDistance(double distance, std::vector<Vec> angles){
 
     setPlaneOrientations(angles);
 
-    mesh.updatePlaneIntersections(rightPlane);
+    std::cout << "Updating intersections from plane distance" << std::endl;
+    if(!isCutInitialising) mesh.updatePlaneIntersections(rightPlane);
     update();
 }
 
@@ -204,7 +205,6 @@ void ViewerFibula::moveGhostPlaneDistance(double distance, std::vector<Vec> angl
 
     // Gives a problem in extreme cases, so we check the index is still within bounds
     curveIndexR += offset;
-    //if(curveIndexR + indexOffset > curve->getNbU()) curveIndexR = curve->getNbU() - 1 - indexOffset;        // Crash protection
 
     // If we're too far along the fibula, take it all back
     int overload = curveIndexR + indexOffset - curve->getNbU() + 1;   // The amount by which the actual index passes the end of the curve
@@ -222,7 +222,8 @@ void ViewerFibula::moveGhostPlaneDistance(double distance, std::vector<Vec> angl
 
     setPlaneOrientations(angles);
 
-    mesh.updatePlaneIntersections(rightPlane);
+    std::cout << "Updating intersections from ghost plane distance" << std::endl;
+    if(!isCutInitialising) mesh.updatePlaneIntersections(rightPlane);
     update();
 }
 
@@ -256,7 +257,8 @@ void ViewerFibula::middlePlaneMoved(int nb, double distances[], std::vector<Vec>
     setPlaneOrientations(angles);
 
     // update the mesh intersections
-    mesh.updatePlaneIntersections(rightPlane);
+    std::cout << "Updating intersections from middle moved" << std::endl;
+    if(!isCutInitialising) mesh.updatePlaneIntersections(rightPlane);
 
     update();
 }
@@ -307,15 +309,6 @@ void ViewerFibula::initCurve(){
 }
 
 void ViewerFibula::cutMesh(){
-    // This happens before the ghost planes are recieved
-    // Send pointers to the mesh
-    /*std::cout << "Ghost planes in fibula " << ghostPlanes.size() << std::endl;
-    Plane *planes[ghostPlanes.size()];
-    for(int i=0; i<ghostPlanes.size(); i++){
-        *planes[i] = ghostPlanes[i];
-        mesh.addPlane(planes[i]);
-    }*/
-
     isCutSignal = true;
     handleCut();
     update();
@@ -323,18 +316,12 @@ void ViewerFibula::cutMesh(){
 
 void ViewerFibula::handleCut(){
     if(isCutSignal && isPlanesRecieved){
-        // Send pointers to the mesh
-        //std::cout << "Ghost planes in fibula " << ghostPlanes.size() << std::endl;
-        //Plane *planes[ghostPlanes.size()];
         for(int i=0; i<ghostPlanes.size(); i++){
-            //*planes[i] = ghostPlanes[i];
-            //std::cout<<"Adding plane"<<std::endl;
             mesh.addPlane(&ghostPlanes[i]);
-            //std::cout<<"Plane added"<<std::endl;
         }
 
-        //std::cout<<"Cutting"<<std::endl;
-        mesh.setIsCut(Side::EXTERIOR, true);
+        std::cout<<"Cutting fibula"<<std::endl;
+        mesh.setIsCut(Side::EXTERIOR, true, false);
         isGhostPlanes = true;
         isCutSignal = false;
         isPlanesRecieved = false;
@@ -342,11 +329,20 @@ void ViewerFibula::handleCut(){
 }
 
 void ViewerFibula::uncutMesh(){
-    mesh.setIsCut(Side::EXTERIOR, false);
+    mesh.setIsCut(Side::EXTERIOR, false, false);
     isGhostPlanes = false;
     ghostPlanes.clear();        // NOTE To eventually be changed
     // Reset their orientations
     leftPlane->setOrientation(getNewOrientation(curveIndexL));
     rightPlane->setOrientation(getNewOrientation(curveIndexR));
     update();
+}
+
+void ViewerFibula::toHaltMeshUpdate(){
+    isCutInitialising = true;
+}
+
+void ViewerFibula::toContinueMeshUpdate(){
+    isCutInitialising = false;
+    mesh.updatePlaneIntersections();
 }

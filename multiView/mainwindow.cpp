@@ -128,6 +128,9 @@ void MainWindow::initDisplayDockWidgets(){
 
     connect(fibulaViewer, &ViewerFibula::sendToManible, skullViewer, &Viewer::recieveFromFibulaMesh);
 
+    /*connect(skullViewer, &Viewer::haltMeshUpdate, fibulaViewer, &ViewerFibula::toHaltMeshUpdate);
+    connect(skullViewer, &Viewer::continueMeshUpdate, fibulaViewer, &ViewerFibula::toContinueMeshUpdate);*/
+
     contentsMand->setLayout(contentLayoutMand);
     contentsFibula->setLayout(contentLayoutFibula);
 

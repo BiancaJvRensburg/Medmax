@@ -160,8 +160,6 @@ void Viewer::recieveFromFibulaMesh(std::vector<int> planes, std::vector<Vec> ver
             int mandPlane = (planes[i]+2) / 2 - 2;
             verticies[i] = ghostPlanes[mandPlane].getMeshCoordinatesFromLocal(verticies[i]);
         }
-
-        // std::cout << verticies[i].x << " " << verticies[i].y << " " << verticies[i].z << " " << std::endl;
     }
 
     Q_EMIT sendFibulaToMesh(verticies, triangles, colours, normals, nbColours);
@@ -279,6 +277,8 @@ void Viewer::initGhostPlanes(){
         // Update the fibula planes and polyline
         std::vector<Vec> angles = updatePolyline();
 
+        Q_EMIT haltMeshUpdate();
+
         double distance;
         if(finalNb > 0) distance = curve->discreteLength(curveIndexL, ghostLocation[0]);
         else distance = curve->discreteLength(curveIndexL, curveIndexR);
@@ -286,6 +286,8 @@ void Viewer::initGhostPlanes(){
         if(finalNb > 0) distance = curve->discreteLength(curveIndexR, ghostLocation[finalNb-1]);
         else distance = curve->discreteLength(curveIndexL, curveIndexR);
         Q_EMIT rightPosChanged(distance, angles);
+
+        Q_EMIT continueMeshUpdate();
 
     }
     else{
@@ -295,6 +297,7 @@ void Viewer::initGhostPlanes(){
 }
 
 void Viewer::cutMesh(){
+    //std::cout << "Cutting from viewer" << std::endl;
 
     // Get the number of ghost planes from the total number of pieces dialog
     bool isNumberRecieved;
@@ -305,14 +308,14 @@ void Viewer::cutMesh(){
     // The dialog wasn't cancelled so the fibula can be cut
     Q_EMIT okToCut();
 
-    mesh.setIsCut(Side::INTERIOR, true);
+    mesh.setIsCut(Side::INTERIOR, true, true);
     isGhostPlanes = true;
     initGhostPlanes();
     update();
 }
 
 void Viewer::uncutMesh(){
-    mesh.setIsCut(Side::INTERIOR, false);
+    mesh.setIsCut(Side::INTERIOR, false, false);
     isGhostPlanes = false;
     ghostPlanes.clear();
     update();
@@ -342,6 +345,7 @@ void Viewer::moveLeftPlane(int position){
     leftPlane->setPosition(curve->getPoint(curveIndexL));
     leftPlane->setOrientation(getNewOrientation(curveIndexL));
 
+    std::cout << "Updating intersections from move plane left" << std::endl;
     mesh.updatePlaneIntersections(leftPlane);
 
     double distance;
@@ -376,6 +380,7 @@ void Viewer::rotateLeftPlane(int position){
     double percentage = static_cast<double>(position) / static_cast<double>(sliderMax);
 
     leftPlane->rotatePlaneXY(percentage);
+    std::cout << "Updating intersections from rotate plane left" << std::endl;
     mesh.updatePlaneIntersections(leftPlane);
     update();
 }
@@ -384,6 +389,7 @@ void Viewer::rotateRightPlane(int position){
     double percentage = static_cast<double>(position) / static_cast<double>(sliderMax);
 
     rightPlane->rotatePlaneXY(percentage);
+    std::cout << "Updating intersections from rotate right" << std::endl;
     mesh.updatePlaneIntersections(rightPlane);
     update();
 }
@@ -407,6 +413,7 @@ void Viewer::moveRightPlane(int position){
     rightPlane->setPosition(curve->getPoint(curveIndexR));
     rightPlane->setOrientation(getNewOrientation(curveIndexR));
 
+    std::cout << "Updating intersections from move plane right" << std::endl;
     mesh.updatePlaneIntersections(rightPlane);
 
     double distance;
@@ -541,6 +548,7 @@ void Viewer::updatePlanes(){
     leftPlane->setOrientation(getNewOrientation(curveIndexL));
     rightPlane->setOrientation(getNewOrientation(curveIndexR));
 
+    std::cout << "Updating intersections from update planes in viewer" << std::endl;
     mesh.updatePlaneIntersections();
 
     update();

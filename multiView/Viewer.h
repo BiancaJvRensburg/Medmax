@@ -46,6 +46,10 @@ Q_SIGNALS:
     void setRMSliderValue(int);   // Right movement
     void sendFibulaToMesh(std::vector<Vec>, std::vector<std::vector<int>>, std::vector<int>, std::vector<Vec3Df>, int);
 
+    // Stop the fibula from updating too many times
+    void haltMeshUpdate();
+    void continueMeshUpdate();
+
 protected:
     void draw();
     std::vector<Vec> updatePolyline();   // returns the new angles between the polyline and the planes

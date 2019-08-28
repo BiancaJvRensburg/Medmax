@@ -23,6 +23,9 @@ public Q_SLOTS:
     void cutMesh();
     void uncutMesh();
 
+    void toHaltMeshUpdate();
+    void toContinueMeshUpdate();
+
     void recieveFromFibulaMesh(std::vector<int>, std::vector<Vec>, std::vector<std::vector<int>>, std::vector<int>, std::vector<Vec3Df>, int);
 
 Q_SIGNALS:
@@ -38,6 +41,7 @@ private:
 
     bool isCutSignal;
     bool isPlanesRecieved;
+    bool isCutInitialising;
 
     int indexOffset;
     int maxOffset;
