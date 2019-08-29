@@ -42,6 +42,8 @@ public:
 
     Vec getLocalCoordinates(Vec v) { return cp->getFrame()->localCoordinatesOf(v); }    // same as get polyline
     Vec getMeshCoordinatesFromLocal(Vec v){ return cp->getFrame()->localInverseCoordinatesOf(v); }
+    Vec getLocalVector(Vec v) { return cp->getFrame()->localTransformOf(v); }    // same as get polyline
+    Vec getMeshVectorFromLocal(Vec v){ return cp->getFrame()->localInverseTransformOf(v); }
 
     Movable status;
 

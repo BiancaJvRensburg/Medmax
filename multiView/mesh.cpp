@@ -24,6 +24,7 @@ void Mesh::computeBB(){
 void Mesh::update(){
     computeBB();
     recomputeNormals();
+    //recomputeFibInMandNormals();
     updatePlaneIntersections();
 }
 
@@ -55,13 +56,37 @@ void Mesh::computeTriangleNormals(){
 }
 
 Vec3Df Mesh::computeTriangleNormal(unsigned int id ){
-
     const Triangle & t = triangles[id];
     Vec3Df normal = Vec3Df::crossProduct(vertices[t.getVertex (1)] - vertices[t.getVertex (0)], vertices[t.getVertex (2)]- vertices[t.getVertex (0)]);
     normal.normalize();
     return normal;
 
 }
+
+/*void Mesh::recomputeFibInMandNormals () {
+
+    computeFibInMandTriangleNormals();
+    computeFibInMandVerticesNormals();
+
+}
+
+void Mesh::computeFibInMandTriangleNormals(){
+
+    fibInMandNormals.clear();
+
+    for(unsigned int i = 0 ; i < fibInMandTriangles.size() ; i++){
+        fibInMandNormals.push_back(computeTriangleNormal(i));
+    }
+
+}
+
+Vec3Df Mesh::computeFibInMandTriangleNormal(unsigned int id ){
+    const Triangle & t = fibInMandTriangles[id];
+    Vec3Df normal = Vec3Df::crossProduct(fibInMandVerticies[t.getVertex (1)] - fibInMandVerticies[t.getVertex (0)], fibInMandVerticies[t.getVertex (2)]- vertices[t.getVertex (0)]);
+    normal.normalize();
+    return normal;
+
+}*/
 
 void Mesh::setIsCut(Side s, bool isCut, bool isUpdate){
     this->isCut = isCut;
@@ -88,6 +113,26 @@ void Mesh::computeVerticesNormals(){
         verticesNormals[ v ].normalize();
     }
 }
+
+/*void Mesh::computeFibInMandVerticesNormals(){
+
+    fibInMandVerticesNormals.clear();
+    fibInMandVerticesNormals.resize( fibInMandVerticies.size() , Vec3Df(0.,0.,0.) );
+
+    for( unsigned int t = 0 ; t < fibInMandTriangles.size(); ++t )
+    {
+        Vec3Df const & tri_normal = normals[t];
+
+        fibInMandVerticesNormals[ fibInMandTriangles[t].getVertex(0) ] += tri_normal;
+        fibInMandVerticesNormals[ fibInMandTriangles[t].getVertex(1) ] += tri_normal;
+        fibInMandVerticesNormals[ fibInMandTriangles[t].getVertex(2) ] += tri_normal;
+    }
+
+    for( unsigned int v = 0 ; v < fibInMandVerticesNormals.size() ; ++v )
+    {
+        fibInMandVerticesNormals[ v ].normalize();
+    }
+}*/
 
 // Access and colour each individual vertex here
 void Mesh::glTriangle(unsigned int i){
@@ -464,7 +509,7 @@ void Mesh::sendToManible(){
     std::vector<Vec> convertedVerticies;    // the vertex coordinates in relation to the plane nb
     std::vector<std::vector<int>>convertedTriangles; // the new indicies of the triangles (3 indicies)
     std::vector<int> convertedColours;
-    std::vector<Vec3Df> convertedNormals;
+    std::vector<Vec> convertedNormals;
     int tempVerticies[smoothedVerticies.size()];   // a temporary marker for already converted verticies
 
     for(int i=0; i<smoothedVerticies.size(); i++) tempVerticies[i] = -1;
@@ -497,7 +542,10 @@ void Mesh::sendToManible(){
                 convertedVerticies.push_back(convertedCoords);
                 // add its corresponding colour and normal
                 convertedColours.push_back(coloursIndicies[triVert]);
-                convertedNormals.push_back(normals[triVert]);       // TODO convert this
+
+                Vec unConvertedNorm = Vec(verticesNormals[triVert][0], verticesNormals[triVert][1], verticesNormals[triVert][2]);
+                Vec convertedNorm = planes[pNb]->getLocalVector(unConvertedNorm);  // TODO might have to change this to vector instead of coords
+                convertedNormals.push_back(convertedNorm);       // TODO convert this
                 int vertexIndex = convertedVerticies.size() - 1;
                 newTriangle.push_back(vertexIndex);  // set it to the last index of convertedVerticies
 
@@ -515,7 +563,7 @@ void Mesh::sendToManible(){
     Q_EMIT sendInfoToManible(planeNb, convertedVerticies, convertedTriangles, convertedColours, convertedNormals, (planes.size()/2));
 }
 
-void Mesh::recieveInfoFromFibula(std::vector<Vec> convertedVerticies, std::vector<std::vector<int>> convertedTriangles, std::vector<int> convertedColours, std::vector<Vec3Df> convertedNormals, int nbColours){
+void Mesh::recieveInfoFromFibula(std::vector<Vec> convertedVerticies, std::vector<std::vector<int>> convertedTriangles, std::vector<int> convertedColours, std::vector<Vec> convertedNormals, int nbColours){
     if(cuttingSide != Side::INTERIOR) return;
 
     fibInMandTriangles.clear();
@@ -529,13 +577,16 @@ void Mesh::recieveInfoFromFibula(std::vector<Vec> convertedVerticies, std::vecto
         Vec3Df v = Vec3Df(convertedVerticies[i].x, convertedVerticies[i].y, convertedVerticies[i].z);
         fibInMandVerticies.push_back(v);
         fibInMandColour.push_back(convertedColours[i]);
-        fibInMandNormals.push_back(convertedNormals[i]);
+        v = Vec3Df(convertedNormals[i].x, convertedNormals[i].y, convertedNormals[i].z);
+        fibInMandNormals.push_back(v);
     }
 
     for(unsigned int i=0; i<convertedTriangles.size(); i++){
         Triangle t = Triangle(convertedTriangles[i][0], convertedTriangles[i][1], convertedTriangles[i][2]);
         fibInMandTriangles.push_back(t);
     }
+
+    //recomputeFibInMandNormals();
 }
 
 void Mesh::draw()

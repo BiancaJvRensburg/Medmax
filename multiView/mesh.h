@@ -54,10 +54,10 @@ public:
     void invertNormal(){normalDirection *= -1;}
 
 public Q_SLOTS:
-    void recieveInfoFromFibula(std::vector<Vec>, std::vector<std::vector<int>>, std::vector<int>, std::vector<Vec3Df>, int);
+    void recieveInfoFromFibula(std::vector<Vec>, std::vector<std::vector<int>>, std::vector<int>, std::vector<Vec>, int);
 
 Q_SIGNALS:
-    void sendInfoToManible(std::vector<int>, std::vector<Vec>, std::vector<std::vector<int>>, std::vector<int>, std::vector<Vec3Df>, int);
+    void sendInfoToManible(std::vector<int>, std::vector<Vec>, std::vector<std::vector<int>>, std::vector<int>, std::vector<Vec>, int);
 
 protected:
     void init();
@@ -70,6 +70,11 @@ protected:
     void glTriangleSmooth(unsigned int i);
     void glTriangleFibInMand(unsigned int i);
     void getColour(unsigned int vertex);
+
+    /*void recomputeFibInMandNormals();
+    void computeFibInMandTriangleNormals();
+    Vec3Df computeFibInMandTriangleNormal(unsigned int t);
+    void computeFibInMandVerticesNormals();*/
 
     void planeIntersection(unsigned int index);
 
@@ -111,6 +116,7 @@ protected:
     std::vector<Triangle> fibInMandTriangles;
     std::vector<int> fibInMandColour;       // Only the fibula bones will be coloured
     std::vector<Vec3Df> fibInMandNormals;
+    std::vector<Vec3Df> fibInMandVerticesNormals;
     int fibInMandNbColours;
 
     Side cuttingSide = Side::INTERIOR;

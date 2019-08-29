@@ -133,7 +133,7 @@ void Viewer::initSignals(){
     connect(this, &Viewer::sendFibulaToMesh, &mesh, &Mesh::recieveInfoFromFibula);
 }
 
-void Viewer::recieveFromFibulaMesh(std::vector<int> planes, std::vector<Vec> verticies, std::vector<std::vector<int>> triangles, std::vector<Vec> fibulaPolyline, std::vector<int> colours, std::vector<Vec3Df> normals, int nbColours){
+void Viewer::recieveFromFibulaMesh(std::vector<int> planes, std::vector<Vec> verticies, std::vector<std::vector<int>> triangles, std::vector<Vec> fibulaPolyline, std::vector<int> colours, std::vector<Vec> normals, int nbColours){
    // Rotate the planes to match the fibula (just the extremities for now)
    /* Vec mandPolylineSegment;
     Vec axis;
@@ -155,12 +155,19 @@ void Viewer::recieveFromFibulaMesh(std::vector<int> planes, std::vector<Vec> ver
      * n : ghostPlane[n-2]
     */
 
-    // For each vertex, convert it from the corresponding plane's coordinates to the mesh coordinates
-    for(int i=0; i<verticies.size(); i++){
-        if(planes[i]==0) verticies[i] = leftPlane->getMeshCoordinatesFromLocal(verticies[i]);
-        else if(planes[i]==1) verticies[i] = rightPlane->getMeshCoordinatesFromLocal(verticies[i]);
+    // For each vertex and normal, convert it from the corresponding plane's coordinates to the mesh coordinates
+    for(unsigned int i=0; i<verticies.size(); i++){
+        if(planes[i]==0){
+            normals[i] = leftPlane->getMeshVectorFromLocal(normals[i]);
+            verticies[i] = leftPlane->getMeshCoordinatesFromLocal(verticies[i]);
+        }
+        else if(planes[i]==1){
+            normals[i] = rightPlane->getMeshVectorFromLocal(normals[i]);
+            verticies[i] = rightPlane->getMeshCoordinatesFromLocal(verticies[i]);
+        }
         else {
             int mandPlane = (planes[i]+2) / 2 - 2;
+            normals[i] = ghostPlanes[mandPlane].getMeshVectorFromLocal(normals[i]);
             verticies[i] = ghostPlanes[mandPlane].getMeshCoordinatesFromLocal(verticies[i]);
         }
     }

@@ -31,7 +31,7 @@ public Q_SLOTS:
     void drawMesh();
     void onLeftSliderReleased();
     void onRightSliderReleased();
-    void recieveFromFibulaMesh(std::vector<int>, std::vector<Vec>, std::vector<std::vector<int>>, std::vector<Vec>, std::vector<int>, std::vector<Vec3Df>, int);
+    void recieveFromFibulaMesh(std::vector<int>, std::vector<Vec>, std::vector<std::vector<int>>, std::vector<Vec>, std::vector<int>, std::vector<Vec>, int);
 
 Q_SIGNALS:
     void leftPosChanged(double, std::vector<Vec>);
@@ -44,7 +44,7 @@ Q_SIGNALS:
     void setRRSliderValue(int);   // Right rotation
     void setLMSliderValue(int);   // Left movement
     void setRMSliderValue(int);   // Right movement
-    void sendFibulaToMesh(std::vector<Vec>, std::vector<std::vector<int>>, std::vector<int>, std::vector<Vec3Df>, int);
+    void sendFibulaToMesh(std::vector<Vec>, std::vector<std::vector<int>>, std::vector<int>, std::vector<Vec>, int);
 
     void noGhostPlanesToSend();     // tells the fibula not to wait for ghost planes before cutting
 
