@@ -46,6 +46,8 @@ Q_SIGNALS:
     void setRMSliderValue(int);   // Right movement
     void sendFibulaToMesh(std::vector<Vec>, std::vector<std::vector<int>>, std::vector<int>, std::vector<Vec3Df>, int);
 
+    void noGhostPlanesToSend();     // tells the fibula not to wait for ghost planes before cutting
+
     // Stop the fibula from updating too many times
     /*void haltMeshUpdate();
     void continueMeshUpdate();*/

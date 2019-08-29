@@ -170,6 +170,7 @@ void Mesh::addPlane(Plane *p){
 
 void Mesh::updatePlaneIntersections(){
     if(isCut){
+        //if(cuttingSide==Side::EXTERIOR) std::cout << "ACTUALLY CUTTING fibula" << std::endl;
         flooding.clear();
         for(int i=0; i<vertices.size(); i++) flooding.push_back(-1);
         for(int i=0; i<planeNeighbours.size(); i++) planeNeighbours[i] = -1;
@@ -212,6 +213,9 @@ void Mesh::cutMesh(){
 
             // fibula
         case Side::EXTERIOR:
+            //std::cout << "Cutting fibula" << std::endl;
+            getSegmentsToKeep();    // figure out what to keep (TODO can be done earlier)
+            //std::cout << "Segments conserved : " << segmentsConserved.size() << std::endl;
             for(unsigned int i=0; i<flooding.size(); i++){
                 bool isKeep = false;
                 // Only keep it if it belongs to a kept segment
@@ -241,7 +245,7 @@ void Mesh::cutMesh(){
     }
 
     // ! Conserve this order
-    if(cuttingSide == Side::EXTERIOR) getSegmentsToKeep();
+    //if(cuttingSide == Side::EXTERIOR) getSegmentsToKeep();
     createSmoothedTriangles();
     if(cuttingSide == Side::EXTERIOR){
         fillColours();
@@ -278,6 +282,19 @@ void Mesh::getSegmentsToKeep(){
     int planeToKeep;
     if(flooding[0]!=-1) planeToKeep = 0;
     else planeToKeep = planes.size();   // keep the otherside if 0 is discared
+
+    // if there are no ghost planes
+    if(planes.size()==2){
+        int rightPlaneKept;
+        if(flooding[1]!=-1) rightPlaneKept = 1;
+        else rightPlaneKept = 3;
+
+        int max;
+        if(planeToKeep>rightPlaneKept) max = planeToKeep;
+        else max = rightPlaneKept;
+        segmentsConserved.push_back(max);
+        return;
+    }
 
     // while we haven't found the right plane
     while(planeToKeep!=1 && planeToKeep!=planes.size()+1){

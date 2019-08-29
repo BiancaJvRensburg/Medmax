@@ -26,6 +26,8 @@ public Q_SLOTS:
    /* void toHaltMeshUpdate();
     void toContinueMeshUpdate();*/
 
+    void noGhostPlanesToRecieve();
+
     void recieveFromFibulaMesh(std::vector<int>, std::vector<Vec>, std::vector<std::vector<int>>, std::vector<int>, std::vector<Vec3Df>, int);
 
 Q_SIGNALS:
