@@ -6,7 +6,6 @@ ViewerFibula::ViewerFibula(QWidget *parent, StandardCamera *camera, int sliderMa
     maxOffset = fibulaOffset;
     isPlanesRecieved = false;
     isCutSignal = false;
-    isCutInitialising = false;
 }
 
 void ViewerFibula::initSignals(){
@@ -69,7 +68,7 @@ void ViewerFibula::movePlanes(int position){
 
     setPlaneOrientations(angleVectors);
 
-    if(!isCutInitialising) mesh.updatePlaneIntersections();
+    mesh.updatePlaneIntersections();
 
     update();
 
@@ -142,12 +141,14 @@ void ViewerFibula::setPlaneOrientations(std::vector<Vec> angles){
 
 // Don't wait for ghost planes, go ahead and cut
 void ViewerFibula::noGhostPlanesToRecieve(){
+    std::cout << "Not going to recieve any " << std::endl;
     isPlanesRecieved = true;
     handleCut();
 }
 
 // Add ghost planes that correspond to the ghost planes in the jaw
 void ViewerFibula::ghostPlanesRecieved(int nb, double distance[], std::vector<Vec> angles){
+    std::cout << "Nb of ghost planes recieved : " << nb << std::endl;
     // if no ghost planes were actually recieved
     if(nb==0){
         ghostPlanes.clear();
@@ -186,7 +187,7 @@ void ViewerFibula::movePlaneDistance(double distance, std::vector<Vec> angles){
 
     setPlaneOrientations(angles);
 
-    if(!isCutInitialising) mesh.updatePlaneIntersections(rightPlane);
+    mesh.updatePlaneIntersections(rightPlane);
     update();
 }
 
@@ -222,7 +223,7 @@ void ViewerFibula::moveGhostPlaneDistance(double distance, std::vector<Vec> angl
 
     setPlaneOrientations(angles);
 
-    if(!isCutInitialising) mesh.updatePlaneIntersections(rightPlane);
+    mesh.updatePlaneIntersections(rightPlane);
     update();
 }
 
@@ -256,7 +257,7 @@ void ViewerFibula::middlePlaneMoved(int nb, double distances[], std::vector<Vec>
     setPlaneOrientations(angles);
 
     // update the mesh intersections
-    if(!isCutInitialising) mesh.updatePlaneIntersections(rightPlane);
+    mesh.updatePlaneIntersections(rightPlane);
 
     update();
 }
@@ -314,7 +315,7 @@ void ViewerFibula::cutMesh(){
 
 void ViewerFibula::handleCut(){
     if(isCutSignal && isPlanesRecieved){
-        //std::cout << "Cutting fibula called" << std::endl;
+        std::cout << "Ghost plane size when cut : " << ghostPlanes.size() << std::endl;
         for(int i=0; i<ghostPlanes.size(); i++){
             mesh.addPlane(&ghostPlanes[i]);
         }
@@ -328,6 +329,7 @@ void ViewerFibula::handleCut(){
 }
 
 void ViewerFibula::uncutMesh(){
+    isPlanesRecieved = false;
     mesh.setIsCut(Side::EXTERIOR, false, false);
     isGhostPlanes = false;
     ghostPlanes.clear();        // NOTE To eventually be changed
@@ -336,13 +338,3 @@ void ViewerFibula::uncutMesh(){
     rightPlane->setOrientation(getNewOrientation(curveIndexR));
     update();
 }
-
-/*void ViewerFibula::toHaltMeshUpdate(){
-    isCutInitialising = true;
-}
-
-void ViewerFibula::toContinueMeshUpdate(){
-    isCutInitialising = false;
-    mesh.updatePlaneIntersections();
-    update();
-}*/

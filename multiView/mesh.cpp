@@ -24,7 +24,6 @@ void Mesh::computeBB(){
 void Mesh::update(){
     computeBB();
     recomputeNormals();
-    //recomputeFibInMandNormals();
     updatePlaneIntersections();
 }
 
@@ -63,34 +62,10 @@ Vec3Df Mesh::computeTriangleNormal(unsigned int id ){
 
 }
 
-/*void Mesh::recomputeFibInMandNormals () {
-
-    computeFibInMandTriangleNormals();
-    computeFibInMandVerticesNormals();
-
-}
-
-void Mesh::computeFibInMandTriangleNormals(){
-
-    fibInMandNormals.clear();
-
-    for(unsigned int i = 0 ; i < fibInMandTriangles.size() ; i++){
-        fibInMandNormals.push_back(computeTriangleNormal(i));
-    }
-
-}
-
-Vec3Df Mesh::computeFibInMandTriangleNormal(unsigned int id ){
-    const Triangle & t = fibInMandTriangles[id];
-    Vec3Df normal = Vec3Df::crossProduct(fibInMandVerticies[t.getVertex (1)] - fibInMandVerticies[t.getVertex (0)], fibInMandVerticies[t.getVertex (2)]- vertices[t.getVertex (0)]);
-    normal.normalize();
-    return normal;
-
-}*/
-
 void Mesh::setIsCut(Side s, bool isCut, bool isUpdate){
     this->isCut = isCut;
     this->cuttingSide = s;
+    if(!isCut) deleteGhostPlanes();
     if(isUpdate) updatePlaneIntersections();
 }
 
@@ -113,26 +88,6 @@ void Mesh::computeVerticesNormals(){
         verticesNormals[ v ].normalize();
     }
 }
-
-/*void Mesh::computeFibInMandVerticesNormals(){
-
-    fibInMandVerticesNormals.clear();
-    fibInMandVerticesNormals.resize( fibInMandVerticies.size() , Vec3Df(0.,0.,0.) );
-
-    for( unsigned int t = 0 ; t < fibInMandTriangles.size(); ++t )
-    {
-        Vec3Df const & tri_normal = normals[t];
-
-        fibInMandVerticesNormals[ fibInMandTriangles[t].getVertex(0) ] += tri_normal;
-        fibInMandVerticesNormals[ fibInMandTriangles[t].getVertex(1) ] += tri_normal;
-        fibInMandVerticesNormals[ fibInMandTriangles[t].getVertex(2) ] += tri_normal;
-    }
-
-    for( unsigned int v = 0 ; v < fibInMandVerticesNormals.size() ; ++v )
-    {
-        fibInMandVerticesNormals[ v ].normalize();
-    }
-}*/
 
 // Access and colour each individual vertex here
 void Mesh::glTriangle(unsigned int i){
@@ -205,12 +160,31 @@ void Mesh::getColour(unsigned int vertex){
 }
 
 void Mesh::addPlane(Plane *p){
+    std::cout << "Adding plane" << std::endl;
     planes.push_back(p);
     planeNeighbours.push_back(-1);  // This is done once for the neg and once for the pos
     planeNeighbours.push_back(-1);
     std::vector<unsigned int> init;
     intersectionTriangles.push_back(init);
     updatePlaneIntersections(p);
+}
+
+void Mesh::deleteGhostPlanes(){
+    // Delete all ghost planes
+    /*for(int i=2; i<planes.size(); i++){
+
+    }*/
+    if(planes.size()==2) return;
+
+    /*std::cout << "Attempting to delete ghost planes" << std::endl;
+    for (std::vector<Plane*>::iterator pObj = planes.begin()+2; pObj != planes.end(); ++pObj) {
+          delete *pObj;
+    }*/
+
+    // TODO maybe a memory leak?
+
+    planes.erase(planes.begin()+2, planes.end());
+    std::cout<<"Planes left after delete : " << planes.size() << std::endl;
 }
 
 void Mesh::updatePlaneIntersections(){
@@ -585,8 +559,6 @@ void Mesh::recieveInfoFromFibula(std::vector<Vec> convertedVerticies, std::vecto
         Triangle t = Triangle(convertedTriangles[i][0], convertedTriangles[i][1], convertedTriangles[i][2]);
         fibInMandTriangles.push_back(t);
     }
-
-    //recomputeFibInMandNormals();
 }
 
 void Mesh::draw()

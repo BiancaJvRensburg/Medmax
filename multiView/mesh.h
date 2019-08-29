@@ -46,7 +46,6 @@ public:
     void addPlane(Plane *p);
 
     void setIsCut(Side s, bool isCut, bool isUpdate);
-    // void switchIsCut(Side s);
     void drawCut();
 
     typedef std::priority_queue< std::pair< float , int > , std::deque< std::pair< float , int > > , std::greater< std::pair< float , int > > > FacesQueue;
@@ -71,11 +70,6 @@ protected:
     void glTriangleFibInMand(unsigned int i);
     void getColour(unsigned int vertex);
 
-    /*void recomputeFibInMandNormals();
-    void computeFibInMandTriangleNormals();
-    Vec3Df computeFibInMandTriangleNormal(unsigned int t);
-    void computeFibInMandVerticesNormals();*/
-
     void planeIntersection(unsigned int index);
 
     void floodNeighbour(unsigned int index, unsigned int id);     // flood the neighbours of the vertex index with the value id
@@ -87,6 +81,7 @@ protected:
 
     void cutMesh();
     void fillColours();
+    void deleteGhostPlanes();
 
     void sendToManible();
 

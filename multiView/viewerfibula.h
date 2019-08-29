@@ -23,9 +23,6 @@ public Q_SLOTS:
     void cutMesh();
     void uncutMesh();
 
-   /* void toHaltMeshUpdate();
-    void toContinueMeshUpdate();*/
-
     void noGhostPlanesToRecieve();
 
     void recieveFromFibulaMesh(std::vector<int>, std::vector<Vec>, std::vector<std::vector<int>>, std::vector<int>, std::vector<Vec>, int);
@@ -43,7 +40,6 @@ private:
 
     bool isCutSignal;
     bool isPlanesRecieved;
-    bool isCutInitialising;
 
     int indexOffset;
     int maxOffset;

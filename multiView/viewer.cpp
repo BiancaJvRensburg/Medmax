@@ -315,6 +315,8 @@ void Viewer::cutMesh(){
     if(isNumberRecieved) nbGhostPlanes = nbPieces-1;
     else return;
 
+    Q_EMIT preparingToCut();
+
     if(nbGhostPlanes==0) Q_EMIT noGhostPlanesToSend();
 
     // The dialog wasn't cancelled so the fibula can be cut
