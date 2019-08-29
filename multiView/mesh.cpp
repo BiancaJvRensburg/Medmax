@@ -160,7 +160,7 @@ void Mesh::getColour(unsigned int vertex){
 }
 
 void Mesh::addPlane(Plane *p){
-    std::cout << "Adding plane" << std::endl;
+    //std::cout << "Adding plane" << std::endl;
     planes.push_back(p);
     planeNeighbours.push_back(-1);  // This is done once for the neg and once for the pos
     planeNeighbours.push_back(-1);
@@ -184,7 +184,7 @@ void Mesh::deleteGhostPlanes(){
     // TODO maybe a memory leak?
 
     planes.erase(planes.begin()+2, planes.end());
-    std::cout<<"Planes left after delete : " << planes.size() << std::endl;
+   // std::cout<<"Planes left after delete : " << planes.size() << std::endl;
 }
 
 void Mesh::updatePlaneIntersections(){
@@ -274,11 +274,11 @@ void Mesh::cutMesh(){
 }
 
 void Mesh::fillColours(){
-    int tempColours[planes.size()];
+    int tempColours[planeNeighbours.size()];
     coloursIndicies.clear();
 
     // init all to -1
-    for(int i=0; i<planes.size(); i++){
+    for(int i=0; i<planeNeighbours.size(); i++){
         tempColours[i] = -1;
     }
 
@@ -297,28 +297,33 @@ void Mesh::fillColours(){
 void Mesh::getSegmentsToKeep(){
     segmentsConserved.clear();
 
+    //std::cout << "Plane size : " << planes.size() << std::endl;
+
     // Find the non-discarded side of the left plane
     int planeToKeep;
-    if(flooding[0]!=-1) planeToKeep = 0;
+    //if(flooding[0]!=-1) planeToKeep = 0;  // this doesn't make sense, this is if the first vertex = -1
+    if(planeNeighbours[0]!=-1) planeToKeep = 0; // if it has a neighbour
     else planeToKeep = planes.size();   // keep the otherside if 0 is discared
 
     // if there are no ghost planes
     if(planes.size()==2){
         int rightPlaneKept;
-        if(flooding[1]!=-1) rightPlaneKept = 1;
+        if(planeNeighbours[1]!=-1) rightPlaneKept = 1;
         else rightPlaneKept = 3;
 
         int max;
         if(planeToKeep>rightPlaneKept) max = planeToKeep;
         else max = rightPlaneKept;
+        std::cout << "Max : " << max << std::endl;
         segmentsConserved.push_back(max);
         return;
     }
 
     // while we haven't found the right plane
     while(planeToKeep!=1 && planeToKeep!=planes.size()+1){
-
+        //std::cout << "Plane to keep : " << planeToKeep << std::endl;
         int nextPlane = planeNeighbours[planeToKeep];   // move on to the next plane
+        //std::cout << "Next plane : " << nextPlane << std::endl;
 
         // Keep the smaller of the two values to match the merge flood
         if(planeToKeep < nextPlane) segmentsConserved.push_back(planeToKeep);
@@ -329,10 +334,15 @@ void Mesh::getSegmentsToKeep(){
         if( nextPlane < planes.size() ) toDiscard = nextPlane + planes.size();
         else toDiscard = nextPlane - planes.size();
 
+        //std::cout << "To discard : " << toDiscard << std::endl;
+
         if(toDiscard==1 || toDiscard==planes.size()+1) break;
 
         // move on to the next plane
         nextPlane = planeNeighbours[toDiscard];
+
+        //std::cout << "Next plane : " << nextPlane << std::endl;
+        //std::cout << " " << std::endl;
 
         // keep the other side
         if( nextPlane < planes.size() ) planeToKeep = nextPlane + planes.size();
