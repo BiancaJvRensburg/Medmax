@@ -105,7 +105,7 @@ void Mesh::glTriangleSmooth(unsigned int i){
     const Triangle & t = triangles[i];
 
     for(unsigned int j = 0 ; j < 3 ; j++ ){
-        //if(cuttingSide==Side::EXTERIOR) getColour(t.getVertex(j));
+        if(cuttingSide==Side::EXTERIOR) getColour(t.getVertex(j));
         glNormal(verticesNormals[t.getVertex(j)]*normalDirection);
         glVertex(smoothedVerticies[t.getVertex(j)]);
     }
@@ -119,7 +119,7 @@ void Mesh::glTriangleFibInMand(unsigned int i){
     //  TODO : normals are all wrong
 
     for(unsigned int j = 0 ; j < 3 ; j++ ){
-        //getColour(t.getVertex(j));
+        getColour(t.getVertex(j));
         glNormal(fibInMandNormals[t.getVertex(j)]*normalDirection);
         glVertex(fibInMandVerticies[t.getVertex(j)]);
     }
@@ -143,15 +143,15 @@ void Mesh::getColour(unsigned int vertex){
 
     if(colour != -1){
         float r,g,b;
-        float c = static_cast<float>(colour);
-        r = ((c+1.f)/nb);
-        g = (c+1.f)/nb + (1.f/3.f);
-        b = (c+1.f)/nb + (2.f/3.f);
+        float c = static_cast<float>(colour) + 1.f;
+        r = c/nb;
+        g = c/nb + (1.f/3.f);
+        b = c/nb + (2.f/3.f);
 
         // mod doesn't work on doubles
-        while(r>nb) r -= nb;
-        while(g>nb) g -= nb;
-        while(b>nb) b -= nb;
+        while(r>1.f) r -= 1.f;
+        while(g>1.f) g -= 1.f;
+        while(b>1.f) b -= 1.f;
 
         // set the colour
         glColor3f(r,g,b);
