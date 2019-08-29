@@ -19,8 +19,6 @@ void ViewerFibula::recieveFromFibulaMesh(std::vector<int> planes, std::vector<Ve
 
     createPolyline();
 
-    std::cout << polyline.size() << std::endl;
-
     // Get the polyline vector in relation to the planes
     v = leftPlane->getPolylineVector(polyline[1]);
     polylineInPlanes.push_back(v);
@@ -34,8 +32,6 @@ void ViewerFibula::recieveFromFibulaMesh(std::vector<int> planes, std::vector<Ve
 
     v = rightPlane->getPolylineVector(polyline[polyline.size()-2]);
     polylineInPlanes.push_back(v);
-
-    std::cout << "Poly in plane size : " << polylineInPlanes.size() << std::endl;
 
     Q_EMIT sendToManible(planes, verticies, triangles, polylineInPlanes, colours, normals, nbColours);
 
@@ -73,7 +69,6 @@ void ViewerFibula::movePlanes(int position){
 
     setPlaneOrientations(angleVectors);
 
-    std::cout << "Updating intersections from move planes" << std::endl;
     if(!isCutInitialising) mesh.updatePlaneIntersections();
 
     update();
@@ -185,7 +180,6 @@ void ViewerFibula::movePlaneDistance(double distance, std::vector<Vec> angles){
 
     setPlaneOrientations(angles);
 
-    std::cout << "Updating intersections from plane distance" << std::endl;
     if(!isCutInitialising) mesh.updatePlaneIntersections(rightPlane);
     update();
 }
@@ -222,7 +216,6 @@ void ViewerFibula::moveGhostPlaneDistance(double distance, std::vector<Vec> angl
 
     setPlaneOrientations(angles);
 
-    std::cout << "Updating intersections from ghost plane distance" << std::endl;
     if(!isCutInitialising) mesh.updatePlaneIntersections(rightPlane);
     update();
 }
@@ -257,7 +250,6 @@ void ViewerFibula::middlePlaneMoved(int nb, double distances[], std::vector<Vec>
     setPlaneOrientations(angles);
 
     // update the mesh intersections
-    std::cout << "Updating intersections from middle moved" << std::endl;
     if(!isCutInitialising) mesh.updatePlaneIntersections(rightPlane);
 
     update();
@@ -320,7 +312,6 @@ void ViewerFibula::handleCut(){
             mesh.addPlane(&ghostPlanes[i]);
         }
 
-        std::cout<<"Cutting fibula"<<std::endl;
         mesh.setIsCut(Side::EXTERIOR, true, false);
         isGhostPlanes = true;
         isCutSignal = false;
@@ -338,11 +329,12 @@ void ViewerFibula::uncutMesh(){
     update();
 }
 
-void ViewerFibula::toHaltMeshUpdate(){
+/*void ViewerFibula::toHaltMeshUpdate(){
     isCutInitialising = true;
 }
 
 void ViewerFibula::toContinueMeshUpdate(){
     isCutInitialising = false;
     mesh.updatePlaneIntersections();
-}
+    update();
+}*/

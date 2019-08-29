@@ -38,8 +38,10 @@ void Viewer::draw() {
     glColor3f(0, 1.0, 0);
     rightPlane->draw();
 
-    glColor3f(0,0,0);
-    for(unsigned int i=0; i<ghostPlanes.size(); i++) ghostPlanes[i].draw();
+    for(unsigned int i=0; i<ghostPlanes.size(); i++){
+        glColor3f(0,0,1.0);
+        ghostPlanes[i].draw();
+    }
 
     //glPolygonMode (GL_FRONT_AND_BACK, GL_LINE);
 
@@ -97,6 +99,7 @@ void Viewer::drawPolyline(){
     glEnd();
 
     glLineWidth(1.0);
+    glColor3f(1.,1.,1.);    // reset the colour
 
     glDisable(GL_DEPTH);
     glDisable(GL_DEPTH_TEST);
@@ -277,7 +280,7 @@ void Viewer::initGhostPlanes(){
         // Update the fibula planes and polyline
         std::vector<Vec> angles = updatePolyline();
 
-        Q_EMIT haltMeshUpdate();
+       // Q_EMIT haltMeshUpdate();
 
         double distance;
         if(finalNb > 0) distance = curve->discreteLength(curveIndexL, ghostLocation[0]);
@@ -287,7 +290,7 @@ void Viewer::initGhostPlanes(){
         else distance = curve->discreteLength(curveIndexL, curveIndexR);
         Q_EMIT rightPosChanged(distance, angles);
 
-        Q_EMIT continueMeshUpdate();
+       // Q_EMIT continueMeshUpdate();
 
     }
     else{
@@ -345,7 +348,6 @@ void Viewer::moveLeftPlane(int position){
     leftPlane->setPosition(curve->getPoint(curveIndexL));
     leftPlane->setOrientation(getNewOrientation(curveIndexL));
 
-    std::cout << "Updating intersections from move plane left" << std::endl;
     mesh.updatePlaneIntersections(leftPlane);
 
     double distance;
@@ -380,7 +382,6 @@ void Viewer::rotateLeftPlane(int position){
     double percentage = static_cast<double>(position) / static_cast<double>(sliderMax);
 
     leftPlane->rotatePlaneXY(percentage);
-    std::cout << "Updating intersections from rotate plane left" << std::endl;
     mesh.updatePlaneIntersections(leftPlane);
     update();
 }
@@ -389,7 +390,6 @@ void Viewer::rotateRightPlane(int position){
     double percentage = static_cast<double>(position) / static_cast<double>(sliderMax);
 
     rightPlane->rotatePlaneXY(percentage);
-    std::cout << "Updating intersections from rotate right" << std::endl;
     mesh.updatePlaneIntersections(rightPlane);
     update();
 }
@@ -413,7 +413,6 @@ void Viewer::moveRightPlane(int position){
     rightPlane->setPosition(curve->getPoint(curveIndexR));
     rightPlane->setOrientation(getNewOrientation(curveIndexR));
 
-    std::cout << "Updating intersections from move plane right" << std::endl;
     mesh.updatePlaneIntersections(rightPlane);
 
     double distance;
@@ -548,7 +547,6 @@ void Viewer::updatePlanes(){
     leftPlane->setOrientation(getNewOrientation(curveIndexL));
     rightPlane->setOrientation(getNewOrientation(curveIndexR));
 
-    std::cout << "Updating intersections from update planes in viewer" << std::endl;
     mesh.updatePlaneIntersections();
 
     update();

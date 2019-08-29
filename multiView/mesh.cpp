@@ -24,7 +24,6 @@ void Mesh::computeBB(){
 void Mesh::update(){
     computeBB();
     recomputeNormals();
-    std::cout << "Updating the mesh" << std::endl;
     updatePlaneIntersections();
 }
 
@@ -67,7 +66,6 @@ Vec3Df Mesh::computeTriangleNormal(unsigned int id ){
 void Mesh::setIsCut(Side s, bool isCut, bool isUpdate){
     this->isCut = isCut;
     this->cuttingSide = s;
-    std::cout << "Setting is cut" << std::endl;
     if(isUpdate) updatePlaneIntersections();
 }
 
@@ -107,7 +105,7 @@ void Mesh::glTriangleSmooth(unsigned int i){
     const Triangle & t = triangles[i];
 
     for(unsigned int j = 0 ; j < 3 ; j++ ){
-        if(cuttingSide==Side::EXTERIOR) getColour(t.getVertex(j));
+        //if(cuttingSide==Side::EXTERIOR) getColour(t.getVertex(j));
         glNormal(verticesNormals[t.getVertex(j)]*normalDirection);
         glVertex(smoothedVerticies[t.getVertex(j)]);
     }
@@ -121,7 +119,7 @@ void Mesh::glTriangleFibInMand(unsigned int i){
     //  TODO : normals are all wrong
 
     for(unsigned int j = 0 ; j < 3 ; j++ ){
-        getColour(t.getVertex(j));
+        //getColour(t.getVertex(j));
         glNormal(fibInMandNormals[t.getVertex(j)]*normalDirection);
         glVertex(fibInMandVerticies[t.getVertex(j)]);
     }
@@ -158,17 +156,16 @@ void Mesh::getColour(unsigned int vertex){
         // set the colour
         glColor3f(r,g,b);
     }
+    else glColor3f(1.0, 1.0, 1.0);
 }
 
 void Mesh::addPlane(Plane *p){
-    std::cout << "Adding plane" << std::endl;
     planes.push_back(p);
     planeNeighbours.push_back(-1);  // This is done once for the neg and once for the pos
     planeNeighbours.push_back(-1);
     std::vector<unsigned int> init;
     intersectionTriangles.push_back(init);
     updatePlaneIntersections(p);
-    //std::cout << "Plane size : " << planeNeighbours.size() << std::endl;
 }
 
 void Mesh::updatePlaneIntersections(){
@@ -186,24 +183,13 @@ void Mesh::updatePlaneIntersections(){
                 }
             }
         }
-        std::cout << "ACTUALLY UPDATING" << std::endl;
         mergeFlood();
-        cutMesh();  // cut it if its already cut
+        cutMesh();
     }
 }
 
 void Mesh::cutMesh(){
     trianglesCut.clear();
-
-    std::cout << "Cutting the actual mesh : ";
-    if(cuttingSide==Side::EXTERIOR) std::cout << "fibula" << std::endl;
-    else std::cout << "manible" << std::endl;
-
-    // TODO : find a better location for this (in meshreader.h)
-    /*coloursIndicies.clear();
-    for(int i=0; i<vertices.size(); i++){
-        coloursIndicies.push_back(-1);
-    }*/
 
     bool truthTriangles[triangles.size()];  // keeps a record of the triangles who are already added
     for(unsigned int i=0; i<triangles.size(); i++) truthTriangles[i] = false;
@@ -222,7 +208,6 @@ void Mesh::cutMesh(){
                     }
                 }
             }
-            //for(int i=0; i<4; i++) std::cout << i << " (interior) : " << planeNeighbours[i] << std::endl;
         break;
 
             // fibula
@@ -237,7 +222,6 @@ void Mesh::cutMesh(){
                     }
                 }
                 if(isKeep){
-                //if(planeNeighbours[flooding[i]]!= -1){
                     // Get the triangles they belong to
                     for(unsigned int j=0; j<vertexTriangles[i].size(); j++){
                         // If it's not already in the list
@@ -248,7 +232,6 @@ void Mesh::cutMesh(){
                     }
                 }
             }
-            //for(int i=0; i<2*planes.size(); i++) std::cout << i << " : " << planeNeighbours[i] << std::endl;
         break;
     }
 
@@ -319,8 +302,6 @@ void Mesh::getSegmentsToKeep(){
         if( nextPlane < planes.size() ) planeToKeep = nextPlane + planes.size();
         else planeToKeep = nextPlane - planes.size();
     }
-
-    //for(int i=0; i<segmentsConserved.size(); i++) std::cout<< i << " : (conserved) " << segmentsConserved[i] << std::endl;
 }
 
 void Mesh::createSmoothedTriangles(){
@@ -513,12 +494,6 @@ void Mesh::sendToManible(){
 
     }
 
-    /*for(int i=0; i<convertedTriangles.size(); i++){
-        for(int j=0; j<3; j++){
-            std::cout << i << " : (plane) " << planeNb[convertedTriangles[i][j]] << " , (vertice) : " << convertedVerticies[convertedTriangles[i][j]][0] << " " << convertedVerticies[convertedTriangles[i][j]][1] << " " << convertedVerticies[convertedTriangles[i][j]][2] << std::endl;
-        }
-    }*/
-
     // Need to send the three initial tables (+ a new table of normals to be dealt with later)
     Q_EMIT sendInfoToManible(planeNb, convertedVerticies, convertedTriangles, convertedColours, convertedNormals, (planes.size()/2));
 }
@@ -530,7 +505,6 @@ void Mesh::recieveInfoFromFibula(std::vector<Vec> convertedVerticies, std::vecto
     fibInMandVerticies.clear();
     fibInMandColour.clear();
     fibInMandNormals.clear();
-    std::cout << "Recieved info" << std::endl;
 
     fibInMandNbColours = nbColours;
 

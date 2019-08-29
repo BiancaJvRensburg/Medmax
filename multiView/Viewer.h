@@ -47,8 +47,8 @@ Q_SIGNALS:
     void sendFibulaToMesh(std::vector<Vec>, std::vector<std::vector<int>>, std::vector<int>, std::vector<Vec3Df>, int);
 
     // Stop the fibula from updating too many times
-    void haltMeshUpdate();
-    void continueMeshUpdate();
+    /*void haltMeshUpdate();
+    void continueMeshUpdate();*/
 
 protected:
     void draw();
