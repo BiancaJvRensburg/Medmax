@@ -181,7 +181,7 @@ void Mesh::deleteGhostPlanes(){
 void Mesh::updatePlaneIntersections(){
     if(isCut){
         flooding.clear();
-        // std::cout << "Actually called " << std::endl;
+        //std::cout << "Actually called " << std::endl;
         for(int i=0; i<vertices.size(); i++) flooding.push_back(-1);
         for(int i=0; i<planeNeighbours.size(); i++) planeNeighbours[i] = -1;
 
@@ -257,7 +257,9 @@ void Mesh::cutMesh(){
     createSmoothedTriangles();
     if(cuttingSide == Side::EXTERIOR){
         fillColours();
-        if(isTransfer) sendToManible();
+        if(isTransfer){
+            sendToManible();
+        }
     }
 
 }

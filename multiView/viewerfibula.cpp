@@ -268,7 +268,6 @@ void ViewerFibula::middlePlaneMoved(int nb, double distances[], std::vector<Vec>
 
     setPlaneOrientations(angles);
 
-    // update the mesh intersections
     mesh.updatePlaneIntersections(rightPlane);
 
     update();
