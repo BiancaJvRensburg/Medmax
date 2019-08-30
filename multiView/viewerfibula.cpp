@@ -141,7 +141,7 @@ void ViewerFibula::setPlaneOrientations(std::vector<Vec> angles){
 
 // Don't wait for ghost planes, go ahead and cut
 void ViewerFibula::noGhostPlanesToRecieve(){
-    //std::cout << "Not going to recieve any " << std::endl;
+    // std::cout << "Not going to recieve any " << std::endl;
     isPlanesRecieved = true;
     handleCut();
 }
@@ -315,7 +315,6 @@ void ViewerFibula::cutMesh(){
 
 void ViewerFibula::handleCut(){
     if(isCutSignal && isPlanesRecieved){
-        //std::cout << "Ghost plane size when cut : " << ghostPlanes.size() << std::endl;
         for(int i=0; i<ghostPlanes.size(); i++){
             mesh.addPlane(&ghostPlanes[i]);
         }

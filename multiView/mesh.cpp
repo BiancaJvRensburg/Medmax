@@ -182,6 +182,7 @@ void Mesh::deleteGhostPlanes(){
 void Mesh::updatePlaneIntersections(){
     if(isCut){
         flooding.clear();
+        // std::cout << "Actually called " << std::endl;
         for(int i=0; i<vertices.size(); i++) flooding.push_back(-1);
         for(int i=0; i<planeNeighbours.size(); i++) planeNeighbours[i] = -1;
 
@@ -297,11 +298,11 @@ void Mesh::getSegmentsToKeep(){
         if(planeNeighbours[1]!=-1) rightPlaneKept = 1;
         else rightPlaneKept = 3;
 
+        // Keep the smallest
         int max;
-        if(planeToKeep>rightPlaneKept) max = planeToKeep;
+        if(planeToKeep<rightPlaneKept) max = planeToKeep;
         else max = rightPlaneKept;
         segmentsConserved.push_back(max);
-        // for(int i=0; i<segmentsConserved.size(); i++) std::cout << "Conserved : " << segmentsConserved[i] << std::endl;
         return;
     }
 
