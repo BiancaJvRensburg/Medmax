@@ -116,8 +116,6 @@ void Mesh::glTriangleSmooth(unsigned int i){
 void Mesh::glTriangleFibInMand(unsigned int i){
     const Triangle & t = fibInMandTriangles[i];
 
-    //  TODO : normals are all wrong
-
     for(unsigned int j = 0 ; j < 3 ; j++ ){
         getColour(t.getVertex(j));
         glNormal(fibInMandNormals[t.getVertex(j)]*normalDirection);
@@ -160,7 +158,6 @@ void Mesh::getColour(unsigned int vertex){
 }
 
 void Mesh::addPlane(Plane *p){
-    //std::cout << "Adding plane" << std::endl;
     planes.push_back(p);
     planeNeighbours.push_back(-1);  // This is done once for the neg and once for the pos
     planeNeighbours.push_back(-1);
@@ -170,13 +167,9 @@ void Mesh::addPlane(Plane *p){
 }
 
 void Mesh::deleteGhostPlanes(){
-    // Delete all ghost planes
-    /*for(int i=2; i<planes.size(); i++){
-
-    }*/
     if(planes.size()==2) return;
 
-    /*std::cout << "Attempting to delete ghost planes" << std::endl;
+    /*
     for (std::vector<Plane*>::iterator pObj = planes.begin()+2; pObj != planes.end(); ++pObj) {
           delete *pObj;
     }*/
@@ -184,12 +177,10 @@ void Mesh::deleteGhostPlanes(){
     // TODO maybe a memory leak?
 
     planes.erase(planes.begin()+2, planes.end());
-   // std::cout<<"Planes left after delete : " << planes.size() << std::endl;
 }
 
 void Mesh::updatePlaneIntersections(){
     if(isCut){
-        //if(cuttingSide==Side::EXTERIOR) std::cout << "ACTUALLY CUTTING fibula" << std::endl;
         flooding.clear();
         for(int i=0; i<vertices.size(); i++) flooding.push_back(-1);
         for(int i=0; i<planeNeighbours.size(); i++) planeNeighbours[i] = -1;
@@ -234,7 +225,6 @@ void Mesh::cutMesh(){
         case Side::EXTERIOR:
             //std::cout << "Cutting fibula" << std::endl;
             getSegmentsToKeep();    // figure out what to keep (TODO can be done earlier)
-            //std::cout << "Segments conserved : " << segmentsConserved.size() << std::endl;
             for(unsigned int i=0; i<flooding.size(); i++){
                 bool isKeep = false;
                 // Only keep it if it belongs to a kept segment
@@ -264,7 +254,6 @@ void Mesh::cutMesh(){
     }
 
     // ! Conserve this order
-    //if(cuttingSide == Side::EXTERIOR) getSegmentsToKeep();
     createSmoothedTriangles();
     if(cuttingSide == Side::EXTERIOR){
         fillColours();
@@ -297,11 +286,8 @@ void Mesh::fillColours(){
 void Mesh::getSegmentsToKeep(){
     segmentsConserved.clear();
 
-    //std::cout << "Plane size : " << planes.size() << std::endl;
-
     // Find the non-discarded side of the left plane
     int planeToKeep;
-    //if(flooding[0]!=-1) planeToKeep = 0;  // this doesn't make sense, this is if the first vertex = -1
     if(planeNeighbours[0]!=-1) planeToKeep = 0; // if it has a neighbour
     else planeToKeep = planes.size();   // keep the otherside if 0 is discared
 
@@ -314,16 +300,14 @@ void Mesh::getSegmentsToKeep(){
         int max;
         if(planeToKeep>rightPlaneKept) max = planeToKeep;
         else max = rightPlaneKept;
-        std::cout << "Max : " << max << std::endl;
         segmentsConserved.push_back(max);
+        // for(int i=0; i<segmentsConserved.size(); i++) std::cout << "Conserved : " << segmentsConserved[i] << std::endl;
         return;
     }
 
     // while we haven't found the right plane
     while(planeToKeep!=1 && planeToKeep!=planes.size()+1){
-        //std::cout << "Plane to keep : " << planeToKeep << std::endl;
         int nextPlane = planeNeighbours[planeToKeep];   // move on to the next plane
-        //std::cout << "Next plane : " << nextPlane << std::endl;
 
         // Keep the smaller of the two values to match the merge flood
         if(planeToKeep < nextPlane) segmentsConserved.push_back(planeToKeep);
@@ -334,15 +318,10 @@ void Mesh::getSegmentsToKeep(){
         if( nextPlane < planes.size() ) toDiscard = nextPlane + planes.size();
         else toDiscard = nextPlane - planes.size();
 
-        //std::cout << "To discard : " << toDiscard << std::endl;
-
         if(toDiscard==1 || toDiscard==planes.size()+1) break;
 
         // move on to the next plane
         nextPlane = planeNeighbours[toDiscard];
-
-        //std::cout << "Next plane : " << nextPlane << std::endl;
-        //std::cout << " " << std::endl;
 
         // keep the other side
         if( nextPlane < planes.size() ) planeToKeep = nextPlane + planes.size();
