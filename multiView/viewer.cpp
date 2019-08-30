@@ -56,6 +56,7 @@ void Viewer::draw() {
 // Updates the polyline vector and angles when a plane is moved (sends the angles to the fibula)
 std::vector<Vec> Viewer::updatePolyline(){
 
+    // NOTE if this is in comments, the planes always line up on the two sides
     // if its not cut / are no ghost planes
     if(!isGhostPlanes){
         std::vector<Vec> angles;
@@ -105,6 +106,10 @@ void Viewer::drawPolyline(){
     glDisable(GL_DEPTH_TEST);
 }
 
+void Viewer::toUpdate(){
+    update();
+}
+
 void Viewer::init() {
   setMouseTracking(true);
 
@@ -131,23 +136,10 @@ void Viewer::init() {
 
 void Viewer::initSignals(){
     connect(this, &Viewer::sendFibulaToMesh, &mesh, &Mesh::recieveInfoFromFibula);
+    connect(&mesh, &Mesh::updateViewer, this, &Viewer::toUpdate);
 }
 
 void Viewer::recieveFromFibulaMesh(std::vector<int> planes, std::vector<Vec> verticies, std::vector<std::vector<int>> triangles, std::vector<Vec> fibulaPolyline, std::vector<int> colours, std::vector<Vec> normals, int nbColours){
-   // Rotate the planes to match the fibula (just the extremities for now)
-   /* Vec mandPolylineSegment;
-    Vec axis;
-    Quaternion s;
-    double anglePoly;
-
-    mandPolylineSegment = polyline[1];
-    anglePoly = angle(mandPolylineSegment, fibulaPolyline[0]);
-    axis = Vec(0,0,1);
-    s = Quaternion(axis, anglePoly);
-    leftPlane->setOrientation(s.normalized());
-
-    std::cout << "Plane rotated" << std::endl;*/
-
     // TODO : Be careful of this!
     /*
      * 0 : left plane
@@ -155,13 +147,37 @@ void Viewer::recieveFromFibulaMesh(std::vector<int> planes, std::vector<Vec> ver
      * n : ghostPlane[n-2]
     */
 
+    // Rotate the planes to match the fibula (just the extremities for now)
+   /* Vec mandPolylineSegment;
+    Vec axis = Vec(0,0,1);
+    Quaternion s;
+    double anglePoly;
+
+    updatePolyline();
+
+    bool isRotated[planes.size()];
+    for(int i=0; i<planes.size(); i++) isRotated[i]=false;*/
+
     // For each vertex and normal, convert it from the corresponding plane's coordinates to the mesh coordinates
     for(unsigned int i=0; i<verticies.size(); i++){
         if(planes[i]==0){
+            //Rotate the plane if it isn't already
+            /*if(!isRotated[planes[i]]){
+                leftPlane->constrainZRotation();
+                leftPlane->setOrientation(Quaternion(fibulaPolyline[0], polyline[1]));
+                isRotated[planes[i]] = true;
+                leftPlane->freeZRotation();
+            }*/
             normals[i] = leftPlane->getMeshVectorFromLocal(normals[i]);
             verticies[i] = leftPlane->getMeshCoordinatesFromLocal(verticies[i]);
         }
         else if(planes[i]==1){
+            /*if(!isRotated[planes[i]]){
+                rightPlane->constrainZRotation();
+                rightPlane->setOrientation(Quaternion(fibulaPolyline[fibulaPolyline.size()-2], polyline[polyline.size()-2]));
+                isRotated[planes[i]] = true;
+                rightPlane->freeZRotation();
+            }*/
             normals[i] = rightPlane->getMeshVectorFromLocal(normals[i]);
             verticies[i] = rightPlane->getMeshCoordinatesFromLocal(verticies[i]);
         }

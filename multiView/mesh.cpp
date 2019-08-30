@@ -146,7 +146,6 @@ void Mesh::getColour(unsigned int vertex){
         g = c/nb + (1.f/3.f);
         b = c/nb + (2.f/3.f);
 
-        // mod doesn't work on doubles
         while(r>1.f) r -= 1.f;
         while(g>1.f) g -= 1.f;
         while(b>1.f) b -= 1.f;
@@ -258,7 +257,7 @@ void Mesh::cutMesh(){
     createSmoothedTriangles();
     if(cuttingSide == Side::EXTERIOR){
         fillColours();
-        sendToManible();
+        if(isTransfer) sendToManible();
     }
 
 }
@@ -549,6 +548,8 @@ void Mesh::recieveInfoFromFibula(std::vector<Vec> convertedVerticies, std::vecto
         Triangle t = Triangle(convertedTriangles[i][0], convertedTriangles[i][1], convertedTriangles[i][2]);
         fibInMandTriangles.push_back(t);
     }
+
+    Q_EMIT updateViewer();
 }
 
 void Mesh::draw()

@@ -14,6 +14,7 @@ public:
 
 public Q_SLOTS:
     void movePlanes(int);
+    void planesMoved();
     void movePlaneDistance(double, std::vector<Vec>);
     void moveGhostPlaneDistance(double, std::vector<Vec>);
     void ghostPlanesRecieved(int, double[], std::vector<Vec>);

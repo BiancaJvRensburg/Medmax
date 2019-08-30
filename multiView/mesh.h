@@ -44,7 +44,8 @@ public:
     void updatePlaneIntersections(Plane *p);
 
     void addPlane(Plane *p);
-
+    void setTransfer(bool isTransfer){ this->isTransfer = isTransfer; }
+    void sendToManible();
     void setIsCut(Side s, bool isCut, bool isUpdate);
     void drawCut();
 
@@ -57,6 +58,7 @@ public Q_SLOTS:
 
 Q_SIGNALS:
     void sendInfoToManible(std::vector<int>, std::vector<Vec>, std::vector<std::vector<int>>, std::vector<int>, std::vector<Vec>, int);
+    void updateViewer();
 
 protected:
     void init();
@@ -82,8 +84,6 @@ protected:
     void cutMesh();
     void fillColours();
     void deleteGhostPlanes();
-
-    void sendToManible();
 
     std::vector <Vec3Df> vertices;      // starting verticies
     std::vector <Triangle> triangles;       // starting triangles
@@ -120,6 +120,8 @@ protected:
     Vec3Df BBMax;
     Vec3Df BBCentre;
     float radius;
+
+    bool isTransfer = true;
 
     int normalDirection;
 };

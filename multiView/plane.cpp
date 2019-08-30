@@ -6,6 +6,8 @@ Plane::Plane(double s, Movable status)
     size = s;
     rotationPercentage = 0;
     normal = Vec(0, 0, 1);
+    constraint.setRotationConstraint(AxisPlaneConstraint::AXIS, Vec(0,0,1));
+    constraintFree.setRotationConstraint(AxisPlaneConstraint::FREE, Vec(0,0,1));
 
     this->status = status;
 

@@ -117,6 +117,7 @@ void MainWindow::initDisplayDockWidgets(){
 
     // Connect the fibula slider
     connect(fibulaSlider, static_cast<void (QSlider::*)(int)>(&QSlider::sliderMoved), fibulaViewer, &ViewerFibula::movePlanes);
+    connect(fibulaSlider, &QSlider::sliderReleased, fibulaViewer, &ViewerFibula::planesMoved);
     connect(fibulaViewer, &ViewerFibula::setPlaneSliderValue, fibulaSlider, &QSlider::setValue);
 
     // Connect the two views

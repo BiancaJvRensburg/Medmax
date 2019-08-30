@@ -18,7 +18,7 @@ void ViewerFibula::recieveFromFibulaMesh(std::vector<int> planes, std::vector<Ve
 
     createPolyline();
 
-    // Get the polyline vector in relation to the planes
+    // Get the polyline vector in relation to the planes (in order of the planes)
     v = leftPlane->getPolylineVector(polyline[1]);
     polylineInPlanes.push_back(v);
 
@@ -68,10 +68,17 @@ void ViewerFibula::movePlanes(int position){
 
     setPlaneOrientations(angleVectors);
 
+    mesh.setTransfer(false);
     mesh.updatePlaneIntersections();
 
     update();
 
+}
+
+void ViewerFibula::planesMoved(){
+    mesh.setTransfer(true);
+    mesh.sendToManible();
+    update();
 }
 
 // Add the ghost planes (this should only be called once)
@@ -95,7 +102,6 @@ void ViewerFibula::addGhostPlanes(int nb){
 
     update();
 }
-
 
 // Find the locations of the ghost planes from the distances from the planes in the mandible
 void ViewerFibula::findGhostLocations(int nb, double distance[]){
@@ -141,17 +147,15 @@ void ViewerFibula::setPlaneOrientations(std::vector<Vec> angles){
 
 // Don't wait for ghost planes, go ahead and cut
 void ViewerFibula::noGhostPlanesToRecieve(){
-    // std::cout << "Not going to recieve any " << std::endl;
     isPlanesRecieved = true;
     handleCut();
 }
 
 // Add ghost planes that correspond to the ghost planes in the jaw
 void ViewerFibula::ghostPlanesRecieved(int nb, double distance[], std::vector<Vec> angles){
-    //std::cout << "Nb of ghost planes recieved : " << nb << std::endl;
     // if no ghost planes were actually recieved
     if(nb==0){
-        ghostPlanes.clear();
+        ghostPlanes.clear();        // TODO look at this (call noGhostPlanesToRecieve?)
         return;
     }
 
