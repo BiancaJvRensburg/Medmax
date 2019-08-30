@@ -44,10 +44,12 @@ public:
     void updatePlaneIntersections(Plane *p);
 
     void addPlane(Plane *p);
+    void deleteGhostPlanes();
     void setTransfer(bool isTransfer){ this->isTransfer = isTransfer; }
     void sendToManible();
     void setIsCut(Side s, bool isCut, bool isUpdate);
     void drawCut();
+    bool getIsCut(){ return isCut; }
 
     typedef std::priority_queue< std::pair< float , int > , std::deque< std::pair< float , int > > , std::greater< std::pair< float , int > > > FacesQueue;
 
@@ -83,7 +85,6 @@ protected:
 
     void cutMesh();
     void fillColours();
-    void deleteGhostPlanes();
 
     std::vector <Vec3Df> vertices;      // starting verticies
     std::vector <Triangle> triangles;       // starting triangles

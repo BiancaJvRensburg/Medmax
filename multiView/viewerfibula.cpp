@@ -156,8 +156,11 @@ void ViewerFibula::ghostPlanesRecieved(int nb, double distance[], std::vector<Ve
     // if no ghost planes were actually recieved
     if(nb==0){
         ghostPlanes.clear();        // TODO look at this (call noGhostPlanesToRecieve?)
+        mesh.deleteGhostPlanes();
         return;
     }
+
+    int oldNb = ghostPlanes.size() / 2;
 
     findGhostLocations(nb, distance);
 
@@ -168,9 +171,14 @@ void ViewerFibula::ghostPlanesRecieved(int nb, double distance[], std::vector<Ve
     // Once everything is initialised, adjust the rotation
     setPlaneOrientations(angles);
 
+    // If its cut and the number of planes has changed
+    if(mesh.getIsCut() && nb!=oldNb){
+        mesh.deleteGhostPlanes();
+        cutMesh();
+    }
+
     isPlanesRecieved = true;
     handleCut();
-    //cutMesh();
 }
 
 // When we want to move the right plane (the right plane is moved in the jaw)
@@ -314,17 +322,19 @@ void ViewerFibula::initCurve(){
 void ViewerFibula::cutMesh(){
     isCutSignal = true;
     handleCut();
-    update();
+    //update();
 }
 
 void ViewerFibula::handleCut(){
     if(isCutSignal && isPlanesRecieved){
-        for(int i=0; i<ghostPlanes.size(); i++){
+
+        for(unsigned int i=0; i<ghostPlanes.size(); i++){
             mesh.addPlane(&ghostPlanes[i]);
         }
 
         if(ghostPlanes.size()==0) mesh.setIsCut(Side::EXTERIOR, true, true);    // call the update if an exterior plane isn't going to
         else mesh.setIsCut(Side::EXTERIOR, true, false);
+
         isGhostPlanes = true;
         isCutSignal = false;
         isPlanesRecieved = false;
